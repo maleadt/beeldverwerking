@@ -1,20 +1,42 @@
+%
+% Configuratie
+%
+
+% Preambule met standaardinstellingen
 \documentclass[]{book}
 
+% Noot: zorg ervoor dat Nederlandse woord-splitsing geactiveerd is.
 \usepackage[dutch]{babel}
+
+% UTF8 gebruiken voor gebruik van alle symbolen
+\usepackage[utf8]{inputenc}
+
+% Andere pakketten
 \usepackage{a4}
 \usepackage{amsmath}
 \usepackage[pdftex]{graphicx}
 
+% Margin instellingen
 \topmargin -0.5in \textheight 9.0in \oddsidemargin 0.0in
 \evensidemargin 0.0in \textwidth 6.5in
 \graphicspath{{images/}}
 
 \begin{document}
 
+
+%
+% Titelpagina
+%
+
 \title{Tram Collision Avoidance}
 \author{Tim BESARD \and Sebastiaan LABIJN \and Dimitri ROOSE \and Ruben SCHOLLAERT}
 \date{ }
 \maketitle
+
+
+%
+% Inhoud
+%
 
 \section{Kerngegevens}\label{sec:kerngegevens}
 
@@ -143,7 +165,7 @@ In de onderstaande tabel geeft u schematisch de timing en het aantal mensuren di
 
 % Zeg ook kort hoe de organisatie van het project zal verlopen. Wie co\"ordineert het project? Hoe verloopt de communicatie (via email, samenkomsten, \ldots) Wie rapporteert wanneer aan wie? Wordt er gebruik gemaakt van de Dokeos site?
 
-Het verloop van het project zal hoofdzakelijk democratisch bepaald worden. Zo hebben alle medewerkers evenwaardige toegang tot de centrale code-repository. De gebruikte service hiervoor kent echter een veel bredere functionaliteitswaaier, die de teamleden zal toelaten op efficiënte wijze te communiceren en overleggen over het verloop van het project. Zo wordt bijvoorbeeld voorzien in een wikipedia-achtige sectie, dat kan gebruikt worden om bepaalde algoritmes uit te doeken te doen, of om snel informatie neer te pennen die dan in een later stadium in het verslag kan verwerk worden. Ook voorziet dezelfde service in mogelijkheden om commentaar in te sturen over bepaalde codefragmenten of -toevoegingen, zodat het eenvoudig is om in team constructief te discussi\"eren over het specifieke verloop van een bepaald projectgedeelte.
+Het verloop van het project zal hoofdzakelijk democratisch bepaald worden. Zo hebben alle medewerkers evenwaardige toegang tot de centrale code-repository. De gebruikte service hiervoor kent echter een veel bredere functionaliteitswaaier, die de teamleden zal toelaten op efficiënte wijze te communiceren en overleggen over het verloop van het project. Zo wordt bijvoorbeeld voorzien in een wikipedia-achtige sectie, dat kan gebruikt worden om bepaalde algoritmes uit te doeken te doen, of om snel informatie neer te pennen die dan in een later stadium in het verslag kan verwerk worden. Ook voorziet dezelfde service in mogelijkheden om commentaar in te sturen over bepaalde codefragmenten of -toevoegingen, zodat het eenvoudig is om in team constructief te discussiëren over het specifieke verloop van een bepaald projectgedeelte.
 
 
 \section{Nut van de resultaten}\label{sec:Nut}
@@ -152,17 +174,17 @@ Het verloop van het project zal hoofdzakelijk democratisch bepaald worden. Zo he
 
 \emph{Hoe} zullen we de \emph{projectresultaten kunnen gebruiken}? Wat is bijvoorbeeld de meerwaarde voor studenten die in een volgende academiejaar dergelijke projecten zullen maken? Kunnen we de resultaten gebruiken op opendeurdagen? Kan het gebruikt worden in thesissen? Kan een programma enkel gebruikt worden door de auteurs van het programma of ook door leken, kinderen, scholieren?
 
-Beschrijf  ook op een kwalitatieve en indien mogelijk op een kwantitatieve wijze de bredere doelgroep die ge\"interesseerd kan zijn in de resultaten van het project. Welke toegevoegde waarde kan het project hen bieden?  Indien zinvol kan u bepaalde categorie\"en gebruikers defini\"eren en voor elke categorie de specifieke voordelen beschrijven. Wees hierbij zo concreet mogelijk. 
+Beschrijf  ook op een kwalitatieve en indien mogelijk op een kwantitatieve wijze de bredere doelgroep die geïnteresseerd kan zijn in de resultaten van het project. Welke toegevoegde waarde kan het project hen bieden?  Indien zinvol kan u bepaalde categorieën gebruikers definiëren en voor elke categorie de specifieke voordelen beschrijven. Wees hierbij zo concreet mogelijk. 
 
 \subsection{Overdracht van kennis aan de gebruikers}\label{sec:Overdracht}
 
-% Een project heeft geen enkel nut als de resultaten niet kenbaar gemaakt worden. Bovendien moeten de resultaten onder een bruikbare vorm beschikbaar worden gesteld. Welke maatregelen zal u nemen om de kennis en de projectresultaten eventueel over te kunnen dragen aan de ge\"interesseerde gebruikers? (Presentaties, rapportering, demonstraties op opendeurdagen, internetsite, CD, \ldots) 
+% Een project heeft geen enkel nut als de resultaten niet kenbaar gemaakt worden. Bovendien moeten de resultaten onder een bruikbare vorm beschikbaar worden gesteld. Welke maatregelen zal u nemen om de kennis en de projectresultaten eventueel over te kunnen dragen aan de geïnteresseerde gebruikers? (Presentaties, rapportering, demonstraties op opendeurdagen, internetsite, CD, \ldots) 
 
 Om de kennis opgedaan met dit project over te dragen aan andere gebruikers, zullen we voorzien in verschillende hulpmiddellen, zowel theoretisch als concreet.
 
 Het theoretische aspect wordt verzorgd door een paper die de beslissingen en overwegingen nodig om tot het begoogde resultaat te bekomen, voldoende uit de doeken doet. Zo zal een gebruiker probleemloos kunnen nalezen waartoe een bepaald algoritme toegepast is, alsook waarom we het verkozen hebben boven andere alternatieven.
 
-Het praktisch aspect wordt verwezenlijkt door de geschreven code in herbruikbare vorm publiek beschikbaar te maken. Zo zal duidelijk worden hoe de gekozen algoritmen exact zijn toegepast, en hoe ze gecombineerd zijn om een sluitend geheel te vormen. De code zal ook gebundeld zijn met voorbeelden zodat de gebruiken eenvoudig in staat is om de werking van het pakket te verifi\"eren.
+Het praktisch aspect wordt verwezenlijkt door de geschreven code in herbruikbare vorm publiek beschikbaar te maken. Zo zal duidelijk worden hoe de gekozen algoritmen exact zijn toegepast, en hoe ze gecombineerd zijn om een sluitend geheel te vormen. De code zal ook gebundeld zijn met voorbeelden zodat de gebruiken eenvoudig in staat is om de werking van het pakket te verifiëren.
 
 Tenslotte wordt ook voorzien in een presentatie, die zowel het theoretische als het meer praktische van het project oppervlakkig aanraakt om een nieuwe gebruiker een algemeen beeld te geven over het doel en werking van het project.
 
