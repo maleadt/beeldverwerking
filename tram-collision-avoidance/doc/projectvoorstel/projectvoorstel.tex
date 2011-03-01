@@ -121,9 +121,11 @@ Het gebeurt echter ook geregeld dat een tram botst met vreemde objecten, zoals a
 
 % Duid bij een aantal werkpakketten ook de deliverables aan (software programma's, presentaties, documenten, software testen, \ldots). Wees daarbij zo concreet mogelijk (Wat is de input van het programma, wat is de output, hoe wordt het getest, wanneer is het klaar, is er feedback mogelijk door gebruikers?) Duid aan welke werkpakketten essentieel zijn voor het welslagen van het project. Welke werkpakketten liggen op het kritisch pad voor het eindresultaat. Welke werkpakketten zijn van secundair belang en kunnen tijdens de uitvoering weggesnoeid worden om tijd te winnen.
 
-\paragraph{WP1}
+\paragraph{Werkpakket 1 - Tramspoor detectie (30 uur)}
 
-Het eerste werkpakket bestaat eruit om de sporen te detecteren voor de tram. Dit werkpakket is van kritiek belang, daar verschillende van de andere werkpakketten berusten op de correcte werking ervan.
+Het eerste werkpakket bestaat eruit om de sporen te detecteren voor de tram. Hiertoe zullen we edge-detection algoritmes toepassen (zoals Sobelfilters), waarna we de effectieve lijnen kunnen extraheren (met vb. de Canny edge detector). De meest courante algoritmen detecteren echter enkel rechte lijnen, terwijl tramsporen best gebogen kunnen zijn (hetzij beperkt). Er zal moeten onderzocht worden of er rond die beperkte kromming kan gewerkt worden, bijvoorbeeld door meerdere kortere lijnen te verbinden, of dat er een geavanceerder algoritme zal benodigd zijn.
+
+Dit werkpakket is van kritiek belang, daar verschillende van de andere werkpakketten berusten op de correcte werking ervan. Om de andere werkpakketen toch toe te laten reeds te starten zonder dat dit pakket afgewerkt is, zal duidelijk moeten afgesproken worden onder welke vorm het uiteindelijke resultaat zal doorgegeven worden. Dit kan bijvoorbeeld onder de vorm van een puntencollectie, of beter, door een enkel object dat een set Tramsporen voorstelt, en voor elk van de twee sporen daarbij een collectie lijnstukken bevat.
 
 \paragraph{WP2}
 
