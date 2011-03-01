@@ -133,7 +133,7 @@ Dit werkpakket is van kritiek belang, daar verschillende van de andere werkpakke
 
 \paragraph{Werkpakket 4 - Blokkerend opbject detecteren (40 uur)}
 
-Om mensen of auto's op de sporen te herkennen zouden we kunnen werken met een simpele herkenning op basis van een verzameling of vector van descriptoren. De verschillende features die we zouden kunnen gebruiken zijn bv verhouden van hoofd tov lichaam, of de vorm van een auto (hier kunnen we dan wel al snel overeenkomsten ontstaan met een simpele betonblok). Eenmaal deze vectoren zijn opgesteld kunnen we de afstand naar de vooropgestelde klassen berekenen van een onbekend patroon om het type te bekomen. Maar omdat mensen \& auto's in allerlei vormen bestaan (grote/kleine mensen, kleine persoonswagen, bus, ...) is het best mogelijk dat we niet zomaar een verzameling van descriptoren kunnen opstellen.
+Om mensen of auto's op de sporen te herkennen zouden we kunnen werken met een simpele herkenning op basis van een verzameling of vector van descriptoren. De verschillende features die we zouden kunnen gebruiken zijn bv verhoudingen van hoofd tov lichaam, of de vorm van een auto. Eenmaal deze vectoren zijn opgesteld kunnen we de afstand naar de vooropgestelde klassen berekenen van een onbekend patroon om het type te bekomen. Maar omdat mensen \& auto's in allerlei vormen bestaan (grote/kleine mensen, kleine persoonswagen, bus, ...) is het best mogelijk dat we niet zomaar een verzameling van descriptoren kunnen opstellen.
 
 Een andere optie is HAAR-training. Hiervoor zullen we meerdere voorbeelden van allerlei personen en voertuigen moeten aanmaken, deze voorbeelden kunnen we dan gebruiken om te trainen en uiteindelijk kunnen we dan het resultaat testen met niet eerder gebruikte beelden. OpenCV heeft zelf een ingebouwd systeem om deze traning door te voeren. Hier hebben we ook weer een beperkte verzameling nodig van descriptoren.
 
@@ -180,9 +180,12 @@ Het verloop van het project zal hoofdzakelijk democratisch bepaald worden. Zo he
 
 \subsection{Beschrijving van het nut}\label{sec:BeschrijvingNut}
 
-\emph{Hoe} zullen we de \emph{projectresultaten kunnen gebruiken}? Wat is bijvoorbeeld de meerwaarde voor studenten die in een volgende academiejaar dergelijke projecten zullen maken? Kunnen we de resultaten gebruiken op opendeurdagen? Kan het gebruikt worden in thesissen? Kan een programma enkel gebruikt worden door de auteurs van het programma of ook door leken, kinderen, scholieren?
+%\emph{Hoe} zullen we de \emph{projectresultaten kunnen gebruiken}? Wat is bijvoorbeeld de meerwaarde voor studenten die in een volgende academiejaar dergelijke projecten zullen maken? Kunnen we de resultaten gebruiken op opendeurdagen? Kan het gebruikt worden in thesissen? Kan een programma enkel gebruikt worden door de auteurs van het programma of ook door leken, kinderen, scholieren?
 
-Beschrijf  ook op een kwalitatieve en indien mogelijk op een kwantitatieve wijze de bredere doelgroep die geïnteresseerd kan zijn in de resultaten van het project. Welke toegevoegde waarde kan het project hen bieden?  Indien zinvol kan u bepaalde categorieën gebruikers definiëren en voor elke categorie de specifieke voordelen beschrijven. Wees hierbij zo concreet mogelijk. 
+%Beschrijf  ook op een kwalitatieve en indien mogelijk op een kwantitatieve wijze de bredere doelgroep die geïnteresseerd kan zijn in de resultaten van het project. Welke toegevoegde waarde kan het project hen bieden?  Indien zinvol kan u bepaalde categorieën gebruikers definiëren en voor elke categorie de specifieke voordelen beschrijven. Wees hierbij zo concreet mogelijk. 
+
+Het uitgewerkte project zal een applicatie zijn die kan gebruikt worden door \emph{De Lijn}, deze applicatie kan dan gekoppeld worden aan een alarm of automatisch stopsysteem als een collision gedetecteerd wordt. Aangezien dit project specifiek toegepast wordt op tramsporen en trams van \emph{De Lijn} kan het niet zomaar toegepast worden voor andere doeleinden, wel zal elk apart werkpunt kunnen gebruikt worden buiten het project.
+Zo kan men werkpunt 4 gebruiken om ook bij andere voertuigen voetgangers of andere blokkerende objecten te detecteren.
 
 \subsection{Overdracht van kennis aan de gebruikers}\label{sec:Overdracht}
 
