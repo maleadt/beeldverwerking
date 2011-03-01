@@ -131,7 +131,13 @@ Dit werkpakket is van kritiek belang, daar verschillende van de andere werkpakke
 
 \paragraph{WP3}
 
-\paragraph{WP4}
+\paragraph{Werkpakket 4 - Blokkerend opbject detecteren (40 uur)}
+
+Om mensen of auto's op de sporen te herkennen zouden we kunnen werken met een simpele herkenning op basis van een verzameling of vector van descriptoren. De verschillende features die we zouden kunnen gebruiken zijn bv verhouden van hoofd tov lichaam, of de vorm van een auto (hier kunnen we dan wel al snel overeenkomsten ontstaan met een simpele betonblok). Eenmaal deze vectoren zijn opgesteld kunnen we de afstand naar de vooropgestelde klassen berekenen van een onbekend patroon om het type te bekomen. Maar omdat mensen \& auto's in allerlei vormen bestaan (grote/kleine mensen, kleine persoonswagen, bus, ...) is het best mogelijk dat we niet zomaar een verzameling van descriptoren kunnen opstellen.
+
+Een andere optie is HAAR-training. Hiervoor zullen we meerdere voorbeelden van allerlei personen en voertuigen moeten aanmaken, deze voorbeelden kunnen we dan gebruiken om te trainen en uiteindelijk kunnen we dan het resultaat testen met niet eerder gebruikte beelden. OpenCV heeft zelf een ingebouwd systeem om deze traning door te voeren. Hier hebben we ook weer een beperkte verzameling nodig van descriptoren.
+
+Om voetgangers op de sporen te detecteren kunnen we gebruik maken van een functie in de laatste versie van OpenCV. Deze bevat namelijk een HOG(histogram of oriented gradients)-gebaseerde implementatie om voetgangers te detecteren.
 
 \subsection{Projectplanning}\label{sec:Projectplanning}
 
@@ -186,7 +192,7 @@ Om de kennis opgedaan met dit project over te dragen aan andere gebruikers, zull
 
 Het theoretische aspect wordt verzorgd door een paper die de beslissingen en overwegingen nodig om tot het begoogde resultaat te bekomen, voldoende uit de doeken doet. Zo zal een gebruiker probleemloos kunnen nalezen waartoe een bepaald algoritme toegepast is, alsook waarom we het verkozen hebben boven andere alternatieven.
 
-Het praktisch aspect wordt verwezenlijkt door de geschreven code in herbruikbare vorm publiek beschikbaar te maken. Zo zal duidelijk worden hoe de gekozen algoritmen exact zijn toegepast, en hoe ze gecombineerd zijn om een sluitend geheel te vormen. De code zal ook gebundeld zijn met voorbeelden zodat de gebruiken eenvoudig in staat is om de werking van het pakket te verifiëren.
+Het praktisch aspect wordt verwezenlijkt door de geschreven code in herbruikbare vorm publiek beschikbaar te maken. Zo zal duidelijk worden hoe de gekozen algoritmen exact zijn toegepast, en hoe ze gecombineerd zijn om een sluitend geheel te vormen. De code zal ook gebundeld zijn met voorbeelden zodat de gebruiker eenvoudig in staat is om de werking van het pakket te verifiëren.
 
 Tenslotte wordt ook voorzien in een presentatie, die zowel het theoretische als het meer praktische van het project oppervlakkig aanraakt om een nieuwe gebruiker een algemeen beeld te geven over het doel en werking van het project.
 
