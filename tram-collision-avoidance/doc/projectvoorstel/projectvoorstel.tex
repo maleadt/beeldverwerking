@@ -127,8 +127,20 @@ Het eerste werkpakket bestaat eruit om de sporen te detecteren voor de tram. Hie
 
 Dit werkpakket is van kritiek belang, daar verschillende van de andere werkpakketten berusten op de correcte werking ervan. Om de andere werkpakketen toch toe te laten reeds te starten zonder dat dit pakket afgewerkt is, zal duidelijk moeten afgesproken worden onder welke vorm het uiteindelijke resultaat zal doorgegeven worden. Dit kan bijvoorbeeld onder de vorm van een puntencollectie, of beter, door een enkel object dat een set Tramsporen voorstelt, en voor elk van de twee sporen daarbij een collectie lijnstukken bevat.
 
-\paragraph{WP2}
+\paragraph{Werkpakket 2 - Tramdetectie (50 uur)}
+De trams dienen herkend te worden in de opeenvolgende frames. Er zijn verschillende technieken mogelijk om dit te verwezenlijken. Om een overzicht te krijgen over de efficiëntie van de technieken worden er enkele geïmplementeerd. Deze worden dan uitvoerig getest en aan de hand van de testresultaten.
+\\\\
+Een eerste manier is gebruik maken van template matching technieken.
+Template matching kan nog eens worden onderverdeeld in twee benaderingen: feature-based en template-gebaseerde matching. 
 
+De feature-based benadering maakt gebruik van de kenmerken van het zoek-en sjabloonafbeelding, zoals randen of hoeken, om de best passende locatie van het sjabloon in de bronafbeelding te zoeken.
+De template-based, of mondiale aanpak, maakt gebruik van het gehele sjabloon.
+Aan de hand van somvergelijkingen van metrische waarden zoals cross-correlatie, vierkantswortels of 
+verschillen in absolute waarden, ken men opnieuw de meest levensvatbare plaats voor het sjabloon in de bronafbeelding vinden.
+ 
+Als het sjabloon sterke kenmerken heeft, kan een feature-based aanpak worden overwogen. Aangezien deze aanpak geen rekening houdt met het geheel van het sjabloon, kan dit leiden tot een hogere computationele efficiëntie.
+
+Voor sjablonen zonder sterke kenmerken kan een template-gebaseerde benadering efficiënt zijn. Aangezien template-gebaseerde sjabloon matching mogelijks het bemonsteren van een groot aantal punten vereist kan men dit verminderen door de resolutie de zoek- en sjabloon afbeelding te verminderen met dezelfde factor en op deze afgeslankte afbeeldingen het algoritme uit te voeren.
 \paragraph{WP3}
 
 \paragraph{WP4}
