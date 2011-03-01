@@ -143,7 +143,13 @@ Als het sjabloon sterke kenmerken heeft, kan een feature-based aanpak worden ove
 Voor sjablonen zonder sterke kenmerken kan een template-gebaseerde benadering efficiënt zijn. Aangezien template-gebaseerde sjabloon matching mogelijks het bemonsteren van een groot aantal punten vereist kan men dit verminderen door de resolutie de zoek- en sjabloon afbeelding te verminderen met dezelfde factor en op deze afgeslankte afbeeldingen het algoritme uit te voeren.
 \paragraph{WP3}
 
-\paragraph{WP4}
+\paragraph{Werkpakket 4 - Blokkerend opbject detecteren (40 uur)}
+
+Om mensen of auto's op de sporen te herkennen zouden we kunnen werken met een simpele herkenning op basis van een verzameling of vector van descriptoren. De verschillende features die we zouden kunnen gebruiken zijn bv verhoudingen van hoofd tov lichaam, of de vorm van een auto. Eenmaal deze vectoren zijn opgesteld kunnen we de afstand naar de vooropgestelde klassen berekenen van een onbekend patroon om het type te bekomen. Maar omdat mensen \& auto's in allerlei vormen bestaan (grote/kleine mensen, kleine persoonswagen, bus, ...) is het best mogelijk dat we niet zomaar een verzameling van descriptoren kunnen opstellen.
+
+Een andere optie is HAAR-training. Hiervoor zullen we meerdere voorbeelden van allerlei personen en voertuigen moeten aanmaken, deze voorbeelden kunnen we dan gebruiken om te trainen en uiteindelijk kunnen we dan het resultaat testen met niet eerder gebruikte beelden. OpenCV heeft zelf een ingebouwd systeem om deze traning door te voeren. Hier hebben we ook weer een beperkte verzameling nodig van descriptoren.
+
+Om voetgangers op de sporen te detecteren kunnen we gebruik maken van een functie in de laatste versie van OpenCV. Deze bevat namelijk een HOG(histogram of oriented gradients)-gebaseerde implementatie om voetgangers te detecteren.
 
 \subsection{Projectplanning}\label{sec:Projectplanning}
 
@@ -186,9 +192,12 @@ Het verloop van het project zal hoofdzakelijk democratisch bepaald worden. Zo he
 
 \subsection{Beschrijving van het nut}\label{sec:BeschrijvingNut}
 
-\emph{Hoe} zullen we de \emph{projectresultaten kunnen gebruiken}? Wat is bijvoorbeeld de meerwaarde voor studenten die in een volgende academiejaar dergelijke projecten zullen maken? Kunnen we de resultaten gebruiken op opendeurdagen? Kan het gebruikt worden in thesissen? Kan een programma enkel gebruikt worden door de auteurs van het programma of ook door leken, kinderen, scholieren?
+%\emph{Hoe} zullen we de \emph{projectresultaten kunnen gebruiken}? Wat is bijvoorbeeld de meerwaarde voor studenten die in een volgende academiejaar dergelijke projecten zullen maken? Kunnen we de resultaten gebruiken op opendeurdagen? Kan het gebruikt worden in thesissen? Kan een programma enkel gebruikt worden door de auteurs van het programma of ook door leken, kinderen, scholieren?
 
-Beschrijf  ook op een kwalitatieve en indien mogelijk op een kwantitatieve wijze de bredere doelgroep die geïnteresseerd kan zijn in de resultaten van het project. Welke toegevoegde waarde kan het project hen bieden?  Indien zinvol kan u bepaalde categorieën gebruikers definiëren en voor elke categorie de specifieke voordelen beschrijven. Wees hierbij zo concreet mogelijk. 
+%Beschrijf  ook op een kwalitatieve en indien mogelijk op een kwantitatieve wijze de bredere doelgroep die geïnteresseerd kan zijn in de resultaten van het project. Welke toegevoegde waarde kan het project hen bieden?  Indien zinvol kan u bepaalde categorieën gebruikers definiëren en voor elke categorie de specifieke voordelen beschrijven. Wees hierbij zo concreet mogelijk. 
+
+Het uitgewerkte project zal een applicatie zijn die kan gebruikt worden door \emph{De Lijn}, deze applicatie kan dan gekoppeld worden aan een alarm of automatisch stopsysteem als een collision gedetecteerd wordt. Aangezien dit project specifiek toegepast wordt op tramsporen en trams van \emph{De Lijn} kan het niet zomaar toegepast worden voor andere doeleinden, wel zal elk apart werkpunt kunnen gebruikt worden buiten het project.
+Zo kan men werkpunt 4 gebruiken om ook bij andere voertuigen voetgangers of andere blokkerende objecten te detecteren.
 
 \subsection{Overdracht van kennis aan de gebruikers}\label{sec:Overdracht}
 
@@ -198,7 +207,7 @@ Om de kennis opgedaan met dit project over te dragen aan andere gebruikers, zull
 
 Het theoretische aspect wordt verzorgd door een paper die de beslissingen en overwegingen nodig om tot het begoogde resultaat te bekomen, voldoende uit de doeken doet. Zo zal een gebruiker probleemloos kunnen nalezen waartoe een bepaald algoritme toegepast is, alsook waarom we het verkozen hebben boven andere alternatieven.
 
-Het praktisch aspect wordt verwezenlijkt door de geschreven code in herbruikbare vorm publiek beschikbaar te maken. Zo zal duidelijk worden hoe de gekozen algoritmen exact zijn toegepast, en hoe ze gecombineerd zijn om een sluitend geheel te vormen. De code zal ook gebundeld zijn met voorbeelden zodat de gebruiken eenvoudig in staat is om de werking van het pakket te verifiëren.
+Het praktisch aspect wordt verwezenlijkt door de geschreven code in herbruikbare vorm publiek beschikbaar te maken. Zo zal duidelijk worden hoe de gekozen algoritmen exact zijn toegepast, en hoe ze gecombineerd zijn om een sluitend geheel te vormen. De code zal ook gebundeld zijn met voorbeelden zodat de gebruiker eenvoudig in staat is om de werking van het pakket te verifiëren.
 
 Tenslotte wordt ook voorzien in een presentatie, die zowel het theoretische als het meer praktische van het project oppervlakkig aanraakt om een nieuwe gebruiker een algemeen beeld te geven over het doel en werking van het project.
 
