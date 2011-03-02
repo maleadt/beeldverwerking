@@ -143,7 +143,12 @@ Als het sjabloon sterke kenmerken heeft, kan een feature-based aanpak worden ove
 Voor sjablonen zonder sterke kenmerken kan een template-gebaseerde benadering efficiënt zijn. Aangezien template-gebaseerde sjabloon matching mogelijks het bemonsteren van een groot aantal punten vereist kan men dit verminderen door de resolutie de zoek- en sjabloon afbeelding te verminderen met dezelfde factor en op deze afgeslankte afbeeldingen het algoritme uit te voeren.
 \\\\
 De tweede manier is gebruik maken van HAAR-training. Hierbij wordt een classificator getraind door middel van voorbeelden van trams. Eens getraind kan deze classificator dan gebruikt worden om in nieuwe bronafbeeldingen te zoeken naar het sjabloon.
-\paragraph{WP3}
+
+\paragraph{Werkpakket 3 - Berekenen afstand tot voorgaande tram (40 uur)}
+
+Om de afstand tot de vorige tram te kunnen berekenen hebben we nood aan vast gegeven. Hiervoor nemen we als referentie dus de afstand tussen 2 tramsporen. Omdat de beelden onder een bepaalde hoek geschoten zijn, moeten we ook rekening houden met het perspectief. We hebben dus nood aan een algoritme dat het perspectief wegwerkt.
+
+Hiervoor is het nodig om een homografie op te stellen die een bepaald perspectief steeds in hetzelfde vlak transformeert. In openCV wordt voorzien in homografie door de functie cvFindHomography. De uiteindelijke afstandbepaling kan dan gebeuren op basis van wiskundige berekening met betrekking tot afstanden.
 
 \paragraph{Werkpakket 4 - Blokkerend opbject detecteren (40 uur)}
 
