@@ -42,7 +42,7 @@
 \begin{document}
 \maketitle
 
-\section*{Kerngegevens}\label{sec:kerngegevens}
+\section{Kerngegevens}\label{sec:kerngegevens}
 
 \subsection{Titel}\label{sec:Titel}
 
@@ -67,13 +67,13 @@ Tram Collision Avoidance.
 \end{table}
 
 \subsection{Startdatum, doorlooptijd, menskracht en begroting}\label{sec:Startdatum}
-
+%TODO
 \begin{table}[h]
 		\begin{tabular}{*{14}{l}}
 		Startdatum & 17 februari 2011 \\
-		Doorlooptijd & \\
-		Menskracht & \\	
-		Begroting & \\
+		Doorlooptijd & 103 dagen\\
+		Menskracht & 160\\	
+		Begroting & Niet van toepassing.\\
 		\end{tabular}
 \end{table}
 
@@ -90,7 +90,7 @@ Er gebeuren jaarlijks heel wat ongelukken met trams omdat de remafstand vrij gro
 Niet enkel de afstand vanuit de tram is belangrijk, ook de positie van de pantograaf en de leidraad hebben hun invloed op de voortstuwing van de tram, en dan vooral de slijtage. Een onderdeel van dit project is het detecteren van de positie van pantograaf en leidraad in videosequenties opgenomen vanop het dak van een tram.
 
 \subsection{Andere projecten van derden}\label{sec:Andere}
-
+%TODO
 %\textbf{\ldots die verband houden met dit voorstel \ldots }
 
 %Welke projecten zijn u bekend over hetzelfde probleem. Wat vond u terug op internet of in publicaties? Wat kan daarvan geleerd worden? Wat kan daarvan eventueel benut worden? Wat is de complementariteit of meerwaarde van onderstaand projectvoorstel t.o.v. de reeds bestaande initiatieven?
@@ -144,10 +144,18 @@ verschillen in absolute waarden, ken men opnieuw de meest levensvatbare plaats v
  
 Als het sjabloon sterke kenmerken heeft, kan een feature-based aanpak worden overwogen. Aangezien deze aanpak geen rekening houdt met het geheel van het sjabloon, kan dit leiden tot een hogere computationele efficiëntie.
 
-Voor sjablonen zonder sterke kenmerken kan een template-gebaseerde benadering efficiënt zijn. Aangezien template-gebaseerde sjabloon matching mogelijks het bemonsteren van een groot aantal punten vereist kan men dit verminderen door de resolutie de zoek- en sjabloon afbeelding te verminderen met dezelfde factor en op deze afgeslankte afbeeldingen het algoritme uit te voeren.
+Voor sjablonen zonder sterke kenmerken kan een template-gebaseerde benadering efficiënt zijn. Aangezien template-gebaseerde sjabloon matching mogelijks het bemonsteren van een groot aantal punten vereist kan men dit verminderen door de resolutie de zoek- en sjabloon afbeelding te verminderen met dezelfde factor en op deze afgeslankte afbeeldingen het algoritme uit te voeren. 
+In OpenCV biedt de keuze uit zes verschillende berekeningsmethoden:
+\begin{itemize}
+\item Correlatie coëfficient.
+\item Kwadratisch verschil.
+\item Cross correlatie.
+\end{itemize}
+Deze kunnen al dan niet genormeerd zijn. Er wordt wel nog geen rekening gehouden met schaling en/of rotatie.
 \\\\
-De tweede manier is gebruik maken van HAAR-training. Hierbij wordt een classificator getraind door middel van voorbeelden van trams. Eens getraind kan deze classificator dan gebruikt worden om in nieuwe bronafbeeldingen te zoeken naar het sjabloon.
-
+De tweede manier is gebruik maken van HAAR-training. Hierbij wordt een classificator getraind door middel van voorbeelden van trams. Eens getraind kan deze classificator dan gebruikt worden om in nieuwe bronafbeeldingen te zoeken naar het sjabloon. Om HAAR-training toe te passen is echter een dataset met afbeeldingen van trams nodig en deze is niet beschikbaar.
+\\\\
+Er wordt eerst een vergelijking gemaakt tussen implementaties van enkele feature-gebaseerde en template-gebaseerde benaderingen.
 \paragraph{Werkpakket 3 - Berekenen afstand tot voorgaande tram (40 uur)}
 
 Om de afstand tot de vorige tram te kunnen berekenen hebben we nood aan vast gegeven. Hiervoor nemen we als referentie dus de afstand tussen 2 tramsporen. Omdat de beelden onder een bepaalde hoek geschoten zijn, moeten we ook rekening houden met het perspectief. We hebben dus nood aan een algoritme dat het perspectief wegwerkt.
@@ -176,9 +184,13 @@ In de onderstaande tabel geeft u schematisch de timing en het aantal mensuren di
 		\hline 
 		  & 1	& 2	& 3	& 4	& 5	& 6	& 7	& 8	& 9	& 10 & 11	& 12 & \\
 		\hline 
-		WP1: \ldots & & & & & & & & & & & & & \\
+		WP1: \ldots &  &  &  &  & & & & & & & & & \\
 		\hline 
-		WP2: \ldots & & & & & & & & & & & & & \\
+		WP2: OpenCV Template Matching &  3 & 3 & 2 & 8 & & & & & & & & & \\
+		\hline 
+		WP2: Implementatie Template Matching & & & & &10&10& & & & & & & \\
+		\hline 
+		WP2: Testen Template Matching & & & & & & & &10&10&& & &\\
 		\hline 
 		WP3: \ldots & & & & & & & & & & & & & \\
 		\hline 
