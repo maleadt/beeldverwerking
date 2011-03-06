@@ -1,44 +1,48 @@
-%
-% Configuratie
-%
-
-% Preambule met standaardinstellingen
-\documentclass[]{book}
+% Standaardinstellingen
+\documentclass[a4paper,oneside,11pt,final]{memoir}
 
 % Noot: zorg ervoor dat Nederlandse woord-splitsing geactiveerd is.
 \usepackage[dutch]{babel}
-
+%\usepackage[none]{hyphenat}
 % UTF8 gebruiken voor gebruik van alle symbolen
 \usepackage[utf8]{inputenc}
+\usepackage{eurosym}
 
-% Andere pakketten
-\usepackage{a4}
-\usepackage{amsmath}
-\usepackage[pdftex]{graphicx}
+% Noot: je kan het graphicxpakket een optie dvips of pdftex doorgeven
+% in dat geval moet je ze ook aan iiiscriptie doorgeven, dus bijvoorbeeld
+% \usepackage[dvips]{graphicx}
+% \usepackage[dvips]{iiiscriptie}
+\usepackage{graphicx}
+\usepackage{IIIScriptie}
+\usepackage{caption}
+%\usepackage{ccaption}
 
-% Margin instellingen
-\topmargin -0.5in \textheight 9.0in \oddsidemargin 0.0in
-\evensidemargin 0.0in \textwidth 6.5in
-\graphicspath{{images/}}
+% Tabellen eleganter maken
+\usepackage{booktabs}
 
-\begin{document}
+% Navigeerbaarheid van hyperlinks in PDF
+\usepackage{hyperref}
 
+% Extra functies
+% \input{functies.tex}
 
 %
 % Titelpagina
 %
 
-\title{Tram Collision Avoidance}
-\author{Tim BESARD \and Sebastiaan LABIJN \and Dimitri ROOSE \and Ruben SCHOLLAERT}
-\date{ }
+% Invullen velden
+\departement{Departement Toegepaste Ingenieurswetenschappen}
+\deptadres{Schoonmeersstraat 52 - 9000 Gent}
+\studiejaar{1e Master Informatica}
+\soortrapport{Projectvoorstel Beeldverwerking}
+\title{Tram Collision Advoidance}
+\author{Tim BESARD\\Ruben SCHOLLAERT\\Dimitri ROOSE\\Sebastiaan LABIJN}
+
+% Pagina maken
+\begin{document}
 \maketitle
 
-
-%
-% Inhoud
-%
-
-\section{Kerngegevens}\label{sec:kerngegevens}
+\section*{Kerngegevens}\label{sec:kerngegevens}
 
 \subsection{Titel}\label{sec:Titel}
 
@@ -73,7 +77,7 @@ Tram Collision Avoidance.
 		\end{tabular}
 \end{table}
 
-\section{Situering van het project}\label{sec:Situering}
+\section*{Situering van het project}\label{sec:Situering}
 
 \subsection{Probleemstelling}\label{sec:Probleemstelling}
 
@@ -91,7 +95,7 @@ Niet enkel de afstand vanuit de tram is belangrijk, ook de positie van de pantog
 
 %Welke projecten zijn u bekend over hetzelfde probleem. Wat vond u terug op internet of in publicaties? Wat kan daarvan geleerd worden? Wat kan daarvan eventueel benut worden? Wat is de complementariteit of meerwaarde van onderstaand projectvoorstel t.o.v. de reeds bestaande initiatieven?
 
-\section{Beschrijving van het uit te voeren project}\label{sec:Beschrijving}
+\section*{Beschrijving van het uit te voeren project}\label{sec:Beschrijving}
 
 \subsection{Doelstelling}\label{sec:Doelstelling}
 
@@ -195,7 +199,7 @@ In de onderstaande tabel geeft u schematisch de timing en het aantal mensuren di
 Het verloop van het project zal hoofdzakelijk democratisch bepaald worden. Zo hebben alle medewerkers evenwaardige toegang tot de centrale code-repository. De gebruikte service hiervoor kent echter een veel bredere functionaliteitswaaier, die de teamleden zal toelaten op efficiënte wijze te communiceren en overleggen over het verloop van het project. Zo wordt bijvoorbeeld voorzien in een wikipedia-achtige sectie, dat kan gebruikt worden om bepaalde algoritmes uit te doeken te doen, of om snel informatie neer te pennen die dan in een later stadium in het verslag kan verwerk worden. Ook voorziet dezelfde service in mogelijkheden om commentaar in te sturen over bepaalde codefragmenten of -toevoegingen, zodat het eenvoudig is om in team constructief te discussiëren over het specifieke verloop van een bepaald projectgedeelte.
 
 
-\section{Nut van de resultaten}\label{sec:Nut}
+\section*{Nut van de resultaten}\label{sec:Nut}
 
 \subsection{Beschrijving van het nut}\label{sec:BeschrijvingNut}
 
@@ -218,11 +222,11 @@ Het praktisch aspect wordt verwezenlijkt door de geschreven code in herbruikbare
 
 Tenslotte wordt ook voorzien in een presentatie, die zowel het theoretische als het meer praktische van het project oppervlakkig aanraakt om een nieuwe gebruiker een algemeen beeld te geven over het doel en werking van het project.
 
-\section{Gebruik van resultaten van derden}\label{sec:Gebruik}
+\section*{Gebruik van resultaten van derden}\label{sec:Gebruik}
 
 % Vermeld hier de resultaten van derden waar u gebruik van zult maken (matlab toolboxes, matlab programma's op internet, demoprogramma's, testdata, powerpoint presentaties, tutorials, handboeken, boeken uit bibliotheek, pdf files\ldots) 
 
-\section{Bijlagen} \label{sec:Bijlagen}
+\section*{Bijlagen} \label{sec:Bijlagen}
 Bijkomend documentatiemateriaal (facultatief). 
 
 \end{document}

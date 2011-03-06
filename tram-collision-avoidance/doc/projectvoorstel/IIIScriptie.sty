@@ -1,0 +1,80 @@
+\NeedsTeXFormat{LaTeX2e}[1995/12/01]
+\ProvidesPackage{iiiscriptie}
+           [2009/06/17. Auteur: Jan Cnops]
+\global\let\@graphex\@empty
+\DeclareOption{dvips}{\def\graphex{.eps}}
+\DeclareOption{pdftex}{\def\graphex{.pdf}}
+\ProcessOptions
+\global\let\@promotor\@empty
+\global\let\@promotoren\@empty
+\global\let\@departement\@empty
+\global\let\@deptadres\@empty
+\global\let\@studiejaar\@empty
+\global\let\@soortrapport\@empty
+\newcommand\@bedrijfslogo{\ }
+\newcommand\departement[1]{\renewcommand\@departement{#1}}
+\newcommand\deptadres[1]{\renewcommand\@deptadres{#1}}
+\newcommand\studiejaar[1]{\renewcommand\@studiejaar{#1}}
+\newcommand\soortrapport[1]{\renewcommand\@soortrapport{#1}}
+\newcommand\bedrijfslogo[1]{\renewcommand\@bedrijfslogo{#1}}
+\newcommand\promotor[1]{\renewcommand\@promotor{Promotor: #1}}
+\newcommand\promotoren[1]{\renewcommand\@promotor{%
+Promotoren:
+%\begin{minipage}[t]{100mm}
+%\begin{center}
+\begin{tabular}[t]{ll}
+#1
+\end{tabular}
+%\end{center}
+%\end{minipage}
+}
+}
+\def\academiejaar{
+\countdef\volg=255
+\volg \number\year
+\ifnum\month>9
+    \advance\volg+1
+    Academiejaar \number\year-\number\volg
+\else
+    \advance\volg-1
+    Academiejaar \number\volg-\number\year
+\fi
+}
+\renewcommand\maketitle{%
+\begin{titlingpage}%
+  \let\footnotesize\small
+  \let\footnoterule\relax
+  \let \footnote \thanks
+\hspace*{-2cm}
+\parbox[t][\textheight][t]{16cm}{
+\begin{minipage}{65mm}
+{\sffamily \@bedrijfslogo
+}
+\end{minipage}
+\hspace*{\fill}
+\begin{minipage}{55mm}\sffamily
+\includegraphics[height=14mm]{logohogent\@graphex}\linebreak
+\end{minipage}\\
+{\sffamily\normalsize \@studiejaar}
+\hspace*{\fill}
+{\sffamily\normalsize \@departement}\\
+{\sffamily\normalsize\academiejaar}
+\hspace*{\fill}
+{\sffamily\normalsize \@deptadres}\\
+\par
+  \null\vfil
+  \vskip 120\p@
+  \begin{center}%
+    {\sffamily \Huge \@title \par}%
+  \end{center}\par
+\par
+  \null\vfil
+  \vskip 120\p@
+{\sffamily\normalsize \@soortrapport}\\
+\ \\
+\sffamily\large\@author\\
+{\sffamily\emph\@promotor}
+}%einde parbox
+ \end{titlingpage}%
+  \setcounter{footnote}{0}%
+}
