@@ -162,13 +162,15 @@ Om de afstand tot de vorige tram te kunnen berekenen hebben we nood aan vast geg
 
 Hiervoor is het nodig om een homografie op te stellen die een bepaald perspectief steeds in hetzelfde vlak transformeert. In openCV wordt voorzien in homografie door de functie cvFindHomography. De uiteindelijke afstandbepaling kan dan gebeuren op basis van wiskundige berekening met betrekking tot afstanden.
 
-\paragraph{Werkpakket 4 - Blokkerend opbject detecteren (40 uur)}
+\paragraph{Werkpakket 4 - Blokkerend object detecteren (50 uur)}
 
-Om mensen of auto's op de sporen te herkennen zouden we kunnen werken met een simpele herkenning op basis van een verzameling of vector van descriptoren. De verschillende features die we zouden kunnen gebruiken zijn bv verhoudingen van hoofd tov lichaam, of de vorm van een auto. Eenmaal deze vectoren zijn opgesteld kunnen we de afstand naar de vooropgestelde klassen berekenen van een onbekend patroon om het type te bekomen. Maar omdat mensen \& auto's in allerlei vormen bestaan (grote/kleine mensen, kleine persoonswagen, bus, ...) is het best mogelijk dat we niet zomaar een verzameling van descriptoren kunnen opstellen.
-
-Een andere optie is HAAR-training. Hiervoor zullen we meerdere voorbeelden van allerlei personen en voertuigen moeten aanmaken, deze voorbeelden kunnen we dan gebruiken om te trainen en uiteindelijk kunnen we dan het resultaat testen met niet eerder gebruikte beelden. OpenCV heeft zelf een ingebouwd systeem om deze traning door te voeren. Hier hebben we ook weer een beperkte verzameling nodig van descriptoren.
-
-Om voetgangers op de sporen te detecteren kunnen we gebruik maken van een functie in de laatste versie van OpenCV. Deze bevat namelijk een HOG(histogram of oriented gradients)-gebaseerde implementatie om voetgangers te detecteren.
+In eerste instantie gebruiken we bij dit werkpunt de resultaten van de vorige werkpunten, zo kunnen we aannemen dat er een obstakel is van zodra de tramsporen niet meer continu gedetecteerd worden.
+\\\\
+Rest ons nu nog aan te geven welk soort obstakel dit is. Aangezien we onmogelijk voor alle soorten objecten een herkenning kunnen maken beperken we ons hier tot het detecteren van auto's en mensen, de overige obstakels worden dan aangegeven als onbekend.
+\\\\
+Om mensen te detecteren gaan we gebruik maken van de kenmerkingen (descriptoren) van een persoon, zo hebben we de typische omega-vorm van het hoofd en de  bouw van een lichaam van een persoon die rechtop loopt. De combinatie van een hoofd en schouders kunnen we samen opnemen in een verzameling van descriptoren, die we dan testen tegen enkele testdata (postieve \& negatieve data) om de resultaten te bekomen die we wensen. Enkel het hoofd kunnen we detecteren via eenvoudige technieken zoals bounding boxes, OpenCV voorziet hiervoor in functies om dit dan op te halen uit beelden.
+\\\\
+Om auto's de detecteren gaan we gebruik maken van Haar classifier training. Hiervoor zullen we aan de hand van een collectie voorbeelden van auto's in zijaanzicht de classifier trainen. Eenmaal deze classifier getraind is kan deze gebruikt worden om auto's op te sporen in de beelden. Ook voor HAAR-training heeft OpenCV een ingebouwd systeem om deze training door te voeren.
 
 \subsection{Projectplanning}\label{sec:Projectplanning}
 
@@ -194,9 +196,16 @@ In de onderstaande tabel geeft u schematisch de timing en het aantal mensuren di
 		\hline 
 		WP3: \ldots & & & & & & & & & & & & & \\
 		\hline 
-		 \ldots & & & & & & & & & & & & & \\
-		\hline 
-		 \ldots & & & & & & & & & & & & & \\
+		WP4: Blokkerend object detecteren& & & & & & & & & & & & & \\
+		\hline
+		WP4: Interpreteren resultaten & & & & & & & & & & & & & \\
+		vorige WP& & & & & & & & & & & & & \\
+		\hline
+		WP4: Detectie personen adhv & & & & & & & & & & & & & \\
+		 descriptoren \& bounding boxes& & & & & & & & & & & & & \\
+		\hline
+		WP4: HAAR-training auto's & & & & & & & & & & & & & \\
+		+ detectie & & & & & & & & & & & & & \\
 		\hline 
 		Vakantie: \ldots & & & & & & & & & & & & & \\
 		\hline
