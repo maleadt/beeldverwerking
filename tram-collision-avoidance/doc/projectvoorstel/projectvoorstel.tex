@@ -23,6 +23,9 @@
 % Navigeerbaarheid van hyperlinks in PDF
 \usepackage{hyperref}
 
+% Rotatie van tabellen
+\usepackage{rotating}
+
 % Extra functies
 % \input{functies.tex}
 
@@ -174,9 +177,9 @@ Om auto's de detecteren gaan we gebruik maken van Haar classifier training. Hier
 
 \subsection{Projectplanning}\label{sec:Projectplanning}
 
-In de onderstaande tabel geeft u schematisch de timing en het aantal mensuren die men effectief op het project zal inzetten. Geef ook aan welke deadlines er zijn. Welke deliverable is wanneer klaar? Wanneer wordt er vergaderd? Wanneer wordt er gerapporteerd?
+% In de onderstaande tabel geeft u schematisch de timing en het aantal mensuren die men effectief op het project zal inzetten. Geef ook aan welke deadlines er zijn. Welke deliverable is wanneer klaar? Wanneer wordt er vergaderd? Wanneer wordt er gerapporteerd?
 
-\begin{table}[h]
+\begin{sidewaystable}[h]
 	\centering
 		\begin{tabular}{|*{14}{c|}}
 		\hline
@@ -219,7 +222,7 @@ In de onderstaande tabel geeft u schematisch de timing en het aantal mensuren di
 		\end{tabular}
 	\caption{projectplanning}
 	\label{tab:projectplanning}
-\end{table}
+\end{sidewaystable}
 																							
 
 % Zeg ook kort hoe de organisatie van het project zal verlopen. Wie co\"ordineert het project? Hoe verloopt de communicatie (via email, samenkomsten, \ldots) Wie rapporteert wanneer aan wie? Wordt er gebruik gemaakt van de Dokeos site?
@@ -263,6 +266,8 @@ Informatie gebruikt voor WP4 in pdf vorm:
 % Vermeld hier de resultaten van derden waar u gebruik van zult maken (matlab toolboxes, matlab programma's op internet, demoprogramma's, testdata, powerpoint presentaties, tutorials, handboeken, boeken uit bibliotheek, pdf files\ldots) 
 
 \section*{Bijlagen} \label{sec:Bijlagen}
-Bijkomend documentatiemateriaal (facultatief). 
+\begin{itemize}
+\item Schematische weergave van de projectplanning.
+\end{itemize}
 
 \end{document}
