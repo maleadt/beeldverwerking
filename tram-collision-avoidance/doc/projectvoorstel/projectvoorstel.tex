@@ -120,7 +120,15 @@ Het gebeurt echter ook geregeld dat een tram botst met vreemde objecten, zoals a
 
 \subsubsection{Algemene werkwijze}
 
-% Geef eerst op \emph{algemene wijze} (1-2 pg) aan hoe u het gestelde probleem wenst aan te pakken en op te lossen. Geef eventueel een schematisch overzicht (met figuur of diagram) van de verschillende onderdelen en hun samenhang. Beperk het aantal werkpakketten tot een overzichtelijk geheel. 
+% Geef eerst op \emph{algemene wijze} (1-2 pg) aan hoe u het gestelde probleem wenst aan te pakken en op te lossen. Geef eventueel een schematisch overzicht (met figuur of diagram) van de verschillende onderdelen en hun samenhang. Beperk het aantal werkpakketten tot een overzichtelijk geheel.
+
+De eerste stap van het project zal er uit bestaan om de vast te leggen hoe de overkoepelende applicatie tewerk gaat. Die applicatie is immers verantwoordelijk voor het vergaren van het bronmateriaal, en om vervolgens in de juiste volgorde (eventueel gedeeltelijk parallel) de verschillende deelcomponenten los te laten op een deel van dat bronmateriaal. Het resultaat van dit verwerkingsproces zal de applicatie tenslotte toelaten te beslissen of de tram al dan niet een noodstop moet uitvoeren.
+
+Vervolgens zullen we de exacte interface waarmee de deelcomponenten zullen aangesproken worden, vastleggen. Vooral het data-aspect is hierbij belangrijk. Zo berusten verschillende deelcomponenten op het resultaat van het tramspoor-detectiesysteem, waardoor het imperatief is van bij het begin van het project te weten hoe de output van desbetreffend systeem er zal uit zien.
+
+Eenmaal deze twee stappen gerealiseerd zijn, kan de effectieve ontwikkeling van de deelsystemen gestart worden. Gezien de applicatie nu ook voldoende gespecifieerd is, kan deze ontwikkeling perfect parallel verlopen.
+
+Tenslotte zullen we de deelsystemen in de overkoepelende applicatie invoegen, waardoor we een functioneel systeem bekomen. Door de rigide specificatie aan het begin van het project, zou dit niet veel tijd mogen in beslag nemen. Toch voorzien voldoende tijd om aan deze fase te besteden, problemen zijn immers altijd mogelijk.
 
 \subsubsection{Beschrijving werkpakketten}
 
@@ -132,7 +140,7 @@ Het gebeurt echter ook geregeld dat een tram botst met vreemde objecten, zoals a
 
 Het eerste werkpakket bestaat eruit om de sporen te detecteren voor de tram. Hiertoe zullen we edge-detection algoritmes toepassen (zoals Sobelfilters), waarna we de effectieve lijnen kunnen extraheren (met vb. de Canny edge detector). De meest courante algoritmen detecteren echter enkel rechte lijnen, terwijl tramsporen best gebogen kunnen zijn (hetzij beperkt). Er zal moeten onderzocht worden of er rond die beperkte kromming kan gewerkt worden, bijvoorbeeld door meerdere kortere lijnen te verbinden, of dat er een geavanceerder algoritme zal benodigd zijn.
 
-Dit werkpakket is van kritiek belang, daar verschillende van de andere werkpakketten berusten op de correcte werking ervan. Om de andere werkpakketen toch toe te laten reeds te starten zonder dat dit pakket afgewerkt is, zal duidelijk moeten afgesproken worden onder welke vorm het uiteindelijke resultaat zal doorgegeven worden. Dit kan bijvoorbeeld onder de vorm van een puntencollectie, of beter, door een enkel object dat een set Tramsporen voorstelt, en voor elk van de twee sporen daarbij een collectie lijnstukken bevat.
+Dit werkpakket is van kritiek belang, daar verschillende van de andere werkpakketten berusten op de correcte werking ervan. Om de andere werkpakketen toch toe te laten reeds te starten zonder dat dit pakket afgewerkt is, zal duidelijk moeten afgesproken worden onder welke vorm het uiteindelijke resultaat zal doorgegeven worden. Dit kan bijvoorbeeld onder de vorm van een puntencollectie, of beter, door een enkel object dat een set tramsporen voorstelt, en voor elk van de twee sporen daarbij een collectie lijnstukken bevat.
 
 \paragraph{Werkpakket 2 - Tramdetectie (50 uur)}
 De trams dienen herkend te worden in de opeenvolgende frames. Er zijn verschillende technieken mogelijk om dit te verwezenlijken. Om een overzicht te krijgen over de efficiëntie van de technieken worden er enkele geïmplementeerd. Deze worden dan uitvoerig getest en aan de hand van de testresultaten.
@@ -189,11 +197,16 @@ Om auto's de detecteren gaan we gebruik maken van Haar classifier training. Hier
 		\hline 
 		  & 1	& 2	& 3	& 4	& 5	& 6	& 7	& 8	& 9	& 10 & 11	& 12 & \\
 		\hline 
-		WP1: Vastleggen interface & & & & & 2 & & & & & & & & \\
+		Algemeen: Vastleggen interface & & & & & 1 & & & & & & & & \\
 		\hline 
-		WP1: Edge detection & & & & & & 5 & 2 & & & & & & \\
+		Algemeen: Realiseren overkoepelende applicatie & & & & & 3 & & & & & & & & \\
 		\hline 
-		WP1: Lijndetectie & & & & & & & 3 & 5 & 2 & & & & \\
+		Algemeen: Samenvoegen deelsystemen & & & & & & & & & & & 3 & 3 & \\
+		\hline 
+		\hline 
+		WP1: Edge detection & & & & & & 6 & 2 & & & & & & \\
+		\hline 
+		WP1: Lijndetectie & & & & & & & 3 & 6 & 2 & & & & \\
 		\hline 
 		WP1: Extraheren tramsporen & & & & & & & & & 6 & 5 & & & \\
 		\hline 
