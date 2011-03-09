@@ -169,9 +169,13 @@ De tweede manier is gebruik maken van HAAR-training. Hierbij wordt een classific
 Er wordt eerst een vergelijking gemaakt tussen implementaties van enkele feature-gebaseerde en template-gebaseerde benaderingen.
 \paragraph{Werkpakket 3 - Berekenen afstand tot voorgaande tram (40 uur)}
 
-Om de afstand tot de vorige tram te kunnen berekenen hebben we nood aan vast gegeven. Hiervoor nemen we als referentie dus de afstand tussen 2 tramsporen. Omdat de beelden onder een bepaalde hoek geschoten zijn, moeten we ook rekening houden met het perspectief. We hebben dus nood aan een algoritme dat het perspectief wegwerkt.
-
-Hiervoor is het nodig om een homografie op te stellen die een bepaald perspectief steeds in hetzelfde vlak transformeert. In openCV wordt voorzien in homografie door de functie cvFindHomography. De uiteindelijke afstandbepaling kan dan gebeuren op basis van wiskundige berekening met betrekking tot afstanden.
+Om de afstand tot de vorige tram te kunnen berekenen hebben we nood aan vast vergelijkingspunt. Hiervoor nemen we als referentie de afstand tussen 2 tramsporen. Omdat de beelden onder een bepaalde hoek geschoten zijn, moeten we ook rekening houden met het perspectief. 
+\\\\
+We hebben dus nood aan een algoritme dat het perspectief wegwerkt. Hiervoor is het nodig om een homografie op te stellen die een bepaald perspectief steeds in hetzelfde vlak transformeert. In openCV wordt voorzien in homografie door de functie cvFindHomography.
+\\\\
+Ook is het nodig om de camerabeelden te calibreren om een eenduidige beeldverwerking te bekomen. In openCV is hiervoor in een functie voorzien, cvCalibrateCamera2(). Dit maakt gebruikt van een calibratie-object dat veel indivuele en herkenbare punten heeft zoals tramsporen. Meetfouten kunnen we opvatten als distortion en zo wegwerken tijdens deze calibratiefase.
+\\\\
+De uiteindelijke afstandbepaling kan dan gebeuren op basis van wiskundige berekening met betrekking tot afstanden.
 
 \paragraph{Werkpakket 4 - Blokkerend object detecteren (48 uur)}
 
@@ -218,7 +222,11 @@ Om auto's de detecteren gaan we gebruik maken van Haar classifier training. Hier
 		WP2: Testen Template Matching & & & & & & & &10&10&& & &\\
 		\hline 
 		\hline 
-		WP3: \ldots & & & & & & & & & & & & & \\
+		WP3: Projectie en Homografie &  3 & 3 & 3 & 3 & & & & & & & & & \\
+		\hline 
+		WP3: CameraCalibratie & & & & &7&8& 5& & & & & & \\
+		\hline 
+		WP3: Distortion en afstandsbepaling & & & & & & & &5&8&& & &\\
 		\hline 
 		\hline 
 		WP4: Blokkerend object detecteren& & & &2 &2 & & & & & & & & \\
