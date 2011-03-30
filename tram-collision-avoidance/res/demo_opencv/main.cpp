@@ -9,14 +9,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include <cv.h>
-#include <highgui.h>
+#include "opencv/cv.h"
+#include "opencv/highgui.h""
 
 
 int main(int argc, char *argv[])
 {
     cvNamedWindow( "Example2", CV_WINDOW_AUTOSIZE );
-    CvCapture* capture = cvCreateFileCapture( "obstakeldetectie.avi" );
+    CvCapture* capture = cvCreateFileCapture( "/home/ruben/beeldverwerking/out.avi" );
     IplImage* frame;
     while(1) {
             frame = cvQueryFrame( capture );

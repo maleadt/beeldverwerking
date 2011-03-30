@@ -1,5 +1,5 @@
-#include "cv.h"
-#include "highgui.h"
+#include "opencv/cv.h"
+#include "opencv/highgui.h"
 #include <cmath>
 #include <iostream>
 
@@ -7,7 +7,8 @@ using namespace cv;
 
 int main(int, char**)
 {
-    VideoCapture cap("/home/tim/Desktop/obstakeldetectie.avi");
+    //VideoCapture cap("/home/tim/Desktop/obstakeldetectie.avi");
+    VideoCapture cap("/home/ruben/beeldverwerking/obstakeldetectie.avi");
     if(!cap.isOpened())
         return -1;
 
