@@ -1,0 +1,36 @@
+Lijndetectie
+------------
+
+Gegeven de kernel:
+	-1	-1	-1
+	 2	 2	 2
+	-1	-1	-1
+Deze kernel zal de horizontale lijnen in het beeld extraheren, omdat elke kolom
+gesommeerd nul zal uitkomen tenzij de pixels boven of onder verschillen in
+intensiteit (een lijn).
+
+Verticale kernel:
+	-1	 2	-1
+	-1	 2	-1
+	-1	 2	-1
+
+Diagonale kernel:
+	 2	-1	-1
+	 -1	 2	-1
+	 -1	-1	 2
+
+
+Randdetectie
+------------
+
+Horizontale en verticale Sobel:
+>> im = imread('images/clown.jpg');
+>> s1 = [-1 -2 -1; 0 0 0; 1 2 1];
+>> ims1 = imfilter(im, s1);
+>> s2 = transpose(s1);
+>> ims2 = imfilter(im, s2);
+>> imshow(ims1+ims2);
+
+
+Lijndetectie m.b.v. de Houghtransformatie
+-----------------------------------------
