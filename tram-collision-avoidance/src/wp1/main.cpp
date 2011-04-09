@@ -81,20 +81,32 @@ int main(int argc, char** argv)
     //
 
     // Read command-line parameters
-    if (argc != 2)
+    if (argc < 2)
     {
         std::cout << "Error: invalid usage" << "\n";
-        std::cout << "Usage: ./wp1 <filename>" << std::endl;
+        std::cout << "Usage: ./wp1 <input_filename> <output_filename>" << std::endl;
         return 1;
     }
-    std::string iVideoFile = argv[1];
 
-    // Open video
+    // Open input video
+    std::string iVideoFile = argv[1];
     cv::VideoCapture iVideo(iVideoFile);
     if(!iVideo.isOpened())
     {
         std::cout << "Error: could not open video" << std::endl;
         return 1;
+    }
+
+    // Open output video
+    cv::VideoWriter oVideo;
+    if (argc == 3)
+    {
+        std::string oVideoFile = argv[2];
+        oVideo = cv::VideoWriter(oVideoFile,
+                                 CV_FOURCC('M', 'J', 'P', 'G'),
+                                 iVideo.get(CV_CAP_PROP_FPS),
+                                 cv::Size(iVideo.get(CV_CAP_PROP_FRAME_WIDTH),iVideo.get(CV_CAP_PROP_FRAME_HEIGHT)),
+                                 true);
     }
 
     // Setup OpenCV
@@ -144,7 +156,6 @@ int main(int argc, char** argv)
         // FEATURE DETECTION //
 
         // Frame with features
-#define DEBUG_PREPROCESSED
 #if defined(DEBUG_PREPROCESSED)
         cv::Mat tFrameFeatures;
         cvtColor(tFramePreprocessed, tFrameFeatures, CV_GRAY2BGR);
@@ -414,6 +425,8 @@ int main(int argc, char** argv)
 
         // Display frame
         imshow("wp1", tFrameFeatures);
+        if (oVideo.isOpened())
+            oVideo << tFrameFeatures;
 
         // Halt on keypress
         if (cv::waitKey(30) >= 0)
