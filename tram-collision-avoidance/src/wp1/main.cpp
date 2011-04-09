@@ -150,12 +150,12 @@ int main(int argc, char** argv)
         const int tracks = 2;
         std::vector<int> track_points, track_segments;
         int y = tFrame.size[0] - 10;
-        for (int x = tFrame.size[1]; x > 0; x--)
+        for (int x = tFrame.size[1]-track_width/2; x > track_width/2; x--)
         {
             // Count the amount of segments intersecting with the current track start point
             int segments = 0;
-            cv::Vec2i p1(x, y);
-            cv::Vec2i p2(x+track_width, y);
+            cv::Vec2i p1(x+track_width/2, y);
+            cv::Vec2i p2(x-track_width/2, y);
             for(size_t i = 0; i < tLines.size(); i++)
             {
                 cv::Vec2i p3(tLines[i][0], tLines[i][1]);
@@ -209,8 +209,10 @@ int main(int argc, char** argv)
         }
         for (size_t i = 0; i < track_points.size(); i++)
         {
+            if (track_segments[i] % 2)                                          // Small hack to improve detection
+                track_points[i] -= track_width/(2 * (track_segments[i] % 2));   // of the track center.
             int x = track_points[i];
-            circle(tFrameFeatures, cv::Point(x+1, y), 5, cv::Scalar(0, 255, 255), -1);
+            circle(tFrameFeatures, cv::Point(x, y), 5, cv::Scalar(0, 255, 255), -1);
         }
 
         // Detect track segments
@@ -219,8 +221,29 @@ int main(int argc, char** argv)
             int width = abs(track_points[0] - track_points[1]);
             if (width > 100 && width < 175)
             {
-                circle(tFrameFeatures, cv::Point(track_points[0]+1, y), 5, cv::Scalar(0, 255, 0), -1);
-                circle(tFrameFeatures, cv::Point(track_points[1]+1, y), 5, cv::Scalar(0, 255, 0), -1);
+                // Set the initial segment start
+                std::vector<std::pair<cv::Point, cv::Point> > track_segments;
+                track_segments.push_back(std::pair<cv::Point, cv::Point>(cv::Point(track_points[0]+1, y), cv::Point(track_points[1]+1, y)));
+
+                // Detect new segments
+                bool tNewSegment = true;
+                while (tNewSegment)
+                {
+                    // Display latest segment
+                    std::pair<cv::Point, cv::Point> segment_last = track_segments.back();
+                    circle(tFrameFeatures, segment_last.first, 5, cv::Scalar(0, 255, 0), -1);
+                    circle(tFrameFeatures, segment_last.second, 5, cv::Scalar(0, 255, 0), -1);
+                    tNewSegment = false;
+
+                    // Scan
+                    for (int length = 10; ; length += 10)
+                    {
+                        for (int angle = -45; angle < 45; angle += 5)
+                        {
+                        }
+                        break;
+                    }
+                }
             }
         }
 
