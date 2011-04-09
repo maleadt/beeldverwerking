@@ -9,6 +9,18 @@
 #include <iostream>
 #include <vector>
 
+// Feature properties
+#define TRACK_WIDTH 15
+#define TRACK_COUNT 2
+#define TRACK_START_OFFSET 10
+#define TRACK_SPACE_MIN 100
+#define TRACK_SPACE_MAX 175
+#define SEGMENT_LENGTH_MIN 50
+#define SEGMENT_LENGTH_DELTA 10
+#define SEGMENT_ANGLE_MIN -M_PI_4
+#define SEGMENT_ANGLE_MAX M_PI_4
+#define SEGMENT_ANGLE_DELTA M_PI_4/64.0
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Routines
@@ -165,16 +177,14 @@ int main(int argc, char** argv)
         }
 
         // Find track start candidates
-        const int track_width = 15;
-        const int tracks = 2;
         std::vector<int> track_points, track_segments;
-        int y = tFrame.size[0] - 10;
-        for (int x = tFrame.size[1]-track_width/2; x > track_width/2; x--)
+        int y = tFrame.size[0] - TRACK_START_OFFSET;
+        for (int x = tFrame.size[1]-TRACK_WIDTH/2; x > TRACK_WIDTH/2; x--)
         {
             // Count the amount of segments intersecting with the current track start point
             int segments = 0;
-            cv::Vec2i p1(x+track_width/2, y);
-            cv::Vec2i p2(x-track_width/2, y);
+            cv::Vec2i p1(x+TRACK_WIDTH/2, y);
+            cv::Vec2i p2(x-TRACK_WIDTH/2, y);
             for(size_t i = 0; i < tLines.size(); i++)
             {
                 cv::Vec2i p3(tLines[i][0], tLines[i][1]);
@@ -192,7 +202,7 @@ int main(int argc, char** argv)
             bool tUpdateExisting = false;
             for (size_t i = 0; i < track_points.size(); i++)
             {
-                if ((track_points[i] - x) < track_width)
+                if ((track_points[i] - x) < TRACK_WIDTH)
                 {
                     tUpdateExisting = true;
                     if (track_segments[i] < segments)
@@ -205,7 +215,7 @@ int main(int argc, char** argv)
             }
             if (!tUpdateExisting)   // New track point!
             {
-                if (track_points.size() < tracks)
+                if (track_points.size() < TRACK_COUNT)
                 {
                     track_points.push_back(x);
                     track_segments.push_back(segments);
@@ -229,7 +239,7 @@ int main(int argc, char** argv)
         for (size_t i = 0; i < track_points.size(); i++)
         {
             if (track_segments[i] % 2)                                          // Small hack to improve detection
-                track_points[i] -= track_width/(2 * (track_segments[i] % 2));   // of the track center.
+                track_points[i] -= TRACK_WIDTH/(2 * (track_segments[i] % 2));   // of the track center.
             int x = track_points[i];
             circle(tFrameFeatures, cv::Point(x, y), 5, cv::Scalar(0, 255, 255), -1);
         }
@@ -238,7 +248,7 @@ int main(int argc, char** argv)
         if (track_points.size() == 2)
         {
             int width = abs(track_points[0] - track_points[1]);
-            if (width > 100 && width < 175)
+            if (width > TRACK_SPACE_MIN && width < TRACK_SPACE_MAX)
             {
                 // Set the initial segment start
                 std::vector<std::pair<cv::Point, cv::Point> > track_segments;
@@ -262,19 +272,19 @@ int main(int argc, char** argv)
                     double max_overlap = 0;
                     int optimal_length;
                     double optimal_angle;
-                    for (int length = 50; ; length += 10)
+                    for (int length = SEGMENT_LENGTH_MIN; ; length += SEGMENT_LENGTH_DELTA)
                     {
                         bool has_improved = false;
 
-                        for (double angle = -M_PI_4; angle < M_PI_4; angle += M_PI/64.0)
+                        for (double angle = SEGMENT_ANGLE_MIN; angle < SEGMENT_ANGLE_MAX; angle += SEGMENT_ANGLE_DELTA)
                         {
                             // Track segment coordinates (not rotated)
-                            cv::Rect r(cv::Point(x-track_width/2, y),
-                                       cv::Point(x+track_width/2, y-length));
-                            cv::Point r1(x - track_width/2, y);
-                            cv::Point r2(x + track_width/2, y);
-                            cv::Point r3(x + track_width/2, y - length);
-                            cv::Point r4(x - track_width/2, y - length);
+                            cv::Rect r(cv::Point(x-TRACK_WIDTH/2, y),
+                                       cv::Point(x+TRACK_WIDTH/2, y-length));
+                            cv::Point r1(x - TRACK_WIDTH/2, y);
+                            cv::Point r2(x + TRACK_WIDTH/2, y);
+                            cv::Point r3(x + TRACK_WIDTH/2, y - length);
+                            cv::Point r4(x - TRACK_WIDTH/2, y - length);
 
                             // Process all lines
                             double tOverlap = 0;
@@ -354,14 +364,14 @@ int main(int argc, char** argv)
                             if (max_overlap > 0)
                             {
                                 // Track segment coordinates (forwardly rotated)
-                                cv::Point r1_rot(x - cos(optimal_angle) * track_width/2,
-                                                 y - sin(optimal_angle) * track_width/2);
-                                cv::Point r2_rot(x + cos(optimal_angle) * track_width/2,
-                                                 y + sin(optimal_angle) * track_width/2);
-                                cv::Point r3_rot(x + cos(optimal_angle) * track_width/2 + sin(optimal_angle) * optimal_length,
-                                                 y + sin(optimal_angle) * track_width/2 - cos(optimal_angle) * optimal_length);
-                                cv::Point r4_rot(x - cos(optimal_angle) * track_width/2 + sin(optimal_angle) * optimal_length,
-                                                 y - sin(optimal_angle) * track_width/2 - cos(optimal_angle) * optimal_length);
+                                cv::Point r1_rot(x - cos(optimal_angle) * TRACK_WIDTH/2,
+                                                 y - sin(optimal_angle) * TRACK_WIDTH/2);
+                                cv::Point r2_rot(x + cos(optimal_angle) * TRACK_WIDTH/2,
+                                                 y + sin(optimal_angle) * TRACK_WIDTH/2);
+                                cv::Point r3_rot(x + cos(optimal_angle) * TRACK_WIDTH/2 + sin(optimal_angle) * optimal_length,
+                                                 y + sin(optimal_angle) * TRACK_WIDTH/2 - cos(optimal_angle) * optimal_length);
+                                cv::Point r4_rot(x - cos(optimal_angle) * TRACK_WIDTH/2 + sin(optimal_angle) * optimal_length,
+                                                 y - sin(optimal_angle) * TRACK_WIDTH/2 - cos(optimal_angle) * optimal_length);
 
                                 // Draw the segment
                                 cv::line(tFrameFeatures, r1_rot, r2_rot, cv::Scalar(0, 255, 0), 1);
