@@ -261,17 +261,16 @@ int main(int argc, char** argv)
                     for (int length = 50; ; length += 10)
                     {
                         bool has_improved = false;
-                        std::cout << length << std::endl;
 
                         for (double angle = -M_PI_4; angle < M_PI_4; angle += M_PI/64.0)
                         {
                             // Track segment coordinates (not rotated)
                             cv::Rect r(cv::Point(x-track_width/2, y),
-                                       cv::Point(x+track_width/2, y+length));
+                                       cv::Point(x+track_width/2, y-length));
                             cv::Point r1(x - track_width/2, y);
                             cv::Point r2(x + track_width/2, y);
-                            cv::Point r3(x + track_width/2, y + length);
-                            cv::Point r4(x - track_width/2, y + length);
+                            cv::Point r3(x + track_width/2, y - length);
+                            cv::Point r4(x - track_width/2, y - length);
 
                             // Process all lines
                             double tOverlap = 0;
@@ -279,19 +278,17 @@ int main(int argc, char** argv)
                             {
                                 // Line coordinates (inversly rotated)
                                 cv::Point p1(tLines[i][0], tLines[i][1]);
-                                cv::Point p1_rot(x + cos(angle)*(p1.x-x) + sin(angle)*(p1.y-y),
-                                                 y - sin(angle)*(p1.x-x) + cos(angle)*(p1.y-y));
+                                cv::Point p1_rot(x + cos(-angle)*(p1.x-x) - sin(-angle)*(p1.y-y),
+                                                 y + sin(-angle)*(p1.x-x) + cos(-angle)*(p1.y-y));
                                 cv::Point p2(tLines[i][2], tLines[i][3]);
-                                cv::Point p2_rot(x + cos(angle)*(p2.x-x) + sin(angle)*(p2.y-y),
-                                                 y - sin(angle)*(p2.x-x) + cos(angle)*(p2.y-y));
+                                cv::Point p2_rot(x + cos(-angle)*(p2.x-x) - sin(-angle)*(p2.y-y),
+                                                 y + sin(-angle)*(p2.x-x) + cos(-angle)*(p2.y-y));
 
                                 // Full overlap
                                 if (r.contains(p1_rot) && r.contains(p2_rot))
-                                {
                                     tOverlap += sqrt((p1.x-p2.x)*(p1.x-p2.x) + (p1.y-p2.y)*(p1.y-p2.y));
-                                }
 
-                                // Partial overlap
+                                // Partial overlap with one point contained
                                 else if (r.contains(p1_rot) || r.contains(p2_rot))
                                 {
                                     // First point (the one within the rectangle)
@@ -304,23 +301,40 @@ int main(int argc, char** argv)
                                     // Second point (intersecting the rectangle)
                                     cv::Point p4;
                                     if (intersect(p1_rot, p2_rot, r1, r2))
-                                        p3 = intersect_point(p1_rot, p2_rot, r1, r2);
+                                        p4 = intersect_point(p1_rot, p2_rot, r1, r2);
                                     else if (intersect(p1_rot, p2_rot, r2, r3))
-                                        p3 = intersect_point(p1_rot, p2_rot, r2, r3);
+                                        p4 = intersect_point(p1_rot, p2_rot, r2, r3);
                                     else if (intersect(p1_rot, p2_rot, r3, r4))
-                                        p3 = intersect_point(p1_rot, p2_rot, r3, r4);
+                                        p4 = intersect_point(p1_rot, p2_rot, r3, r4);
                                     else if (intersect(p1_rot, p2_rot, r4, r1))
-                                        p3 = intersect_point(p1_rot, p2_rot, r4, r1);
+                                        p4 = intersect_point(p1_rot, p2_rot, r4, r1);
 
                                     // Calculate the distance
                                     tOverlap += sqrt((p3.x-p4.x)*(p3.x-p4.x) + (p3.y-p4.y)*(p3.y-p4.y));
+                                }
+
+                                // Partial overlap with no point contained
+                                else
+                                {
+                                    std::vector<cv::Point> p;
+
+                                    if (intersect(p1_rot, p2_rot, r1, r2))
+                                        p.push_back(intersect_point(p1_rot, p2_rot, r1, r2));
+                                    if (intersect(p1_rot, p2_rot, r2, r3))
+                                        p.push_back(intersect_point(p1_rot, p2_rot, r2, r3));
+                                    if (intersect(p1_rot, p2_rot, r3, r4))
+                                        p.push_back(intersect_point(p1_rot, p2_rot, r3, r4));
+                                    if (intersect(p1_rot, p2_rot, r4, r1))
+                                        p.push_back(intersect_point(p1_rot, p2_rot, r4, r1));
+
+                                    if (p.size() == 2)
+                                        tOverlap += sqrt((p[0].x-p[1].x)*(p[0].x-p[1].x) + (p[0].y-p[1].y)*(p[0].y-p[1].y));
                                 }
                             }
 
                             // Have the new values increased the overlap?
                             if (tOverlap > max_overlap)
                             {
-                                std::cout << "New max overlap: " << tOverlap << std::endl;
                                 max_overlap = tOverlap;
                                 optimal_angle = angle;
                                 optimal_length = length;
@@ -332,7 +346,6 @@ int main(int argc, char** argv)
                         // (i.e. no improvement in the last iteration)
                         if (!has_improved)
                         {
-                            std::cout << "New segment found (length " << optimal_length << ", overlapping score " << max_overlap << ")" << std::endl;
                             // If a segment had been found, save it
                             if (max_overlap > 0)
                             {
@@ -376,8 +389,8 @@ int main(int argc, char** argv)
         imshow("wp1", tFrameFeatures);
 
         // Halt on keypress
-        if (cv::waitKey(30) >= 0)
-            break;
+        //if (cv::waitKey(30) >= 0)
+        //    break;
     }
 
     return 0;
