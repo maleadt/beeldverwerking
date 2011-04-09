@@ -15,11 +15,12 @@
 #define TRACK_START_OFFSET 10
 #define TRACK_SPACE_MIN 100
 #define TRACK_SPACE_MAX 175
-#define SEGMENT_LENGTH_MIN 50
+#define SEGMENT_LENGTH_MIN 25
 #define SEGMENT_LENGTH_DELTA 10
 #define SEGMENT_ANGLE_MIN -M_PI_4
 #define SEGMENT_ANGLE_MAX M_PI_4
 #define SEGMENT_ANGLE_DELTA M_PI_4/64.0
+#define SEGMENT_ANGLE_DELTA_MAX M_PI/6.0
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -373,19 +374,31 @@ int main(int argc, char** argv)
                                 cv::Point r4_rot(x - cos(optimal_angle) * TRACK_WIDTH/2 + sin(optimal_angle) * optimal_length,
                                                  y - sin(optimal_angle) * TRACK_WIDTH/2 - cos(optimal_angle) * optimal_length);
 
-                                // Draw the segment
-                                cv::line(tFrameFeatures, r1_rot, r2_rot, cv::Scalar(0, 255, 0), 1);
-                                cv::line(tFrameFeatures, r2_rot, r3_rot, cv::Scalar(0, 255, 0), 1);
-                                cv::line(tFrameFeatures, r3_rot, r4_rot, cv::Scalar(0, 255, 0), 1);
-                                cv::line(tFrameFeatures, r4_rot, r1_rot, cv::Scalar(0, 255, 0), 1);
-                                imshow("wp1", tFrameFeatures);
-
-                                // Save the segment
+                                // Segment coordinates (center point of the top of the segment)
                                 double x_new = x + optimal_length * sin(optimal_angle);
                                 double y_new = y - optimal_length * cos(optimal_angle);
-                                track_segments.push_back(std::pair<cv::Point, cv::Point>(cv::Point(x_new, y_new), cv::Point(0, 0)));
-                                tNewSegment = true;
-                                cv::waitKey(300);
+
+                                // Check the slope
+                                double slope_current = atan2(y_new - track_segments.back().first.y,
+                                                             x_new - track_segments.back().first.x);
+                                double slope_prev;
+                                if (track_segments.size() >= 2)
+                                {
+                                    slope_prev = atan2(track_segments[track_segments.size()-1].first.y - track_segments[track_segments.size()-2].first.y,
+                                                       track_segments[track_segments.size()-1].first.x - track_segments[track_segments.size()-2].first.x);
+                                }
+                                if (track_segments.size() == 1 || abs(slope_current - slope_prev) <= SEGMENT_ANGLE_DELTA_MAX)
+                                {
+                                    // Draw the segment
+                                    cv::line(tFrameFeatures, r1_rot, r2_rot, cv::Scalar(0, 255, 0), 1);
+                                    cv::line(tFrameFeatures, r2_rot, r3_rot, cv::Scalar(0, 255, 0), 1);
+                                    cv::line(tFrameFeatures, r3_rot, r4_rot, cv::Scalar(0, 255, 0), 1);
+                                    cv::line(tFrameFeatures, r4_rot, r1_rot, cv::Scalar(0, 255, 0), 1);
+
+                                    // Save the segment
+                                    track_segments.push_back(std::pair<cv::Point, cv::Point>(cv::Point(x_new, y_new), cv::Point(0, 0)));
+                                    tNewSegment = true;
+                                }
                             }
 
                             // Stop the current iteration
@@ -403,8 +416,8 @@ int main(int argc, char** argv)
         imshow("wp1", tFrameFeatures);
 
         // Halt on keypress
-        //if (cv::waitKey(30) >= 0)
-        //    break;
+        if (cv::waitKey(30) >= 0)
+            break;
     }
 
     return 0;
