@@ -10,3 +10,8 @@ HEADERS += \
     auxiliary.h \
     component.h \
     framefeatures.h
+
+profile {
+    QMAKE_CXXFLAGS_DEBUG += -pg
+    QMAKE_LFLAGS_DEBUG += -pg
+}
