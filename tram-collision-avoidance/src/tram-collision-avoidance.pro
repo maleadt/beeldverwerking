@@ -9,7 +9,8 @@ HEADERS += \
     trackdetection.h \
     auxiliary.h \
     component.h \
-    framefeatures.h
+    framefeatures.h \
+    featureexception.h
 
 profile {
     QMAKE_CXXFLAGS_DEBUG += -pg

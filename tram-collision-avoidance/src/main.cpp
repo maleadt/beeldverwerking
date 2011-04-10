@@ -51,7 +51,7 @@ int main(int argc, char** argv)
     }
 
     // Setup OpenCV
-    cv::namedWindow("tram-collision-avoidance", 1);
+    cv::namedWindow("tram collision avoidance", 1);
 
 
     //
@@ -62,22 +62,32 @@ int main(int argc, char** argv)
     while (iVideo.grab() && iVideo.retrieve(tFrame))
     {
         // Set-up struct with features
-        FrameFeatures tFrameFeatures;
+        FrameFeatures tFeatures;
+        cv::Mat tFeaturesVisualized = tFrame.clone();
 
-        // Detect tracks
+        // Load objects
         TrackDetection tTrackDetection(tFrame);
-        tTrackDetection.preprocess();
-#if defined(DEBUG_PREPROCESSED)
-        tTrackDetection.setFrameDebug(tTrackDetection.framePreprocessed());
-        cvtColor(tFramePreprocessed, tFrameFeatures, CV_GRAY2BGR);
-#else
-        tTrackDetection.setFrameDebug(tFrame.clone());
-#endif
-        tTrackDetection.find_features(tFrameFeatures);
 
-        // Draw debug screen
-        // TODO: draw features instead of debug
-        imshow("track detection", tTrackDetection.frameDebug());
+        // Preprocess
+        tTrackDetection.preprocess();
+        tTrackDetection.setFrameDebug(tTrackDetection.framePreprocessed());
+
+        // Find features
+        imshow("tram collision avoidance", tFrame);
+        try
+        {
+            // Track detection
+            tTrackDetection.find_features(tFeatures);
+            for (size_t i = 0; i < tFeatures.track_left.size()-1; i++)
+                cv::line(tFeaturesVisualized, tFeatures.track_left[i], tFeatures.track_left[i+1], cv::Scalar(0, 255, 0), 3);
+            for (size_t i = 0; i < tFeatures.track_right.size()-1; i++)
+                cv::line(tFeaturesVisualized, tFeatures.track_right[i], tFeatures.track_right[i+1], cv::Scalar(0, 255, 0), 3);
+            imshow("tram collision avoidance", tFeaturesVisualized);
+        }
+        catch (FeatureException e)
+        {
+            std::cerr << "Error processing frame: " << e.what() << std::endl;
+        }
 
         // Halt on keypress
         if (cv::waitKey(30) >= 0)

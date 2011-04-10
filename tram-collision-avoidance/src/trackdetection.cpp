@@ -67,30 +67,35 @@ void TrackDetection::preprocess()
     mFramePreprocessed = tFrameThresholded;
 }
 
-void TrackDetection::find_features(FrameFeatures& iFrameFeatures)
+void TrackDetection::find_features(FrameFeatures& iFrameFeatures) throw(FeatureException)
 {
     // Detect lines
     std::vector<cv::Vec4i> tLines = find_lines();
 
     // Find track start candidates
     std::vector<cv::Point> tTrackCandidates = find_track_start(tLines);
+    if (tTrackCandidates.size() != 2)
+        throw FeatureException("could not find track start candidates (incorrect amount)");
 
     // Detect track segments
-    if (tTrackCandidates.size() == 2)
-    {
-        int tTrackSpacing = abs(tTrackCandidates[0].x - tTrackCandidates[1].x);
-        if (tTrackSpacing > TRACK_SPACE_MIN && tTrackSpacing < TRACK_SPACE_MAX)
-        {
-            // Detect both tracks
-            std::vector<cv::Point> tTrack1 = find_track(tTrackCandidates[0], tLines);
-            std::vector<cv::Point> tTrack2 = find_track(tTrackCandidates[1], tLines);
+    int tTrackSpacing = abs(tTrackCandidates[0].x - tTrackCandidates[1].x);
+    if (tTrackSpacing < TRACK_SPACE_MIN || tTrackSpacing > TRACK_SPACE_MAX)
+        throw FeatureException("could not find track start candidates (incorrect spacing)");
 
-            // TODO: check validity
+    // Detect both tracks
+    std::vector<cv::Point> tTrack1 = find_track(tTrackCandidates[0], tLines);
+    if (tTrack1.size() <= 1)
+        throw FeatureException("could not find first track");
+    std::vector<cv::Point> tTrack2 = find_track(tTrackCandidates[1], tLines);
+    if (tTrack2.size() <= 1)
+        throw FeatureException("could not find second track");
 
-            iFrameFeatures.track_left = tTrack1;
-            iFrameFeatures.track_right = tTrack2;
-        }
-    }
+    // TODO: detect left and right
+
+    // TODO: check validity
+
+    iFrameFeatures.track_left = tTrack1;
+    iFrameFeatures.track_right = tTrack2;
 }
 
 

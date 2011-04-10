@@ -20,7 +20,7 @@ public:
 
     // Component interface
     void preprocess();
-    void find_features(FrameFeatures& iFrameFeatures);
+    void find_features(FrameFeatures& iFrameFeatures) throw(FeatureException);
 
 private:
     // Feature detection
