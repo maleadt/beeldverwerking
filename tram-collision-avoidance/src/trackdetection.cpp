@@ -1,13 +1,10 @@
-///////////////////////////////////////////////////////////////////////////////
+//
 // Configuration
 //
 
-// Headers
-#include "opencv/cv.h"
-#include "opencv/highgui.h"
-#include <cmath>
-#include <iostream>
-#include <vector>
+// Includes
+#include "trackdetection.h"
+#include "auxiliary.h"
 
 // Feature properties
 #define TRACK_WIDTH 15
@@ -23,94 +20,77 @@
 #define SEGMENT_ANGLE_DELTA_MAX M_PI/6.0
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Routines
+//
+// Construction and destruction
 //
 
-//
-// Auxiliary
-//
-
-int twz(cv::Point a, cv::Point b, cv::Point c)
+TrackDetection::TrackDetection(const cv::Mat& iFrame) : Component(iFrame)
 {
-    int dxb = b.x - a.x, dyb = b.y - a.y,
-            dxc = c.x - a.x, dyc = c.y - a.y;
-    if (dxb * dyc > dyb * dxc)
-        return 1;
-    else if (dxb * dyc < dyb * dxc)
-        return -1;
-    else if (dxb * dxc < 0 || dyb * dyc < 0)
-        return -1;
-    else if (dxb * dxb + dyb * dyb >= dxc * dxc + dyc * dyc)
-        return 0;
-    else
-        return 1;
-}
 
-// Test of two segments intersect
-bool intersect(const cv::Point &p1, const cv::Point &p2,
-               const cv::Point &p3, const cv::Point &p4)
-{
-    return     (twz(p1, p2, p3) * twz(p1, p2, p4) <= 0)
-            && (twz(p3, p4, p1) * twz(p3, p4, p2) <= 0);
-}
-
-// Fetch the intersection point of two colliding segments (this has to
-// be tested beforehand)
-cv::Point intersect_point(const cv::Point &p1, const cv::Point &p2,
-                          const cv::Point &p3, const cv::Point &p4)
-{
-    int d = (p1.x-p2.x)*(p3.y-p4.y) - (p1.y-p2.y)*(p3.x-p4.x);
-
-    // HACK HACK
-    if (d == 0)
-        d++;
-
-    int xi = ((p3.x-p4.x)*(p1.x*p2.y-p1.y*p2.x)
-              -(p1.x-p2.x)*(p3.x*p4.y-p3.y*p4.x))
-            /d;
-    int yi = ((p3.y-p4.y)*(p1.x*p2.y-p1.y*p2.x)
-              -(p1.y-p2.y)*(p3.x*p4.y-p3.y*p4.x))
-            /d;
-
-    return cv::Point(xi, yi);
 }
 
 
 //
-// Preprocessing
+// Component interface
 //
 
-cv::Mat preprocess(const cv::Mat& iFrame)
+void TrackDetection::preprocess()
 {
     // Convert to grayscale
-    cv::Mat tFrameGray(iFrame.size(), CV_8U);
-    cvtColor(iFrame, tFrameGray, CV_RGB2GRAY);
+    cv::Mat tFrameGray(mFrame.size(), CV_8U);
+    cvtColor(mFrame, tFrameGray, CV_RGB2GRAY);
 
     // Sobel transform
-    cv::Mat tFrameSobel(iFrame.size(), CV_16S);
+    cv::Mat tFrameSobel(mFrame.size(), CV_16S);
     Sobel(tFrameGray, tFrameSobel, CV_16S, 3, 0, 9);
 
     // Convert to 32F
-    cv::Mat tFrameSobelFloat(iFrame.size(), CV_8U);
+    cv::Mat tFrameSobelFloat(mFrame.size(), CV_8U);
     tFrameSobel.convertTo(tFrameSobelFloat, CV_32F, 1.0/256, 128);
 
     // Threshold
     cv::Mat tFrameThresholded = tFrameSobelFloat > 200;
 
     // Blank out useless region
-    rectangle(tFrameThresholded, cv::Rect(0, 0, iFrame.size[1], iFrame.size[0] * 0.50), cv::Scalar::all(0), CV_FILLED);
+    rectangle(tFrameThresholded, cv::Rect(0, 0, mFrame.size[1], mFrame.size[0] * 0.50), cv::Scalar::all(0), CV_FILLED);
     std::vector<cv::Point> tRectRight, tRectLeft;
-    tRectRight.push_back(cv::Point(iFrame.size[1], iFrame.size[0]));
-    tRectRight.push_back(cv::Point(iFrame.size[1]-iFrame.size[1]*0.25, iFrame.size[0]));
-    tRectRight.push_back(cv::Point(iFrame.size[1], 0));
+    tRectRight.push_back(cv::Point(mFrame.size[1], mFrame.size[0]));
+    tRectRight.push_back(cv::Point(mFrame.size[1]-mFrame.size[1]*0.25, mFrame.size[0]));
+    tRectRight.push_back(cv::Point(mFrame.size[1], 0));
     fillConvexPoly(tFrameThresholded, &tRectRight[0], tRectRight.size(), cv::Scalar::all(0));
-    tRectLeft.push_back(cv::Point(0, iFrame.size[0]));
-    tRectLeft.push_back(cv::Point(0+iFrame.size[1]*0.25, iFrame.size[0]));
+    tRectLeft.push_back(cv::Point(0, mFrame.size[0]));
+    tRectLeft.push_back(cv::Point(0+mFrame.size[1]*0.25, mFrame.size[0]));
     tRectLeft.push_back(cv::Point(0, 0));
     fillConvexPoly(tFrameThresholded, &tRectLeft[0], tRectLeft.size(), cv::Scalar::all(0));
 
-    return tFrameThresholded;
+    // Save final frame
+    mFramePreprocessed = tFrameThresholded;
+}
+
+void TrackDetection::find_features(FrameFeatures& iFrameFeatures)
+{
+    // Detect lines
+    std::vector<cv::Vec4i> tLines = find_lines();
+
+    // Find track start candidates
+    std::vector<cv::Point> tTrackCandidates = find_track_start(tLines);
+
+    // Detect track segments
+    if (tTrackCandidates.size() == 2)
+    {
+        int tTrackSpacing = abs(tTrackCandidates[0].x - tTrackCandidates[1].x);
+        if (tTrackSpacing > TRACK_SPACE_MIN && tTrackSpacing < TRACK_SPACE_MAX)
+        {
+            // Detect both tracks
+            std::vector<cv::Point> tTrack1 = find_track(tTrackCandidates[0], tLines);
+            std::vector<cv::Point> tTrack2 = find_track(tTrackCandidates[1], tLines);
+
+            // TODO: check validity
+
+            iFrameFeatures.track_left = tTrack1;
+            iFrameFeatures.track_right = tTrack2;
+        }
+    }
 }
 
 
@@ -119,24 +99,23 @@ cv::Mat preprocess(const cv::Mat& iFrame)
 //
 
 // Find lines in a frams
-std::vector<cv::Vec4i> find_lines(cv::Mat& iFrame,
-                                  cv::Mat& iDebug)
+std::vector<cv::Vec4i> TrackDetection::find_lines()
 {
     // Find the lines through Hough transform
     std::vector<cv::Vec4i> oLines;
-    cv::HoughLinesP(iFrame, // Image
-                oLines,             // Lines
-                1,                  // Rho
-                CV_PI/180,          // Theta
-                20,                 // Threshold
-                50,                 // Minimum line length
-                3                   // Maximum line gap
+    cv::HoughLinesP(mFramePreprocessed, // Image
+                oLines,                 // Lines
+                1,                      // Rho
+                CV_PI/180,              // Theta
+                20,                     // Threshold
+                50,                     // Minimum line length
+                3                       // Maximum line gap
                 );
 
     // Draw lines
     for(size_t i = 0; i < oLines.size(); i++)
     {
-        line(iDebug,
+        line(mFrameDebug,
              cv::Point(oLines[i][0],
                        oLines[i][1]),
              cv::Point(oLines[i][2],
@@ -151,14 +130,12 @@ std::vector<cv::Vec4i> find_lines(cv::Mat& iFrame,
 }
 
 // Find the start candidates of a track
-std::vector<cv::Point> find_track_start(const cv::Mat& iFrame,
-                                        const std::vector<cv::Vec4i>& iLines,
-                                        cv::Mat& iDebug)
+std::vector<cv::Point> TrackDetection::find_track_start(const std::vector<cv::Vec4i>& iLines)
 {
     // Find track start candidates
     std::vector<int> track_points, track_intersections;
-    int y = iFrame.size[0] - TRACK_START_OFFSET;
-    for (int x = iFrame.size[1]-TRACK_WIDTH/2; x > TRACK_WIDTH/2; x--)
+    int y = mFramePreprocessed.size[0] - TRACK_START_OFFSET;
+    for (int x = mFramePreprocessed.size[1]-TRACK_WIDTH/2; x > TRACK_WIDTH/2; x--)
     {
         // Count the amount of segments intersecting with the current track start point
         int segments = 0;
@@ -223,7 +200,7 @@ std::vector<cv::Point> find_track_start(const cv::Mat& iFrame,
         if (track_intersections[i] % 2)                                          // Small hack to improve detection
             track_points[i] -= TRACK_WIDTH/(2 * (track_intersections[i] % 2));   // of the track center.
         int x = track_points[i];
-        circle(iDebug, cv::Point(x, y), 5, cv::Scalar(0, 255, 255), -1);
+        circle(mFrameDebug, cv::Point(x, y), 5, cv::Scalar(0, 255, 255), -1);
         oTrackCandidates.push_back(cv::Point(x, y));
     }
 
@@ -231,9 +208,8 @@ std::vector<cv::Point> find_track_start(const cv::Mat& iFrame,
 }
 
 // Find the segments of a track
-std::vector<cv::Point> find_track(const cv::Point& iStart,
-                                  const std::vector<cv::Vec4i>& iLines,
-                                  cv::Mat& iDebug)
+std::vector<cv::Point> TrackDetection::find_track(const cv::Point& iStart,
+                                                  const std::vector<cv::Vec4i>& iLines)
 {
     // Create output vector
     std::vector<cv::Point> oTrack;
@@ -245,7 +221,7 @@ std::vector<cv::Point> find_track(const cv::Point& iStart,
     {
         // Display segment
         cv::Point segment_last = oTrack.back();
-        circle(iDebug, segment_last, 5, cv::Scalar(0, 255, 0), -1);
+        circle(mFrameDebug, segment_last, 5, cv::Scalar(0, 255, 0), -1);
         tNewSegment = false;
 
         // Convenience variables for segment center
@@ -373,10 +349,10 @@ std::vector<cv::Point> find_track(const cv::Point& iStart,
                     if (oTrack.size() == 1 || abs(slope_current - slope_prev) <= SEGMENT_ANGLE_DELTA_MAX)
                     {
                         // Draw the segment
-                        cv::line(iDebug, r1_rot, r2_rot, cv::Scalar(0, 255, 0), 1);
-                        cv::line(iDebug, r2_rot, r3_rot, cv::Scalar(0, 255, 0), 1);
-                        cv::line(iDebug, r3_rot, r4_rot, cv::Scalar(0, 255, 0), 1);
-                        cv::line(iDebug, r4_rot, r1_rot, cv::Scalar(0, 255, 0), 1);
+                        cv::line(mFrameDebug, r1_rot, r2_rot, cv::Scalar(0, 255, 0), 1);
+                        cv::line(mFrameDebug, r2_rot, r3_rot, cv::Scalar(0, 255, 0), 1);
+                        cv::line(mFrameDebug, r3_rot, r4_rot, cv::Scalar(0, 255, 0), 1);
+                        cv::line(mFrameDebug, r4_rot, r1_rot, cv::Scalar(0, 255, 0), 1);
 
                         // Save the segment
                         oTrack.push_back(cv::Point(x_new, y_new));
@@ -391,104 +367,4 @@ std::vector<cv::Point> find_track(const cv::Point& iStart,
     }
 
     return oTrack;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Main
-//
-
-int main(int argc, char** argv)
-{
-    //
-    // Setup application
-    //
-
-    // Read command-line parameters
-    if (argc < 2)
-    {
-        std::cout << "Error: invalid usage" << "\n";
-        std::cout << "Usage: ./wp1 <input_filename> <output_filename>" << std::endl;
-        return 1;
-    }
-
-    // Open input video
-    std::string iVideoFile = argv[1];
-    cv::VideoCapture iVideo(iVideoFile);
-    if(!iVideo.isOpened())
-    {
-        std::cout << "Error: could not open video" << std::endl;
-        return 1;
-    }
-
-    // Open output video
-    cv::VideoWriter oVideo;
-    if (argc == 3)
-    {
-        std::string oVideoFile = argv[2];
-        oVideo = cv::VideoWriter(oVideoFile,
-                                 CV_FOURCC('M', 'J', 'P', 'G'),
-                                 iVideo.get(CV_CAP_PROP_FPS),
-                                 cv::Size(iVideo.get(CV_CAP_PROP_FRAME_WIDTH),iVideo.get(CV_CAP_PROP_FRAME_HEIGHT)),
-                                 true);
-    }
-
-    // Setup OpenCV
-    cv::namedWindow("wp1", 1);
-
-
-    //
-    // Process video
-    //
-
-    cv::Mat tFrame;
-    while (iVideo.grab() && iVideo.retrieve(tFrame))
-    {
-        // PREPROCESS //
-
-        cv::Mat tFramePreprocessed = preprocess(tFrame);
-
-
-        // FEATURE DETECTION //
-
-        // Frame with features
-        cv::Mat tFrameFeatures;
-#if defined(DEBUG_PREPROCESSED)
-        cvtColor(tFramePreprocessed, tFrameFeatures, CV_GRAY2BGR);
-#else
-        tFrameFeatures = tFrame.clone();
-#endif
-
-        // Detect lines
-        std::vector<cv::Vec4i> tLines = find_lines(tFramePreprocessed, tFrameFeatures);
-
-        // Find track start candidates
-        std::vector<cv::Point> tTrackCandidates = find_track_start(tFramePreprocessed, tLines, tFrameFeatures);
-
-        // Detect track segments
-        if (tTrackCandidates.size() == 2)
-        {
-            int tTrackSpacing = abs(tTrackCandidates[0].x - tTrackCandidates[1].x);
-            if (tTrackSpacing > TRACK_SPACE_MIN && tTrackSpacing < TRACK_SPACE_MAX)
-            {
-                // Detect both tracks
-                std::vector<cv::Point> tTrack1 = find_track(tTrackCandidates[0], tLines, tFrameFeatures);
-                std::vector<cv::Point> tTrack2 = find_track(tTrackCandidates[1], tLines, tFrameFeatures);
-
-            }
-        }
-
-
-        // DISPLAY //
-
-        // Display frame
-        imshow("wp1", tFrameFeatures);
-        if (oVideo.isOpened())
-            oVideo << tFrameFeatures;
-
-        // Halt on keypress
-        if (cv::waitKey(30) >= 0)
-            break;
-    }
-
-    return 0;
 }
