@@ -10,6 +10,9 @@
 #include "component.h"
 #include "trackdetection.h"
 
+// Definitions
+#define FEATURE_EXPIRATION 5
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main
@@ -59,8 +62,15 @@ int main(int argc, char** argv)
     //
 
     cv::Mat tFrame;
+    unsigned int tFrameCount = 0;
+    FrameFeatures tOldFeatures;
+    unsigned int tAgeTrack = 0;
     while (iVideo.grab() && iVideo.retrieve(tFrame))
     {
+        // Initialize the frame
+        std::cout << "-- PROCESSING FRAME " << tFrameCount++ << " --" << std::endl;
+        imshow("tram collision avoidance", tFrame);
+
         // Set-up struct with features
         FrameFeatures tFeatures;
         cv::Mat tFeaturesVisualized = tFrame.clone();
@@ -69,15 +79,33 @@ int main(int argc, char** argv)
         TrackDetection tTrackDetection(tFrame);
 
         // Preprocess
+        std::cout << "* Preprocessing" << std::endl;
         tTrackDetection.preprocess();
         tTrackDetection.setFrameDebug(tTrackDetection.framePreprocessed());
 
         // Find features
-        imshow("tram collision avoidance", tFrame);
+        std::cout << "* Finding features" << std::endl;
         try
         {
-            // Track detection
-            tTrackDetection.find_features(tFeatures);
+            // Find tracks
+            std::cout << "- Finding tracks" << std::endl;
+            try
+            {
+                tTrackDetection.find_features(tFeatures);
+                tTrackDetection.copy_features(tFeatures, tOldFeatures);
+                tAgeTrack = FEATURE_EXPIRATION;
+            }
+            catch (FeatureException e)
+            {
+                std::cout << "  Warning: " << e.what() << std::endl;
+                if (tAgeTrack > 0)
+                {
+                    tAgeTrack--;
+                    tTrackDetection.copy_features(tOldFeatures, tFeatures);
+                }
+                else
+                    throw FeatureException("could not find the tracks");
+            }
             for (size_t i = 0; i < tFeatures.track_left.size()-1; i++)
                 cv::line(tFeaturesVisualized, tFeatures.track_left[i], tFeatures.track_left[i+1], cv::Scalar(0, 255, 0), 3);
             for (size_t i = 0; i < tFeatures.track_right.size()-1; i++)
@@ -86,12 +114,13 @@ int main(int argc, char** argv)
         }
         catch (FeatureException e)
         {
-            std::cerr << "Error processing frame: " << e.what() << std::endl;
+            std::cout << "! Error: " << e.what() << std::endl;
         }
 
         // Halt on keypress
         if (cv::waitKey(30) >= 0)
             break;
+        std::cout << std::endl;
     }
 
     return 0;

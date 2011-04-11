@@ -21,6 +21,7 @@ public:
     // Component interface
     void preprocess();
     void find_features(FrameFeatures& iFrameFeatures) throw(FeatureException);
+    void copy_features(const FrameFeatures& from, FrameFeatures& to) const;
 
 private:
     // Feature detection
