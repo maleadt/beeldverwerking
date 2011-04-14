@@ -27,7 +27,7 @@ public:
 private:
     // Feature detection
     std::vector<cv::Vec4i> find_lines();
-    std::vector<cv::Point> find_track_start(const std::vector<cv::Vec4i>& iLines);
+    std::vector<cv::Point> find_track_start(const std::vector<cv::Vec4i>& iLines, unsigned int iScanline);
     std::vector<cv::Point> find_track(const cv::Point& iStart, const std::vector<cv::Vec4i>& iLines);
 
     // Frames

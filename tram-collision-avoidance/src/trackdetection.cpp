@@ -9,7 +9,9 @@
 // Feature properties
 #define TRACK_WIDTH 15
 #define TRACK_COUNT 2
-#define TRACK_START_OFFSET 10
+#define TRACK_START_OFFSET_MIN 10
+#define TRACK_START_OFFSET_MAX 50
+#define TRACK_START_OFFSET_DELTA 5
 #define TRACK_SPACE_MIN 100
 #define TRACK_SPACE_MAX 175
 #define SEGMENT_LENGTH_MIN 25
@@ -74,7 +76,16 @@ void TrackDetection::find_features(FrameFeatures& iFrameFeatures) throw(FeatureE
     std::vector<cv::Vec4i> tLines = find_lines();
 
     // Find track start candidates
-    std::vector<cv::Point> tTrackCandidates = find_track_start(tLines);
+    std::vector<cv::Point> tTrackCandidates;
+    for (int tScanlineOffset = TRACK_START_OFFSET_MIN; tScanlineOffset < TRACK_START_OFFSET_MAX; tScanlineOffset += TRACK_START_OFFSET_DELTA)
+    {
+        unsigned int tScanline = mFramePreprocessed.size[0] - tScanlineOffset;
+        tTrackCandidates = find_track_start(tLines, tScanline);
+        if (tTrackCandidates.size() == 2)
+            break;
+    }
+    for (size_t i = 0; i < tTrackCandidates.size(); i++)
+        circle(mFrameDebug, tTrackCandidates[i], 5, cv::Scalar(0, 255, 255), -1);
     if (tTrackCandidates.size() != 2)
         throw FeatureException("could not find track start candidates (incorrect amount)");
 
@@ -147,11 +158,11 @@ std::vector<cv::Vec4i> TrackDetection::find_lines()
 }
 
 // Find the start candidates of a track
-std::vector<cv::Point> TrackDetection::find_track_start(const std::vector<cv::Vec4i>& iLines)
+std::vector<cv::Point> TrackDetection::find_track_start(const std::vector<cv::Vec4i>& iLines, unsigned int iScanline)
 {
     // Find track start candidates
     std::vector<int> track_points, track_intersections;
-    int y = mFramePreprocessed.size[0] - TRACK_START_OFFSET;
+    int y = iScanline;
     for (int x = mFramePreprocessed.size[1]-TRACK_WIDTH/2; x > TRACK_WIDTH/2; x--)
     {
         // Count the amount of segments intersecting with the current track start point
@@ -217,7 +228,6 @@ std::vector<cv::Point> TrackDetection::find_track_start(const std::vector<cv::Ve
         if (track_intersections[i] % 2)                                          // Small hack to improve detection
             track_points[i] -= TRACK_WIDTH/(2 * (track_intersections[i] % 2));   // of the track center.
         int x = track_points[i];
-        circle(mFrameDebug, cv::Point(x, y), 5, cv::Scalar(0, 255, 255), -1);
         oTrackCandidates.push_back(cv::Point(x, y));
     }
 
