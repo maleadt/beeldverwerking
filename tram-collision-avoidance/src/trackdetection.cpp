@@ -37,34 +37,35 @@ TrackDetection::TrackDetection(const cv::Mat& iFrame) : Component(iFrame)
 void TrackDetection::preprocess()
 {
     // Convert to grayscale
-    cv::Mat tFrameGray(mFrame.size(), CV_8U);
-    cvtColor(mFrame, tFrameGray, CV_RGB2GRAY);
+    cv::Mat tFrameGray(frame().size(), CV_8U);
+    cvtColor(frame(), tFrameGray, CV_RGB2GRAY);
 
     // Sobel transform
-    cv::Mat tFrameSobel(mFrame.size(), CV_16S);
+    cv::Mat tFrameSobel(frame().size(), CV_16S);
     Sobel(tFrameGray, tFrameSobel, CV_16S, 3, 0, 9);
 
     // Convert to 32F
-    cv::Mat tFrameSobelFloat(mFrame.size(), CV_8U);
+    cv::Mat tFrameSobelFloat(frame().size(), CV_8U);
     tFrameSobel.convertTo(tFrameSobelFloat, CV_32F, 1.0/256, 128);
 
     // Threshold
     cv::Mat tFrameThresholded = tFrameSobelFloat > 200;
 
     // Blank out useless region
-    rectangle(tFrameThresholded, cv::Rect(0, 0, mFrame.size[1], mFrame.size[0] * 0.50), cv::Scalar::all(0), CV_FILLED);
+    rectangle(tFrameThresholded, cv::Rect(0, 0, frame().size[1], frame().size[0] * 0.50), cv::Scalar::all(0), CV_FILLED);
     std::vector<cv::Point> tRectRight, tRectLeft;
-    tRectRight.push_back(cv::Point(mFrame.size[1], mFrame.size[0]));
-    tRectRight.push_back(cv::Point(mFrame.size[1]-mFrame.size[1]*0.25, mFrame.size[0]));
-    tRectRight.push_back(cv::Point(mFrame.size[1], 0));
+    tRectRight.push_back(cv::Point(frame().size[1], frame().size[0]));
+    tRectRight.push_back(cv::Point(frame().size[1]-frame().size[1]*0.25, frame().size[0]));
+    tRectRight.push_back(cv::Point(frame().size[1], 0));
     fillConvexPoly(tFrameThresholded, &tRectRight[0], tRectRight.size(), cv::Scalar::all(0));
-    tRectLeft.push_back(cv::Point(0, mFrame.size[0]));
-    tRectLeft.push_back(cv::Point(0+mFrame.size[1]*0.25, mFrame.size[0]));
+    tRectLeft.push_back(cv::Point(0, frame().size[0]));
+    tRectLeft.push_back(cv::Point(0+frame().size[1]*0.25, frame().size[0]));
     tRectLeft.push_back(cv::Point(0, 0));
     fillConvexPoly(tFrameThresholded, &tRectLeft[0], tRectLeft.size(), cv::Scalar::all(0));
 
     // Save final frame
     mFramePreprocessed = tFrameThresholded;
+    cvtColor(mFramePreprocessed, mFrameDebug, CV_GRAY2BGR);
 }
 
 void TrackDetection::find_features(FrameFeatures& iFrameFeatures) throw(FeatureException)
@@ -102,6 +103,11 @@ void TrackDetection::copy_features(const FrameFeatures& from, FrameFeatures& to)
 {
     to.track_left = from.track_left;
     to.track_right = from.track_right;
+}
+
+cv::Mat TrackDetection::frameDebug() const
+{
+    return mFrameDebug;
 }
 
 

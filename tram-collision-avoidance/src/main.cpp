@@ -91,7 +91,6 @@ int main(int argc, char** argv)
         // Preprocess
         std::cout << "* Preprocessing" << std::endl;
         tTrackDetection.preprocess();
-        tTrackDetection.setFrameDebug(tTrackDetection.framePreprocessed());        
         if (tVisualisationType == DEBUG_TRACK)
             tVisualisation = tTrackDetection.frameDebug();
 
@@ -156,7 +155,7 @@ int main(int argc, char** argv)
             int tThickness = 1;
             int tBaseline = 0;
             cv::Size tTextSize = cv::getTextSize(tVisualisationTitle, tFontFace, tFontScale, tThickness, &tBaseline);
-            cv::Point tTextOrigin(0, tTextSize.height + 10);
+            cv::Point tTextOrigin(10, tTextSize.height + 10);
             putText(tVisualisation, tVisualisationTitle, tTextOrigin, tFontFace, tFontScale, cv::Scalar::all(255), tThickness, 8);
         }
         imshow("tram collision avoidance", tVisualisation);
