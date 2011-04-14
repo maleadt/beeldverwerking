@@ -13,6 +13,13 @@
 // Definitions
 #define FEATURE_EXPIRATION 5
 
+// Enumerations
+enum Visualisation {
+    FINAL = 1,
+    DEBUG_TRACK,
+};
+static int Visualisations = 2;
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main
@@ -65,15 +72,18 @@ int main(int argc, char** argv)
     unsigned int tFrameCount = 0;
     FrameFeatures tOldFeatures;
     unsigned int tAgeTrack = 0;
+    Visualisation tVisualisationType = FINAL;
+    unsigned int tVisualisationDuration = 0;
     while (iVideo.grab() && iVideo.retrieve(tFrame))
     {
-        // Initialize the frame
+        // Initialisation
         std::cout << "-- PROCESSING FRAME " << tFrameCount++ << " --" << std::endl;
-        imshow("tram collision avoidance", tFrame);
-
-        // Set-up struct with features
         FrameFeatures tFeatures;
-        cv::Mat tFeaturesVisualized = tFrame.clone();
+
+        // Manage visualisation
+        cv::Mat tVisualisation;
+        if (tVisualisationType == FINAL)
+            tVisualisation = tFrame.clone();
 
         // Load objects
         TrackDetection tTrackDetection(tFrame);
@@ -81,7 +91,9 @@ int main(int argc, char** argv)
         // Preprocess
         std::cout << "* Preprocessing" << std::endl;
         tTrackDetection.preprocess();
-        tTrackDetection.setFrameDebug(tTrackDetection.framePreprocessed());
+        tTrackDetection.setFrameDebug(tTrackDetection.framePreprocessed());        
+        if (tVisualisationType == DEBUG_TRACK)
+            tVisualisation = tTrackDetection.frameDebug();
 
         // Find features
         std::cout << "* Finding features" << std::endl;
@@ -106,22 +118,69 @@ int main(int argc, char** argv)
                 else
                     throw FeatureException("could not find the tracks");
             }
-            for (size_t i = 0; i < tFeatures.track_left.size()-1; i++)
-                cv::line(tFeaturesVisualized, tFeatures.track_left[i], tFeatures.track_left[i+1], cv::Scalar(0, 255, 0), 3);
-            for (size_t i = 0; i < tFeatures.track_right.size()-1; i++)
-                cv::line(tFeaturesVisualized, tFeatures.track_right[i], tFeatures.track_right[i+1], cv::Scalar(0, 255, 0), 3);
-            imshow("tram collision avoidance", tFeaturesVisualized);
+
+            // Draw tracks
+            if (tVisualisationType == FINAL)
+            {
+                for (size_t i = 0; i < tFeatures.track_left.size()-1; i++)
+                    cv::line(tVisualisation, tFeatures.track_left[i], tFeatures.track_left[i+1], cv::Scalar(0, 255, 0), 3);
+                for (size_t i = 0; i < tFeatures.track_right.size()-1; i++)
+                    cv::line(tVisualisation, tFeatures.track_right[i], tFeatures.track_right[i+1], cv::Scalar(0, 255, 0), 3);
+            }
         }
         catch (FeatureException e)
         {
             std::cout << "! Error: " << e.what() << std::endl;
         }
 
-        // Halt on keypress
-        if (cv::waitKey(30) >= 0)
+        // Draw title
+        if (tVisualisationDuration++ < 10)
+        {
+            // Generate visualisation title
+            std::string tVisualisationTitle;
+            switch (tVisualisationType)
+            {
+            case FINAL:
+                tVisualisationTitle = "Final frame";
+                break;
+            case DEBUG_TRACK:
+                tVisualisationTitle = "Track detection debug";
+                break;
+            default:
+                tVisualisationTitle = "Unknown";
+            }
+
+            // Manage placing
+            int tFontFace = cv::FONT_HERSHEY_DUPLEX;
+            double tFontScale = 1;
+            int tThickness = 1;
+            int tBaseline = 0;
+            cv::Size tTextSize = cv::getTextSize(tVisualisationTitle, tFontFace, tFontScale, tThickness, &tBaseline);
+            cv::Point tTextOrigin(0, tTextSize.height + 10);
+            putText(tVisualisation, tVisualisationTitle, tTextOrigin, tFontFace, tFontScale, cv::Scalar::all(255), tThickness, 8);
+        }
+        imshow("tram collision avoidance", tVisualisation);
+
+        // Manage keypresses
+        int tKeycode = cv::waitKey(30);
+        switch (tKeycode)
+        {
+        case -1:
             break;
+        case 32:
+            tVisualisationType++;
+            if (tVisualisationType > Visualisations)
+                tVisualisationType = FINAL;
+            tVisualisationDuration = 0;
+            break;
+        default:
+            goto END;
+        }
         std::cout << std::endl;
     }
+
+    END:
+        iVideo.release();
 
     return 0;
 }
