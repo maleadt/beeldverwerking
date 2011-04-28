@@ -18,7 +18,12 @@ enum Visualisation {
     FINAL = 1,
     DEBUG_TRACK,
 };
-static int Visualisations = 2;
+
+// Enumeratie increment
+template <class Enum> Enum & enum_increment(Enum& value, Enum begin, Enum end)
+{
+    return value = (value == end) ? begin : Enum(value + 1);
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -167,12 +172,11 @@ int main(int argc, char** argv)
         case -1:
             break;
         case 32:
-            tVisualisationType++;
-            if (tVisualisationType > Visualisations)
-                tVisualisationType = FINAL;
+            enum_increment(tVisualisationType, FINAL, DEBUG_TRACK);
             tVisualisationDuration = 0;
             break;
         default:
+            std::cout << tKeycode << std::endl;
             goto END;
         }
         std::cout << std::endl;
@@ -183,3 +187,4 @@ int main(int argc, char** argv)
 
     return 0;
 }
+
