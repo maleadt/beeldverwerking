@@ -11,6 +11,7 @@
 #include <cmath>
 #include <vector>
 #include "component.h"
+#include "framefeatures.h"
 
 class TrackDetection : public Component
 {
