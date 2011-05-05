@@ -17,7 +17,6 @@
 #include "featureexception.h"
 
 // Definitions
-#define FEATURE_EXPIRATION 5
 #define WRITE_VIDEO 0
 
 // Enumerations
@@ -66,11 +65,8 @@ private:
 #endif
 
     // Detection state
-    unsigned int mFrameCount;
-    FrameFeatures mOldFeatures;
-    unsigned int mAgeTrack;
+    FrameFeatures mFeatures;
     Visualisation mVisualisationType;
-    unsigned int mVisualisationDuration;
 };
 
 #endif // MAINWINDOW_H

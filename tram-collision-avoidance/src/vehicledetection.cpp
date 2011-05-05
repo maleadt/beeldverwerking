@@ -33,7 +33,7 @@ void VehicleDetection::preprocess()
 
 void VehicleDetection::find_features(FrameFeatures& iFrameFeatures) throw(FeatureException)
 {
-    for (int i = 0; i < vehicles.size(); i++) {
+    for (size_t i = 0; i < vehicles.size(); i++) {
         iFrameFeatures.vehicles.push_back(vehicles[i]);
     }
 }

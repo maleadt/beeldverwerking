@@ -66,11 +66,7 @@ void MainWindow::on_actionStart_triggered()
 #endif
 
     // Setup variables
-    mFrameCount = 0;
-    mOldFeatures;
-    mAgeTrack = 0;
     mVisualisationType = FINAL;
-    mVisualisationDuration = 0;
 
     // Schedule processing
     mUI->actionStop->setEnabled(true);
@@ -124,8 +120,7 @@ void MainWindow::process()
 cv::Mat MainWindow::processFrame(cv::Mat &iFrame)
 {
     // Initialisation
-    std::cout << "-- PROCESSING FRAME " << mFrameCount++ << " --" << std::endl;
-    FrameFeatures tFeatures;
+    std::cout << "-- PROCESSING FRAME -- " << std::endl;
 
     // Manage visualisation
     cv::Mat tVisualisation;
@@ -153,29 +148,26 @@ cv::Mat MainWindow::processFrame(cv::Mat &iFrame)
         std::cout << "- Finding tracks" << std::endl;
         try
         {
-            tTrackDetection.find_features(tFeatures);
-            tTrackDetection.copy_features(tFeatures, mOldFeatures);
-            mAgeTrack = FEATURE_EXPIRATION;
+            tTrackDetection.find_features(mFeatures);
         }
         catch (FeatureException e)
         {
-            std::cout << "  Warning: " << e.what() << std::endl;
-            if (mAgeTrack > 0)
-            {
-                mAgeTrack--;
-                tTrackDetection.copy_features(mOldFeatures, tFeatures);
-            }
-            else
-                throw FeatureException("could not find the tracks");
+            std::cout << "  Error finding tracks: " << e.what() << std::endl;
         }
 
         // Draw tracks
         if (mVisualisationType == FINAL)
         {
-            for (size_t i = 0; i < tFeatures.track_left.size()-1; i++)
-                cv::line(tVisualisation, tFeatures.track_left[i], tFeatures.track_left[i+1], cv::Scalar(0, 255, 0), 3);
-            for (size_t i = 0; i < tFeatures.track_right.size()-1; i++)
-                cv::line(tVisualisation, tFeatures.track_right[i], tFeatures.track_right[i+1], cv::Scalar(0, 255, 0), 3);
+            if (mFeatures.track_left.size())
+            {
+                for (size_t i = 0; i < mFeatures.track_left.size()-1; i++)
+                    cv::line(tVisualisation, mFeatures.track_left[i], mFeatures.track_left[i+1], cv::Scalar(0, 255, 0), 3);
+            }
+            if (mFeatures.track_right.size())
+            {
+                for (size_t i = 0; i < mFeatures.track_right.size()-1; i++)
+                    cv::line(tVisualisation, mFeatures.track_right[i], mFeatures.track_right[i+1], cv::Scalar(0, 255, 0), 3);
+            }
         }
     }
     catch (FeatureException e)
