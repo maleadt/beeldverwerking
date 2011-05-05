@@ -106,7 +106,7 @@ void VehicleDetection::detectWheels() {
 
     int start = 5; int end = 100;
     for (int i = start; i < end; i += 15) { //i += 5
-        vector<vector<cv::Point> > contours;
+        std::vector<std::vector<cv::Point> > contours;
         cv::Mat bimage = img >= i;
 
         findContours(bimage, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE ); //CV_RETR_LIST
@@ -144,7 +144,7 @@ void VehicleDetection::detectWheels() {
 
             Rectangle * r = new Rectangle(box);
 
-            list<Rectangle*>::iterator it;
+            std::list<Rectangle*>::iterator it;
             bool add = true;
             it=lst.begin();
             while (it != lst.end()) {
@@ -165,7 +165,7 @@ void VehicleDetection::detectWheels() {
             }
         }
     }
-    list<Rectangle*>::iterator it;
+    std::list<Rectangle*>::iterator it;
     for ( it=lst.begin() ; it != lst.end(); it++ ) {
         if ((*it) != 0) {
             vehicles.push_back((*(*it)).getRect());

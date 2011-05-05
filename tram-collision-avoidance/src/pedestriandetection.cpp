@@ -92,8 +92,8 @@ void PedestrianDetection::enhanceFrame() {
 }
 void PedestrianDetection::detectPedestrians(FrameFeatures& iFrameFeatures) {
 
-    vector<cv::Rect> found_filtered;
-    vector<cv::Rect> found;
+    std::vector<cv::Rect> found_filtered;
+    std::vector<cv::Rect> found;
 
 
     found_filtered.clear();
