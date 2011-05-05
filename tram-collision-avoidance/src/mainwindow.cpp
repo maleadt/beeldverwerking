@@ -169,6 +169,22 @@ cv::Mat MainWindow::processFrame(cv::Mat &iFrame)
                     cv::line(tVisualisation, mFeatures.track_right[i], mFeatures.track_right[i+1], cv::Scalar(0, 255, 0), 3);
             }
         }
+
+        // Find tracks
+        std::cout << "- Finding tracks" << std::endl;
+        try
+        {
+            tTramDetection.find_features(tFeatures);
+        }
+        catch (FeatureException e)
+        {
+        }
+
+        // Draw tram
+        if (mVisualisationType == FINAL)
+        {
+            cv::rectangle(tVisualisation, tFeatures.tram, cv::Scalar(0, 255, 0), 1);
+        }
     }
     catch (FeatureException e)
     {
