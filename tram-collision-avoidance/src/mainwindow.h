@@ -24,6 +24,7 @@
 enum Visualisation {
     FINAL = 1,
     DEBUG_TRACK,
+    DEBUG_TRAM
 };
 template <class Enum> Enum & enum_increment(Enum& value, Enum begin, Enum end)
 {

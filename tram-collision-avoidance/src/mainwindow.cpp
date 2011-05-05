@@ -8,6 +8,7 @@
 #include <QtGui/QVBoxLayout>
 #include <iostream>
 #include "trackdetection.h"
+#include "tramdetection.h"
 #include <QFileDialog>
 #include <QDebug>
 
@@ -133,12 +134,16 @@ cv::Mat MainWindow::processFrame(cv::Mat &iFrame)
 
     // Load objects
     TrackDetection tTrackDetection(iFrame);
+    TramDetection tTramDetection(iFrame);
 
     // Preprocess
     std::cout << "* Preprocessing" << std::endl;
     tTrackDetection.preprocess();
+    tTramDetection.preprocess();
     if (mVisualisationType == DEBUG_TRACK)
         tVisualisation = tTrackDetection.frameDebug();
+    else if (mVisualisationType == DEBUG_TRAM)
+        tVisualisation = tTramDetection.frameDebug();
 
     // Find features
     std::cout << "* Finding features" << std::endl;

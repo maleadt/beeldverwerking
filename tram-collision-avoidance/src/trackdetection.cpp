@@ -54,14 +54,14 @@ void TrackDetection::preprocess()
     cv::Mat tFrameThresholded = tFrameSobelFloat > 200;
 
     // Blank out useless region
-    rectangle(tFrameThresholded, cv::Rect(0, 0, frame().size[1], frame().size[0] * 0.50), cv::Scalar::all(0), CV_FILLED);
+    rectangle(tFrameThresholded, cv::Rect(0, 0, frame().size().width, frame().size().height * 0.50), cv::Scalar::all(0), CV_FILLED);
     std::vector<cv::Point> tRectRight, tRectLeft;
-    tRectRight.push_back(cv::Point(frame().size[1], frame().size[0]));
-    tRectRight.push_back(cv::Point(frame().size[1]-frame().size[1]*0.25, frame().size[0]));
-    tRectRight.push_back(cv::Point(frame().size[1], 0));
+    tRectRight.push_back(cv::Point(frame().size().width, frame().size().height));
+    tRectRight.push_back(cv::Point(frame().size().width-frame().size().width*0.25, frame().size().height));
+    tRectRight.push_back(cv::Point(frame().size().width, 0));
     fillConvexPoly(tFrameThresholded, &tRectRight[0], tRectRight.size(), cv::Scalar::all(0));
-    tRectLeft.push_back(cv::Point(0, frame().size[0]));
-    tRectLeft.push_back(cv::Point(0+frame().size[1]*0.25, frame().size[0]));
+    tRectLeft.push_back(cv::Point(0, frame().size().height));
+    tRectLeft.push_back(cv::Point(0+frame().size().width*0.25, frame().size().height));
     tRectLeft.push_back(cv::Point(0, 0));
     fillConvexPoly(tFrameThresholded, &tRectLeft[0], tRectLeft.size(), cv::Scalar::all(0));
 
@@ -79,7 +79,7 @@ void TrackDetection::find_features(FrameFeatures& iFrameFeatures) throw(FeatureE
     std::vector<cv::Point> tTrackCandidates;
     for (int tScanlineOffset = TRACK_START_OFFSET_MIN; tScanlineOffset < TRACK_START_OFFSET_MAX; tScanlineOffset += TRACK_START_OFFSET_DELTA)
     {
-        unsigned int tScanline = mFramePreprocessed.size[0] - tScanlineOffset;
+        unsigned int tScanline = mFramePreprocessed.size().height - tScanlineOffset;
         tTrackCandidates = find_track_start(tLines, tScanline);
         if (tTrackCandidates.size() == 2)
             break;
@@ -163,7 +163,7 @@ std::vector<cv::Point> TrackDetection::find_track_start(const std::vector<cv::Ve
     // Find track start candidates
     std::vector<int> track_points, track_intersections;
     int y = iScanline;
-    for (int x = mFramePreprocessed.size[1]-TRACK_WIDTH/2; x > TRACK_WIDTH/2; x--)
+    for (int x = mFramePreprocessed.size().width-TRACK_WIDTH/2; x > TRACK_WIDTH/2; x--)
     {
         // Count the amount of segments intersecting with the current track start point
         int segments = 0;

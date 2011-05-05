@@ -7,7 +7,10 @@ SOURCES += \
     main.cpp \
     trackdetection.cpp \
     glwidget.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    tramdetection.cpp \
+    pedestriandetection.cpp \
+    vehicledetection.cpp
 
 HEADERS += \
     trackdetection.h \
@@ -16,7 +19,10 @@ HEADERS += \
     framefeatures.h \
     featureexception.h \
     glwidget.h \
-    mainwindow.h
+    mainwindow.h \
+    tramdetection.h \
+    pedestriandetection.h \
+    vehicledetection.h
 
 profile {
     QMAKE_CXXFLAGS_DEBUG += -pg
