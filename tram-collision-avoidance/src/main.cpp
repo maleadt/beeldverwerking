@@ -12,6 +12,7 @@
 #include "tramdetection.h"
 #include "pedestriandetection.h"
 #include "vehicledetection.h"
+#include <QDebug>
 
 // Definitions
 #define FEATURE_EXPIRATION 5
@@ -106,8 +107,8 @@ int main(int argc, char** argv)
         if (tVisualisationType == DEBUG_TRACK)
             tVisualisation = tTrackDetection.frameDebug();
 
-        else if (tVisualisationType == DEBUG_TRAM)
-            tVisualisation = tTramDetection.frameDebug();
+        else if (tVisualisationType == DEBUG_TRAM) {
+            tVisualisation = tTramDetection.frameDebug();}
 
         // Find features
         std::cout << "* Finding features" << std::endl;
@@ -141,6 +142,23 @@ int main(int argc, char** argv)
                 for (size_t i = 0; i < tFeatures.track_right.size()-1; i++)
                     cv::line(tVisualisation, tFeatures.track_right[i], tFeatures.track_right[i+1], cv::Scalar(0, 255, 0), 3);
             }
+
+
+            // Find tracks
+            std::cout << "- Finding tram" << std::endl;
+            try
+            {
+                tTramDetection.find_features(tFeatures);
+            }
+            catch (FeatureException e)
+            {
+            }
+
+            // Draw tram
+            if( tVisualisationType == FINAL){
+                cv::rectangle(tVisualisation, tFeatures.tram, cv::Scalar(0, 255, 0, 0), 1, 0, 0);
+            }
+
         }
         catch (FeatureException e)
         {
@@ -197,7 +215,7 @@ int main(int argc, char** argv)
     }
 
     END:
-        iVideo.release();
+    iVideo.release();
 
     return 0;
 }

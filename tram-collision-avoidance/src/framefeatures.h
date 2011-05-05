@@ -17,6 +17,8 @@ struct FrameFeatures
     std::vector<cv::Rect> pedestrians;
 
     std::vector<cv::Rect> vehicles;
+
+    cv::Rect tram;
 };
 
 #endif // FRAMEFEATURES_H
