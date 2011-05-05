@@ -10,6 +10,8 @@
 #include "component.h"
 #include "trackdetection.h"
 #include "tramdetection.h"
+#include "pedestriandetection.h"
+#include "vehicledetection.h"
 
 // Definitions
 #define FEATURE_EXPIRATION 5
@@ -34,6 +36,7 @@ template <class Enum> Enum & enum_increment(Enum& value, Enum begin, Enum end)
 
 int main(int argc, char** argv)
 {
+
     //
     // Setup application
     //

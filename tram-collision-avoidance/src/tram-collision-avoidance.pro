@@ -4,7 +4,9 @@ PKGCONFIG += opencv
 SOURCES += \
     main.cpp \
     trackdetection.cpp \
-    tramdetection.cpp
+    tramdetection.cpp \
+    pedestriandetection.cpp \
+    vehicledetection.cpp
 
 HEADERS += \
     trackdetection.h \
@@ -12,7 +14,9 @@ HEADERS += \
     component.h \
     framefeatures.h \
     featureexception.h \
-    tramdetection.h
+    tramdetection.h \
+    pedestriandetection.h \
+    vehicledetection.h
 
 profile {
     QMAKE_CXXFLAGS_DEBUG += -pg
