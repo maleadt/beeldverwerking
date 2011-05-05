@@ -9,6 +9,7 @@
 #include "framefeatures.h"
 #include "component.h"
 #include "trackdetection.h"
+#include "tramdetection.h"
 
 // Definitions
 #define FEATURE_EXPIRATION 5
@@ -17,6 +18,7 @@
 enum Visualisation {
     FINAL = 1,
     DEBUG_TRACK,
+    DEBUG_TRAM,
 };
 
 // Enumeratie increment
@@ -92,12 +94,17 @@ int main(int argc, char** argv)
 
         // Load objects
         TrackDetection tTrackDetection(tFrame);
+        TramDetection tTramDetection(tFrame);
 
         // Preprocess
         std::cout << "* Preprocessing" << std::endl;
         tTrackDetection.preprocess();
+        tTramDetection.preprocess();
         if (tVisualisationType == DEBUG_TRACK)
             tVisualisation = tTrackDetection.frameDebug();
+
+        else if (tVisualisationType == DEBUG_TRAM)
+            tVisualisation = tTramDetection.frameDebug();
 
         // Find features
         std::cout << "* Finding features" << std::endl;
@@ -150,6 +157,9 @@ int main(int argc, char** argv)
             case DEBUG_TRACK:
                 tVisualisationTitle = "Track detection debug";
                 break;
+            case DEBUG_TRAM:
+                tVisualisationTitle = "Tram detection debug";
+                break;
             default:
                 tVisualisationTitle = "Unknown";
             }
@@ -171,8 +181,9 @@ int main(int argc, char** argv)
         {
         case -1:
             break;
-        case 32:
-            enum_increment(tVisualisationType, FINAL, DEBUG_TRACK);
+        case 32: // Spatie
+        case 1048608:
+            enum_increment(tVisualisationType, FINAL, DEBUG_TRAM);
             tVisualisationDuration = 0;
             break;
         default:

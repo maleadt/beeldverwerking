@@ -3,14 +3,16 @@ PKGCONFIG += opencv
 
 SOURCES += \
     main.cpp \
-    trackdetection.cpp
+    trackdetection.cpp \
+    tramdetection.cpp
 
 HEADERS += \
     trackdetection.h \
     auxiliary.h \
     component.h \
     framefeatures.h \
-    featureexception.h
+    featureexception.h \
+    tramdetection.h
 
 profile {
     QMAKE_CXXFLAGS_DEBUG += -pg
