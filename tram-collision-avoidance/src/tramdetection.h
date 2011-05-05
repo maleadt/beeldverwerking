@@ -3,6 +3,7 @@
 
 // Includes
 #include "opencv/cv.h"
+#include "highgui.h"
 #include <cmath>
 #include <vector>
 #include "component.h"
