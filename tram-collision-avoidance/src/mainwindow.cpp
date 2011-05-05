@@ -144,53 +144,46 @@ cv::Mat MainWindow::processFrame(cv::Mat &iFrame)
     std::cout << "* Finding features" << std::endl;
     try
     {
-        // Find tracks
-        std::cout << "- Finding tracks" << std::endl;
-        try
-        {
-            tTrackDetection.find_features(mFeatures);
-        }
-        catch (FeatureException e)
-        {
-            std::cout << "  Error finding tracks: " << e.what() << std::endl;
-        }
-
-        // Draw tracks
-        if (mVisualisationType == FINAL)
-        {
-            if (mFeatures.track_left.size())
-            {
-                for (size_t i = 0; i < mFeatures.track_left.size()-1; i++)
-                    cv::line(tVisualisation, mFeatures.track_left[i], mFeatures.track_left[i+1], cv::Scalar(0, 255, 0), 3);
-            }
-            if (mFeatures.track_right.size())
-            {
-                for (size_t i = 0; i < mFeatures.track_right.size()-1; i++)
-                    cv::line(tVisualisation, mFeatures.track_right[i], mFeatures.track_right[i+1], cv::Scalar(0, 255, 0), 3);
-            }
-        }
-
-        // Find tram
-        std::cout << "- Finding tracks" << std::endl;
-        try
-        {
-            tTramDetection.find_features(mFeatures);
-        }
-        catch (FeatureException e)
-        {
-            std::cout << "  Error finding tram: " << e.what() << std::endl;
-        }
-
-        // Draw tram
-        if (mVisualisationType == FINAL)
-        {
-            cv::rectangle(tVisualisation, mFeatures.tram, cv::Scalar(0, 255, 0), 1);
-        }
+        tTrackDetection.find_features(mFeatures);
     }
     catch (FeatureException e)
     {
-        std::cout << "! Error: " << e.what() << std::endl;
+        std::cout << "  Error finding tracks: " << e.what() << std::endl;
     }
+    try
+    {
+        tTramDetection.find_features(mFeatures);
+    }
+    catch (FeatureException e)
+    {
+        std::cout << "  Error finding tram: " << e.what() << std::endl;
+    }
+
+    // Draw image
+    std::cout << "* Drawing image" << std::endl;
+    if (mVisualisationType == FINAL)
+    {
+        tVisualisation = iFrame.clone();
+
+        // Draw tracks
+        if (mFeatures.track_left.size())
+        {
+            for (size_t i = 0; i < mFeatures.track_left.size()-1; i++)
+                cv::line(tVisualisation, mFeatures.track_left[i], mFeatures.track_left[i+1], cv::Scalar(0, 255, 0), 3);
+        }
+        if (mFeatures.track_right.size())
+        {
+            for (size_t i = 0; i < mFeatures.track_right.size()-1; i++)
+                cv::line(tVisualisation, mFeatures.track_right[i], mFeatures.track_right[i+1], cv::Scalar(0, 255, 0), 3);
+        }
+
+        // Draw tram
+        cv::rectangle(tVisualisation, mFeatures.tram, cv::Scalar(0, 255, 0), 1);
+    }
+    else if (mVisualisationType == DEBUG_TRACK)
+        tVisualisation = tTrackDetection.frameDebug();
+    else if (mVisualisationType == DEBUG_TRAM)
+        tVisualisation = tTramDetection.frameDebug();
 
     return tVisualisation;
 }
