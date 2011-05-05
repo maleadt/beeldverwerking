@@ -170,20 +170,21 @@ cv::Mat MainWindow::processFrame(cv::Mat &iFrame)
             }
         }
 
-        // Find tracks
+        // Find tram
         std::cout << "- Finding tracks" << std::endl;
         try
         {
-            tTramDetection.find_features(tFeatures);
+            tTramDetection.find_features(mFeatures);
         }
         catch (FeatureException e)
         {
+            std::cout << "  Error finding tram: " << e.what() << std::endl;
         }
 
         // Draw tram
         if (mVisualisationType == FINAL)
         {
-            cv::rectangle(tVisualisation, tFeatures.tram, cv::Scalar(0, 255, 0), 1);
+            cv::rectangle(tVisualisation, mFeatures.tram, cv::Scalar(0, 255, 0), 1);
         }
     }
     catch (FeatureException e)
