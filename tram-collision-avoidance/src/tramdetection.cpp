@@ -36,9 +36,6 @@ void TramDetection::preprocess()
     mFramePreprocessed = tFrame;
 }
 
-void TramDetection::copy_features(const FrameFeatures& from, FrameFeatures& to) const {
-}
-
 void TramDetection::find_features(FrameFeatures &iFrameFeatures) throw(FeatureException) {
     // Loading template to match with the mPreProcessedFrame
     cv::Mat tTemplate = cv::imread("../res/tram_back001.jpeg");

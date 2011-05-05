@@ -37,10 +37,6 @@ void VehicleDetection::find_features(FrameFeatures& iFrameFeatures) throw(Featur
         iFrameFeatures.vehicles.push_back(vehicles[i]);
     }
 }
-void VehicleDetection::copy_features(const FrameFeatures& from, FrameFeatures& to) const
-{
-    to.vehicles = from.vehicles;
-}
 
 cv::Mat VehicleDetection::frameDebug() const
 {

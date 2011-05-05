@@ -35,13 +35,6 @@ public:
     virtual void find_features(FrameFeatures&) throw(FeatureException) = 0;
 
     /*
-      This method copies features from a previous result to a new variable. It
-      is called by the application when the find_features() call threw an exception,
-      and the application decides to re-use a previous result.
-      */
-    virtual void copy_features(const FrameFeatures& from, FrameFeatures& to) const = 0;
-
-    /*
       The current frame to be processed.
       */
 

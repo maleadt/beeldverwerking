@@ -110,12 +110,6 @@ void TrackDetection::find_features(FrameFeatures& iFrameFeatures) throw(FeatureE
     iFrameFeatures.track_right = tTrack2;
 }
 
-void TrackDetection::copy_features(const FrameFeatures& from, FrameFeatures& to) const
-{
-    to.track_left = from.track_left;
-    to.track_right = from.track_right;
-}
-
 cv::Mat TrackDetection::frameDebug() const
 {
     return mFrameDebug;
