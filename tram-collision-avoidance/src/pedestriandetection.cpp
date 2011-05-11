@@ -31,10 +31,6 @@ void PedestrianDetection::find_features(FrameFeatures& iFrameFeatures) throw(Fea
     enhanceFrame();
     detectPedestrians(iFrameFeatures);
 }
-void PedestrianDetection::copy_features(const FrameFeatures& from, FrameFeatures& to) const
-{
-    to.pedestrians = from.pedestrians;
-}
 
 cv::Mat PedestrianDetection::frameDebug() const
 {
