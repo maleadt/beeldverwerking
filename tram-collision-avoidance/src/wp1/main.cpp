@@ -8,7 +8,7 @@ using namespace cv;
 int main(int, char**)
 {
     //VideoCapture cap("/home/tim/Desktop/obstakeldetectie.avi");
-    VideoCapture cap("/home/ruben/beeldverwerking/obstakeldetectie.avi");
+    VideoCapture cap("/home/sebastiaan/beeldverwerking/obstakeldetectie.avi");
     if(!cap.isOpened())
         return -1;
 
@@ -37,7 +37,7 @@ int main(int, char**)
             double dy = double(lines[i][3] - lines[i][1]);
             double dx = double(lines[i][2] - lines[i][0]);
             double rc = abs(dy/dx);
-            std::cout << "rc: " << rc << std::endl;
+         //   std::cout << "rc: " << rc << std::endl;
             line(
                         edges_color,
                         Point(lines[i][0],
