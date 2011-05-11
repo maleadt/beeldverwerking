@@ -22,6 +22,6 @@ template = im_bw_inverted(topleft(2):downright(2), topleft(1):downright(1));
 figure, imshow(bwhitmiss(uint8(im_bw_inverted),uint8(template)));
 
 
-%normxcorr2 ???
+%normxcorr2 ??? --> ZIE TEMPLATE MATCHING
 end
 
