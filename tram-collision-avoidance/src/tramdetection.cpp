@@ -1,4 +1,14 @@
+//
+// Configuration
+//
+
+// Includes
 #include "tramdetection.h"
+#include <QString>
+
+// Feature properties
+#define MAX_THRESHOLD 0.89
+#define MIN_THRESHOLD 0
 
 //
 // Construction and destruction
@@ -67,10 +77,18 @@ void TramDetection::find_features(FrameFeatures &iFrameFeatures) throw(FeatureEx
     cv::Point tLocation;
 
     // Afhankelijk van gebruikte methode moet globaal minimum of globaal maximum gebruikt worden
-    if(currMethod < 2 ) {
+    if(currMethod < 3 ) {
+        // Is er echt wel een tram?
+        if(tMinValue > MIN_THRESHOLD){
+            throw FeatureException("no tram found (" + QString::number(tMaxValue) + ")");
+        }
         // Gebruik globaal minimum
         tLocation = tMinLocation;
     } else {
+        // Is er echt wel een tram?
+        if(tMaxValue < MAX_THRESHOLD){
+            throw FeatureException("no tram found (" + QString::number(tMaxValue) + ")");
+        }
         // Gebruik globaal maximum
         tLocation = tMaxLocation;
     }
