@@ -23,8 +23,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), mUI(new Ui::MainW
     mUI->setupUi(this);
     mGLWidget = new GLWidget();
     mUI->videoLayout->addWidget(mGLWidget);
-    mUI->actionStart->setEnabled(false);
-    mUI->actionStop->setEnabled(false);
+    mUI->buttonStart->setEnabled(false);
+    mUI->buttonStop->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
@@ -40,11 +40,11 @@ MainWindow::~MainWindow()
 // UI slots
 //
 
-void MainWindow::on_actionStart_triggered()
+void MainWindow::on_buttonStart_clicked()
 {
     // Statusbar message
     mUI->statusBar->showMessage("Started processing");
-    mUI->actionStart->setEnabled(false);
+    mUI->buttonStart->setEnabled(false);
 
     // Open input video
     mVideoCapture = new cv::VideoCapture(mVideoFilename.toStdString());
@@ -65,17 +65,17 @@ void MainWindow::on_actionStart_triggered()
 #endif
 
     // Schedule processing
-    mUI->actionStop->setEnabled(true);
+    mUI->buttonStop->setEnabled(true);
     process();
 }
 
-void MainWindow::on_actionStop_triggered()
+void MainWindow::on_buttonStop_clicked()
 {
     // Statusbar message
     mUI->statusBar->showMessage("Stopped processing");
     mVideoCapture->release();
-    mUI->actionStart->setEnabled(true);
-    mUI->actionStop->setEnabled(false);
+    mUI->buttonStart->setEnabled(true);
+    mUI->buttonStop->setEnabled(false);
 }
 
 void MainWindow::on_actionOpen_triggered()
@@ -83,12 +83,12 @@ void MainWindow::on_actionOpen_triggered()
     mVideoFilename = QFileDialog::getOpenFileName(this, tr("Open Video"), "", tr("Video Files (*.avi *.mp4)"));
     if (QFileInfo(mVideoFilename).isReadable())
     {
-        mUI->actionStart->setEnabled(true);
+        mUI->buttonStart->setEnabled(true);
     }
     else
     {
         qWarning() << "File '" << mVideoFilename << "' not readable";
-        mUI->actionStart->setEnabled(false);
+        mUI->buttonStart->setEnabled(false);
     }
 }
 

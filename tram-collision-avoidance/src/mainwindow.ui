@@ -23,37 +23,59 @@
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
      <layout class="QGridLayout" name="mainLayout">
-      <item row="1" column="0">
+      <item row="1" column="1">
        <layout class="QHBoxLayout" name="buttonLayout">
         <item>
-         <widget class="QCheckBox" name="drawFeatures">
-          <property name="text">
-           <string>Draw detected features</string>
-          </property>
-         </widget>
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <item>
+           <widget class="QCheckBox" name="drawFeatures">
+            <property name="text">
+             <string>Draw detected features</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="visualisationType">
+            <item>
+             <property name="text">
+              <string>Input frame</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Track detection debugging</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Tram detection debugging</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item>
-         <widget class="QComboBox" name="visualisationType">
+         <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
-           <property name="text">
-            <string>Input frame</string>
-           </property>
+           <widget class="QPushButton" name="buttonStart">
+            <property name="text">
+             <string>Start</string>
+            </property>
+           </widget>
           </item>
           <item>
-           <property name="text">
-            <string>Track detection debugging</string>
-           </property>
+           <widget class="QPushButton" name="buttonStop">
+            <property name="text">
+             <string>Stop</string>
+            </property>
+           </widget>
           </item>
-          <item>
-           <property name="text">
-            <string>Tram detection debugging</string>
-           </property>
-          </item>
-         </widget>
+         </layout>
         </item>
        </layout>
       </item>
-      <item row="2" column="0">
+      <item row="2" column="1">
        <layout class="QHBoxLayout" name="videoLayout"/>
       </item>
      </layout>
@@ -77,15 +99,7 @@
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
-   <widget class="QMenu" name="menuVideo">
-    <property name="title">
-     <string>Video</string>
-    </property>
-    <addaction name="actionStart"/>
-    <addaction name="actionStop"/>
-   </widget>
    <addaction name="menuAction"/>
-   <addaction name="menuVideo"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionStart">

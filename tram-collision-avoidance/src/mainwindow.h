@@ -44,8 +44,8 @@ public:
 
     // UI slots
 private slots:
-    void on_actionStart_triggered();
-    void on_actionStop_triggered();
+    void on_buttonStart_clicked();
+    void on_buttonStop_clicked();
     void on_actionOpen_triggered();
 
     // Auxiliary
