@@ -22,8 +22,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), mUI(new Ui::MainW
     // Setup interface
     mUI->setupUi(this);
     mGLWidget = new GLWidget();
-    mUI->verticalLayout->addWidget(mGLWidget);
-
+    mUI->videoLayout->addWidget(mGLWidget);
     mUI->actionStart->setEnabled(false);
     mUI->actionStop->setEnabled(false);
 }
@@ -64,9 +63,6 @@ void MainWindow::on_actionStart_triggered()
                              cv::Size(mVideoCapture->get(CV_CAP_PROP_FRAME_WIDTH),mVideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT)),
                              true);
 #endif
-
-    // Setup variables
-    mVisualisationType = FINAL;
 
     // Schedule processing
     mUI->actionStop->setEnabled(true);
@@ -122,11 +118,6 @@ cv::Mat MainWindow::processFrame(cv::Mat &iFrame)
     // Initialisation
     std::cout << "-- PROCESSING FRAME -- " << std::endl;
 
-    // Manage visualisation
-    cv::Mat tVisualisation;
-    if (mVisualisationType == FINAL)
-        tVisualisation = iFrame.clone();
-
     // Load objects
     TrackDetection tTrackDetection(&iFrame);
     TramDetection tTramDetection(&iFrame);
@@ -135,10 +126,6 @@ cv::Mat MainWindow::processFrame(cv::Mat &iFrame)
     std::cout << "* Preprocessing" << std::endl;
     tTrackDetection.preprocess();
     tTramDetection.preprocess();
-    if (mVisualisationType == DEBUG_TRACK)
-        tVisualisation = tTrackDetection.frameDebug();
-    else if (mVisualisationType == DEBUG_TRAM)
-        tVisualisation = tTramDetection.frameDebug();
 
     // Find features
     std::cout << "* Finding features" << std::endl;
@@ -161,7 +148,14 @@ cv::Mat MainWindow::processFrame(cv::Mat &iFrame)
 
     // Draw image
     std::cout << "* Drawing image" << std::endl;
-    if (mVisualisationType == FINAL)
+    cv::Mat tVisualisation;
+    if (mUI->visualisationType->currentIndex() == 0)
+        tVisualisation = iFrame.clone();
+    else if (mUI->visualisationType->currentIndex() == 1)
+        tVisualisation = tTrackDetection.frameDebug();
+    else if (mUI->visualisationType->currentIndex() == 2)
+        tVisualisation = tTramDetection.frameDebug();
+    if (mUI->drawFeatures->isChecked())
     {
         // Draw tracks
         if (mFeatures.track_left.size())
@@ -178,10 +172,6 @@ cv::Mat MainWindow::processFrame(cv::Mat &iFrame)
         // Draw tram
         cv::rectangle(tVisualisation, mFeatures.tram, cv::Scalar(0, 255, 0), 1);
     }
-    else if (mVisualisationType == DEBUG_TRACK)
-        tVisualisation = tTrackDetection.frameDebug();
-    else if (mVisualisationType == DEBUG_TRAM)
-        tVisualisation = tTramDetection.frameDebug();
 
     return tVisualisation;
 }

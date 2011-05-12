@@ -66,7 +66,6 @@ private:
 
     // Detection state
     FrameFeatures mFeatures;
-    Visualisation mVisualisationType;
 };
 
 #endif // MAINWINDOW_H

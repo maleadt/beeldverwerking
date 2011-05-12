@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>340</width>
-    <height>306</height>
+    <width>746</width>
+    <height>506</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -22,7 +22,41 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <layout class="QVBoxLayout" name="verticalLayout"/>
+     <layout class="QGridLayout" name="mainLayout">
+      <item row="1" column="0">
+       <layout class="QHBoxLayout" name="buttonLayout">
+        <item>
+         <widget class="QCheckBox" name="drawFeatures">
+          <property name="text">
+           <string>Draw detected features</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="visualisationType">
+          <item>
+           <property name="text">
+            <string>Input frame</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Track detection debugging</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Tram detection debugging</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="2" column="0">
+       <layout class="QHBoxLayout" name="videoLayout"/>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>
@@ -31,7 +65,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>340</width>
+     <width>746</width>
      <height>27</height>
     </rect>
    </property>
