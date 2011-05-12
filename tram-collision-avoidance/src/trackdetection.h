@@ -17,7 +17,7 @@ class TrackDetection : public Component
 {
 public:
     // Construction and destruction
-    TrackDetection(const cv::Mat& iFrame);
+    TrackDetection(cv::Mat const* iFrame);
 
     // Component interface
     void preprocess();

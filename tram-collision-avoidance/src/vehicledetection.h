@@ -21,7 +21,7 @@ class VehicleDetection : public Component
 {
 public:
     // Construction and destruction
-    VehicleDetection(const cv::Mat& iFrame);
+    VehicleDetection(cv::Mat const* iFrame);
 
     // Component interface
     void preprocess();

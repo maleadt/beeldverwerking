@@ -26,7 +26,7 @@
 // Construction and destruction
 //
 
-TrackDetection::TrackDetection(const cv::Mat& iFrame) : Component(iFrame)
+TrackDetection::TrackDetection(cv::Mat const* iFrame) : Component(iFrame)
 {
 
 }
@@ -39,29 +39,29 @@ TrackDetection::TrackDetection(const cv::Mat& iFrame) : Component(iFrame)
 void TrackDetection::preprocess()
 {
     // Convert to grayscale
-    cv::Mat tFrameGray(frame().size(), CV_8U);
-    cvtColor(frame(), tFrameGray, CV_RGB2GRAY);
+    cv::Mat tFrameGray(frame()->size(), CV_8U);
+    cvtColor(*frame(), tFrameGray, CV_RGB2GRAY);
 
     // Sobel transform
-    cv::Mat tFrameSobel(frame().size(), CV_16S);
+    cv::Mat tFrameSobel(frame()->size(), CV_16S);
     Sobel(tFrameGray, tFrameSobel, CV_16S, 3, 0, 9);
 
     // Convert to 32F
-    cv::Mat tFrameSobelFloat(frame().size(), CV_8U);
+    cv::Mat tFrameSobelFloat(frame()->size(), CV_8U);
     tFrameSobel.convertTo(tFrameSobelFloat, CV_32F, 1.0/256, 128);
 
     // Threshold
     cv::Mat tFrameThresholded = tFrameSobelFloat > 200;
 
     // Blank out useless region
-    rectangle(tFrameThresholded, cv::Rect(0, 0, frame().size().width, frame().size().height * 0.50), cv::Scalar::all(0), CV_FILLED);
+    rectangle(tFrameThresholded, cv::Rect(0, 0, frame()->size().width, frame()->size().height * 0.50), cv::Scalar::all(0), CV_FILLED);
     std::vector<cv::Point> tRectRight, tRectLeft;
-    tRectRight.push_back(cv::Point(frame().size().width, frame().size().height));
-    tRectRight.push_back(cv::Point(frame().size().width-frame().size().width*0.25, frame().size().height));
-    tRectRight.push_back(cv::Point(frame().size().width, 0));
+    tRectRight.push_back(cv::Point(frame()->size().width, frame()->size().height));
+    tRectRight.push_back(cv::Point(frame()->size().width-frame()->size().width*0.25, frame()->size().height));
+    tRectRight.push_back(cv::Point(frame()->size().width, 0));
     fillConvexPoly(tFrameThresholded, &tRectRight[0], tRectRight.size(), cv::Scalar::all(0));
-    tRectLeft.push_back(cv::Point(0, frame().size().height));
-    tRectLeft.push_back(cv::Point(0+frame().size().width*0.25, frame().size().height));
+    tRectLeft.push_back(cv::Point(0, frame()->size().height));
+    tRectLeft.push_back(cv::Point(0+frame()->size().width*0.25, frame()->size().height));
     tRectLeft.push_back(cv::Point(0, 0));
     fillConvexPoly(tFrameThresholded, &tRectLeft[0], tRectLeft.size(), cv::Scalar::all(0));
 

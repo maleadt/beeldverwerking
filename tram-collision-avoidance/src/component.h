@@ -14,7 +14,7 @@
 class Component
 {
 public:
-    Component(const cv::Mat& iFrame) : mFrame(iFrame)
+    Component(cv::Mat const* iFrame) : mFrame(iFrame)
     {
     }
 
@@ -38,7 +38,7 @@ public:
       The current frame to be processed.
       */
 
-    cv::Mat frame() const
+    cv::Mat const* frame() const
     {
         return mFrame;
     }
@@ -47,7 +47,7 @@ public:
     virtual cv::Mat frameDebug() const = 0;
 
 private:
-    const cv::Mat& mFrame;
+    cv::Mat const* mFrame;
 };
 
 #endif // COMPONENT_H

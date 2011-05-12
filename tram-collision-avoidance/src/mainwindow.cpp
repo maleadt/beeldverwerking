@@ -128,8 +128,8 @@ cv::Mat MainWindow::processFrame(cv::Mat &iFrame)
         tVisualisation = iFrame.clone();
 
     // Load objects
-    TrackDetection tTrackDetection(iFrame);
-    TramDetection tTramDetection(iFrame);
+    TrackDetection tTrackDetection(&iFrame);
+    TramDetection tTramDetection(&iFrame);
 
     // Preprocess
     std::cout << "* Preprocessing" << std::endl;
@@ -163,8 +163,6 @@ cv::Mat MainWindow::processFrame(cv::Mat &iFrame)
     std::cout << "* Drawing image" << std::endl;
     if (mVisualisationType == FINAL)
     {
-        tVisualisation = iFrame.clone();
-
         // Draw tracks
         if (mFeatures.track_left.size())
         {

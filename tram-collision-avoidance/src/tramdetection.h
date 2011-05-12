@@ -14,7 +14,7 @@ class TramDetection : public Component
 public:
     TramDetection();
     // Construction and destruction
-    TramDetection(const cv::Mat& iFrame);
+    TramDetection(cv::Mat const* iFrame);
 
     // Component interface
     void preprocess();
