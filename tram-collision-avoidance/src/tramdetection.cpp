@@ -53,9 +53,7 @@ void TramDetection::find_features(FrameFeatures &iFrameFeatures) throw(FeatureEx
                      CV_TM_CCOEFF_NORMED};
 
     // Template matching method pick
-    int currMethod = 1;
-
-    //cv::matchTemplate(mFramePreprocessed, tTemplate, mFrameDebug, method[currMethod]);
+    int currMethod = 3;
 
     cv::matchTemplate(mFramePreprocessed, tTemplate, tFrame, method[currMethod]);
 
@@ -68,7 +66,7 @@ void TramDetection::find_features(FrameFeatures &iFrameFeatures) throw(FeatureEx
     cv::Point tLocation;
 
     // Afhankelijk van gebruikte methode moet globaal minimum of globaal maximum gebruikt worden
-    if(currMethod == 0 || currMethod == 1){
+    if(currMethod < 2 ) {
         // Gebruik globaal minimum
         tLocation = tMinLocation;
     } else {
@@ -85,7 +83,7 @@ void TramDetection::find_features(FrameFeatures &iFrameFeatures) throw(FeatureEx
 
     iFrameFeatures.tram = cv::Rect(tLocation,tOppositeLocaction);
 
-    mFrameDebug = tFrame;
+    cvtColor(tFrame, mFrameDebug, CV_GRAY2BGR);
 }
 
 cv::Mat TramDetection::frameDebug() const
