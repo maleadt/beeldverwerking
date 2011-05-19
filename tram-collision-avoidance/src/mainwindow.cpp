@@ -124,8 +124,11 @@ cv::Mat MainWindow::processFrame(cv::Mat &iFrame)
 
     // Preprocess
     std::cout << "* Preprocessing" << std::endl;
-    tTrackDetection.preprocess();
-    tTramDetection.preprocess();
+    #pragma omp sections
+    {
+        { tTrackDetection.preprocess(); }
+        { tTramDetection.preprocess(); }
+    }
 
     // Find features
     std::cout << "* Finding features" << std::endl;
