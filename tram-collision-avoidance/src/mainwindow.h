@@ -54,6 +54,7 @@ private slots:
     bool openFile(QString iFilename);
     void process();
     void processFrame(cv::Mat& iFrame);
+    void drawStats();
 
     // Auxiliary
 private slots:

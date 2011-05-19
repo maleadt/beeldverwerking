@@ -64,6 +64,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), mUI(new Ui::MainW
 #else
     mUI->statusBar->showMessage("Application initialized (singelthreaded execution)");
 #endif
+    mFrames = 0; drawStats();
+    setTitle();
 }
 
 MainWindow::~MainWindow()
@@ -134,6 +136,7 @@ void MainWindow::on_actRecentFile_triggered()
 bool MainWindow::openFile(QString iFilename)
 {
     // Do we need to clean up a previous file?
+    mProcessing = false;
     if (mVideoCapture != 0)
     {
         // Close and delete the capturer
@@ -144,6 +147,7 @@ bool MainWindow::openFile(QString iFilename)
 
         // Update the interface
         mUI->btnStart->setEnabled(false);
+        mFrames = 0; drawStats();
         setTitle();
     }
 
@@ -173,14 +177,15 @@ bool MainWindow::openFile(QString iFilename)
 #endif
 
     mFrames = 0;
-    mTimePreprocess = 1;
-    mTimeTrack = 1;
-    mTimeTram = 1;
-    mTimeDraw = 1;
+    mTimePreprocess = 0;
+    mTimeTrack = 0;
+    mTimeTram = 0;
+    mTimeDraw = 0;
 
     statusBar()->showMessage("File opened and loaded");
     mUI->btnStart->setEnabled(true);
-    setTitle(iFilename);
+    mUI->btnStop->setEnabled(false);
+    setCurrentFile(iFilename);
     return true;
 }
 
@@ -194,13 +199,8 @@ void MainWindow::process()
         if (tFrame.data)
         {
             processFrame(tFrame);
-
             mFrames++;
-            mUI->lblPreprocess->setText("Preprocess: " + QString::number(mTimePreprocess / mFrames) + " ms");
-            mUI->lblTrack->setText("Track: " + QString::number(mTimeTrack / mFrames) + " ms");
-            mUI->lblTram->setText("Tram: " + QString::number(mTimeTram / mFrames) + " ms");
-            mUI->lblDraw->setText("Draw: " + QString::number(mTimeDraw / mFrames) + " ms");
-
+            drawStats();
             QTimer::singleShot(25, this, SLOT(process()));
         }
     }
@@ -276,6 +276,22 @@ void MainWindow::processFrame(cv::Mat &iFrame)
     }    
     mGLWidget->sendImage(&tVisualisation);
     mTimeDraw += timeDelta();
+}
+
+void MainWindow::drawStats()
+{
+    int mPreprocessDelta = 0, mTrackDelta = 0, mTramDelta = 0, mTimeDelta = 0;
+    if (mFrames > 0)
+    {
+        mPreprocessDelta = mTimePreprocess / mFrames;
+        mTrackDelta = mTimeTrack / mFrames;
+        mTramDelta = mTimeTram / mFrames;
+        mTimeDelta = mTimeDraw / mFrames;
+    }
+    mUI->lblPreprocess->setText("Preprocess: " + QString::number(mPreprocessDelta) + " ms");
+    mUI->lblTrack->setText("Track: " + QString::number(mTrackDelta) + " ms");
+    mUI->lblTram->setText("Tram: " + QString::number(mTramDelta) + " ms");
+    mUI->lblDraw->setText("Draw: " + QString::number(mTimeDelta) + " ms");
 }
 
 
