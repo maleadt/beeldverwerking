@@ -136,6 +136,7 @@ void MainWindow::on_actRecentFile_triggered()
 bool MainWindow::openFile(QString iFilename)
 {
     // Do we need to clean up a previous file?
+    mProcessing = false;
     if (mVideoCapture != 0)
     {
         // Close and delete the capturer
@@ -183,6 +184,7 @@ bool MainWindow::openFile(QString iFilename)
 
     statusBar()->showMessage("File opened and loaded");
     mUI->btnStart->setEnabled(true);
+    mUI->btnStop->setEnabled(false);
     setCurrentFile(iFilename);
     return true;
 }
