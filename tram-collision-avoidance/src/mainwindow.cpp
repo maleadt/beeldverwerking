@@ -19,19 +19,62 @@
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), mUI(new Ui::MainWindow)
 {
+    // Initialize application
+    mSettings = new QSettings("Beeldverwerking", "Tram Collision Detection");
+    mVideoCapture = 0;
+#if WRITE_VIDEO
+    mVideoWriter = 0;
+#endif
+
     // Setup interface
     mUI->setupUi(this);
     mGLWidget = new GLWidget();
     mUI->videoLayout->addWidget(mGLWidget);
     mUI->buttonStart->setEnabled(false);
     mUI->buttonStop->setEnabled(false);
+
+    // Exit action
+    mActionExit = new QAction(tr("E&xit"), this);
+    mActionExit->setShortcut(tr("Ctrl+Q"));
+    mActionExit->setStatusTip(tr("Exit the application"));
+    connect(mActionExit, SIGNAL(triggered()), qApp, SLOT(closeAllWindows()));
+
+    // Recent file actions
+    for (int i = 0; i < MaxRecentFiles; ++i) {
+        mActionsRecentFiles[i] = new QAction(this);
+        mActionsRecentFiles[i]->setVisible(false);
+        connect(mActionsRecentFiles[i], SIGNAL(triggered()),
+                this, SLOT(on_actionRecentFile_triggered()));
+    }
+
+    // Build recent files
+    QMenu* fileMenu = mUI->menuFile;
+    mActionSeparator = fileMenu->addSeparator();
+    for (int i = 0; i < MaxRecentFiles; ++i)
+        fileMenu->addAction(mActionsRecentFiles[i]);
+    fileMenu->addSeparator();
+    fileMenu->addAction(mActionExit);
+    updateRecentFileActions();
 }
 
 MainWindow::~MainWindow()
 {
-    if (mVideoCapture->isOpened())
-        mVideoCapture->release();
-    delete mVideoCapture;
+    if (mVideoCapture != 0)
+    {
+        if (mVideoCapture->isOpened())
+            mVideoCapture->release();
+        delete mVideoCapture;
+    }
+
+#if WRITE_VIDEO
+    if (mVideoWriter != 0)
+    {
+        if (mVideoWriter->isOpened())
+            mVideoWriter->release();
+        delete mVideoWriter;
+    }
+#endif
+
     delete mUI;
 }
 
@@ -43,15 +86,71 @@ MainWindow::~MainWindow()
 void MainWindow::on_buttonStart_clicked()
 {
     // Statusbar message
-    mUI->statusBar->showMessage("Started processing");
+    mUI->statusBar->showMessage("Starting processing...");
     mUI->buttonStart->setEnabled(false);
 
+    // Schedule processing
+    mUI->buttonStop->setEnabled(true);
+    mProcessing = true;
+    process();
+}
+
+void MainWindow::on_buttonStop_clicked()
+{
+    // Statusbar message
+    mUI->statusBar->showMessage("Stopped processing");
+    mProcessing = false;
+    mUI->buttonStart->setEnabled(true);
+    mUI->buttonStop->setEnabled(false);
+}
+
+void MainWindow::on_actionOpen_triggered()
+{
+    QString tFilename = QFileDialog::getOpenFileName(this, tr("Open Video"), "", tr("Video Files (*.avi *.mp4)"));
+    openFile(tFilename);
+}
+
+void MainWindow::on_actionRecentFile_triggered()
+{
+    QAction *tAction = qobject_cast<QAction *>(sender());
+    if (tAction)
+        openFile(tAction->data().toString());
+}
+
+
+//
+// File and video processing
+//
+
+bool MainWindow::openFile(QString iFilename)
+{
+    // Do we need to clean up a previous file?
+    if (mVideoCapture != 0)
+    {
+        // Close and delete the capturer
+        if (mVideoCapture->isOpened())
+            mVideoCapture->release();
+        delete mVideoCapture;
+        mVideoCapture = 0;
+
+        // Update the interface
+        mUI->actionStart->setEnabled(false);
+        setTitle();
+    }
+
+    // Check if we can open the file
+    if (! QFileInfo(iFilename).isReadable())
+    {
+        statusBar()->showMessage("Error: could not read file");
+        return false;
+    }
+
     // Open input video
-    mVideoCapture = new cv::VideoCapture(mVideoFilename.toStdString());
+    mVideoCapture = new cv::VideoCapture(iFilename.toStdString());
     if(!mVideoCapture->isOpened())
     {
-        std::cout << "Error: could not 'open video" << std::endl;
-        return;
+        statusBar()->showMessage("Error: could not open file");
+        return false;
     }
 
     // Open output video
@@ -64,42 +163,15 @@ void MainWindow::on_buttonStart_clicked()
                              true);
 #endif
 
-    // Schedule processing
-    mUI->buttonStop->setEnabled(true);
-    process();
+    statusBar()->showMessage("File opened and loaded");
+    mUI->actionStart->setEnabled(true);
+    setTitle(iFilename);
+    return true;
 }
-
-void MainWindow::on_buttonStop_clicked()
-{
-    // Statusbar message
-    mUI->statusBar->showMessage("Stopped processing");
-    mVideoCapture->release();
-    mUI->buttonStart->setEnabled(true);
-    mUI->buttonStop->setEnabled(false);
-}
-
-void MainWindow::on_actionOpen_triggered()
-{
-    mVideoFilename = QFileDialog::getOpenFileName(this, tr("Open Video"), "", tr("Video Files (*.avi *.mp4)"));
-    if (QFileInfo(mVideoFilename).isReadable())
-    {
-        mUI->buttonStart->setEnabled(true);
-    }
-    else
-    {
-        qWarning() << "File '" << mVideoFilename << "' not readable";
-        mUI->buttonStart->setEnabled(false);
-    }
-}
-
-
-//
-// Auxiliary
-//
 
 void MainWindow::process()
 {
-    if (mVideoCapture->isOpened())
+    if (mProcessing && mVideoCapture->isOpened())
     {
         mTimer.restart();
         cv::Mat tFrame;
@@ -177,4 +249,58 @@ cv::Mat MainWindow::processFrame(cv::Mat &iFrame)
     }
 
     return tVisualisation;
+}
+
+
+//
+// Auxiliary
+//
+
+void MainWindow::updateRecentFileActions()
+{
+    // Fetch the saved list
+    QStringList tRecentFiles = mSettings->value("recentFileList").toStringList();
+    int tRecentFileCount = qMin(tRecentFiles.size(), (int)MaxRecentFiles);
+
+    // Update the action list
+    for (int i = 0; i < tRecentFileCount; ++i)
+    {
+        QString tText = tr("&%1 %2").arg(i + 1).arg(strippedName(tRecentFiles[i]));
+        mActionsRecentFiles[i]->setText(tText);
+        mActionsRecentFiles[i]->setData(tRecentFiles[i]);
+        mActionsRecentFiles[i]->setVisible(true);
+    }
+    for (int i = tRecentFileCount; i < MaxRecentFiles; ++i)
+        mActionsRecentFiles[i]->setVisible(false);
+    mActionSeparator->setVisible(tRecentFileCount > 0);
+}
+
+void MainWindow::setCurrentFile(const QString &iFilename)
+{
+    // Update the file list
+    QStringList tFiles = mSettings->value("recentFileList").toStringList();
+    tFiles.removeAll(iFilename);
+    tFiles.prepend(iFilename);
+    while (tFiles.size() > MaxRecentFiles)
+        tFiles.removeLast();
+    mSettings->setValue("recentFileList", tFiles);
+
+    // Update the interface
+    setTitle(iFilename);
+    updateRecentFileActions();
+}
+
+QString MainWindow::strippedName(const QString &fullFileName)
+{
+    return QFileInfo(fullFileName).fileName();
+}
+
+void MainWindow::setTitle(QString iFilename)
+{
+    if (iFilename.isEmpty())
+        setWindowTitle(tr("Tram Collision Detection"));
+    else
+        setWindowTitle(tr("%1 - %2").arg(strippedName(iFilename))
+                                    .arg("Tram Collision Detection"));
+
 }
