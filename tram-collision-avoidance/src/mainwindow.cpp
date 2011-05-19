@@ -127,29 +127,29 @@ bool MainWindow::openFile(QString iFilename)
     // Do we need to clean up a previous file?
     if (mVideoCapture != 0)
     {
+        // Close and delete the capturer
         if (mVideoCapture->isOpened())
             mVideoCapture->release();
         delete mVideoCapture;
         mVideoCapture = 0;
 
+        // Update the interface
         mUI->actionStart->setEnabled(false);
-
-        // window title
+        setTitle();
     }
 
     // Check if we can open the file
     if (! QFileInfo(iFilename).isReadable())
     {
-        statusBar()->showMessage("Error: file '" + iFilename + "' not readable");
+        statusBar()->showMessage("Error: could not read file");
         return false;
     }
-
 
     // Open input video
     mVideoCapture = new cv::VideoCapture(iFilename.toStdString());
     if(!mVideoCapture->isOpened())
     {
-        statusBar()->showMessage("Error: could not open video file");
+        statusBar()->showMessage("Error: could not open file");
         return false;
     }
 
@@ -165,6 +165,7 @@ bool MainWindow::openFile(QString iFilename)
 
     statusBar()->showMessage("File opened and loaded");
     mUI->actionStart->setEnabled(true);
+    setTitle(iFilename);
     return true;
 }
 
@@ -273,14 +274,6 @@ void MainWindow::updateRecentFileActions()
 
 void MainWindow::setCurrentFile(const QString &iFilename)
 {
-    // Set the window title
-    if (iFilename.isEmpty())
-        setWindowTitle(tr("Tram Collision Detection"));
-    else
-        setWindowTitle(tr("%1 - %2").arg(strippedName(iFilename))
-                                    .arg(tr("Recent Files")));
-
-
     // Update the file list
     QStringList tFiles = mSettings->value("recentFileList").toStringList();
     tFiles.removeAll(iFilename);
@@ -289,11 +282,22 @@ void MainWindow::setCurrentFile(const QString &iFilename)
         tFiles.removeLast();
     mSettings->setValue("recentFileList", tFiles);
 
-    // Update the actions
+    // Update the interface
+    setTitle(iFilename);
     updateRecentFileActions();
 }
 
 QString MainWindow::strippedName(const QString &fullFileName)
 {
     return QFileInfo(fullFileName).fileName();
+}
+
+void MainWindow::setTitle(QString iFilename)
+{
+    if (iFilename.isEmpty())
+        setWindowTitle(tr("Tram Collision Detection"));
+    else
+        setWindowTitle(tr("%1 - %2").arg(strippedName(iFilename))
+                                    .arg("Tram Collision Detection"));
+
 }

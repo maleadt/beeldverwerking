@@ -60,6 +60,7 @@ private slots:
     void updateRecentFileActions();
     void setCurrentFile(const QString &fileName);
     QString strippedName(const QString &fullFileName);
+    void setTitle(QString iFilename = "");
 
 private:
     // Member data
