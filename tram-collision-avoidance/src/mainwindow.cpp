@@ -21,6 +21,10 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), mUI(new Ui::MainW
 {
     // Initialize application
     mSettings = new QSettings("Beeldverwerking", "Tram Collision Detection");
+    mVideoCapture = 0;
+#if WRITE_VIDEO
+    mVideoWriter = 0;
+#endif
 
     // Setup interface
     mUI->setupUi(this);
@@ -55,9 +59,22 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), mUI(new Ui::MainW
 
 MainWindow::~MainWindow()
 {
-    if (mVideoCapture->isOpened())
-        mVideoCapture->release();
-    delete mVideoCapture;
+    if (mVideoCapture != 0)
+    {
+        if (mVideoCapture->isOpened())
+            mVideoCapture->release();
+        delete mVideoCapture;
+    }
+
+#if WRITE_VIDEO
+    if (mVideoWriter != 0)
+    {
+        if (mVideoWriter->isOpened())
+            mVideoWriter->release();
+        delete mVideoWriter;
+    }
+#endif
+
     delete mUI;
 }
 
@@ -69,29 +86,12 @@ MainWindow::~MainWindow()
 void MainWindow::on_actionStart_triggered()
 {
     // Statusbar message
-    mUI->statusBar->showMessage("Started processing");
+    mUI->statusBar->showMessage("Starting processing...");
     mUI->actionStart->setEnabled(false);
-
-    // Open input video
-    mVideoCapture = new cv::VideoCapture(mVideoFilename.toStdString());
-    if(!mVideoCapture->isOpened())
-    {
-        std::cout << "Error: could not 'open video" << std::endl;
-        return;
-    }
-
-    // Open output video
-#if WRITE_VIDEO
-    std::string oVideoFile = argv[2];
-    mVideoWriter = new cv::VideoWriter(oVideoFile,
-                             CV_FOURCC('M', 'J', 'P', 'G'),
-                             mVideoCapture->get(CV_CAP_PROP_FPS),
-                             cv::Size(mVideoCapture->get(CV_CAP_PROP_FRAME_WIDTH),mVideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT)),
-                             true);
-#endif
 
     // Schedule processing
     mUI->actionStop->setEnabled(true);
+    mProcessing = true;
     process();
 }
 
@@ -99,7 +99,7 @@ void MainWindow::on_actionStop_triggered()
 {
     // Statusbar message
     mUI->statusBar->showMessage("Stopped processing");
-    mVideoCapture->release();
+    mProcessing = false;
     mUI->actionStart->setEnabled(true);
     mUI->actionStop->setEnabled(false);
 }
@@ -112,9 +112,9 @@ void MainWindow::on_actionOpen_triggered()
 
 void MainWindow::on_actionRecentFile_triggered()
 {
-    QAction *action = qobject_cast<QAction *>(sender());
-    if (action)
-        openFile(action->data().toString());
+    QAction *tAction = qobject_cast<QAction *>(sender());
+    if (tAction)
+        openFile(tAction->data().toString());
 }
 
 
@@ -122,24 +122,55 @@ void MainWindow::on_actionRecentFile_triggered()
 // File and video processing
 //
 
-void MainWindow::openFile(QString iFilename)
+bool MainWindow::openFile(QString iFilename)
 {
-    if (QFileInfo(iFilename).isReadable())
+    // Do we need to clean up a previous file?
+    if (mVideoCapture != 0)
     {
-        mVideoFilename = iFilename;
-        setCurrentFile(iFilename);
-        mUI->actionStart->setEnabled(true);
-    }
-    else
-    {
-        qWarning() << "File '" << iFilename << "' not readable";
+        if (mVideoCapture->isOpened())
+            mVideoCapture->release();
+        delete mVideoCapture;
+        mVideoCapture = 0;
+
         mUI->actionStart->setEnabled(false);
+
+        // window title
     }
+
+    // Check if we can open the file
+    if (! QFileInfo(iFilename).isReadable())
+    {
+        statusBar()->showMessage("Error: file '" + iFilename + "' not readable");
+        return false;
+    }
+
+
+    // Open input video
+    mVideoCapture = new cv::VideoCapture(iFilename.toStdString());
+    if(!mVideoCapture->isOpened())
+    {
+        statusBar()->showMessage("Error: could not open video file");
+        return false;
+    }
+
+    // Open output video
+#if WRITE_VIDEO
+    std::string oVideoFile = argv[2];
+    mVideoWriter = new cv::VideoWriter(oVideoFile,
+                             CV_FOURCC('M', 'J', 'P', 'G'),
+                             mVideoCapture->get(CV_CAP_PROP_FPS),
+                             cv::Size(mVideoCapture->get(CV_CAP_PROP_FRAME_WIDTH),mVideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT)),
+                             true);
+#endif
+
+    statusBar()->showMessage("File opened and loaded");
+    mUI->actionStart->setEnabled(true);
+    return true;
 }
 
 void MainWindow::process()
 {
-    if (mVideoCapture->isOpened())
+    if (mProcessing && mVideoCapture->isOpened())
     {
         mTimer.restart();
         cv::Mat tFrame;

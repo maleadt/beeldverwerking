@@ -50,8 +50,8 @@ private slots:
     void on_actionRecentFile_triggered();
 
     // File and vidoe processing
-private:
-    void openFile(QString iFilename);
+private slots:
+    bool openFile(QString iFilename);
     void process();
     cv::Mat processFrame(cv::Mat& iFrame);
 
@@ -63,7 +63,6 @@ private slots:
 
 private:
     // Member data
-    QString mVideoFilename;
     QTime mTimer;
     GLWidget* mGLWidget;
     cv::VideoCapture* mVideoCapture;
@@ -80,6 +79,7 @@ private:
     QAction *mActionsRecentFiles[MaxRecentFiles];
 
     // Detection state
+    bool mProcessing;
     FrameFeatures mFeatures;
 };
 
