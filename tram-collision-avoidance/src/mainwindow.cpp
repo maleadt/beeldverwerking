@@ -173,7 +173,10 @@ bool MainWindow::openFile(QString iFilename)
 #endif
 
     mFrames = 0;
-    mStartTime = QDateTime::currentMSecsSinceEpoch();
+    mTimePreprocess = 1;
+    mTimeTrack = 1;
+    mTimeTram = 1;
+    mTimeDraw = 1;
 
     statusBar()->showMessage("File opened and loaded");
     mUI->btnStart->setEnabled(true);
@@ -190,30 +193,27 @@ void MainWindow::process()
         *mVideoCapture >> tFrame;
         if (tFrame.data)
         {
-            cv::Mat tOutput = processFrame(tFrame);
-            mGLWidget->sendImage(&tOutput);
+            processFrame(tFrame);
 
             mFrames++;
-            unsigned long tCurrentTime = QDateTime::currentMSecsSinceEpoch();
-            mUI->lblFrames->setText("Count: " + QString::number(mFrames) + " frames");
-            unsigned long tTimeProcessing = tCurrentTime - mStartTime;
-            if (tTimeProcessing > 0)
-                mUI->lblFps->setText("Speed: " + QString::number((double) 1000*mFrames / tTimeProcessing, 'g', 2) + " FPS");
-            else
-                 mUI->lblFps->setText("Speed: NaN");
+            mUI->lblPreprocess->setText("Preprocess: " + QString::number(mTimePreprocess / mFrames) + " ms");
+            mUI->lblTrack->setText("Track: " + QString::number(mTimeTrack / mFrames) + " ms");
+            mUI->lblTram->setText("Tram: " + QString::number(mTimeTram / mFrames) + " ms");
+            mUI->lblDraw->setText("Draw: " + QString::number(mTimeDraw / mFrames) + " ms");
 
             QTimer::singleShot(25, this, SLOT(process()));
         }
     }
 }
 
-cv::Mat MainWindow::processFrame(cv::Mat &iFrame)
+void MainWindow::processFrame(cv::Mat &iFrame)
 {
     // Load objects
     TrackDetection tTrackDetection(&iFrame);
     TramDetection tTramDetection(&iFrame);
 
     // Preprocess
+    timeStart();
     #pragma omp parallel sections
     {
         #pragma omp section
@@ -225,8 +225,10 @@ cv::Mat MainWindow::processFrame(cv::Mat &iFrame)
             tTramDetection.preprocess();
         }
     }
+    mTimePreprocess += timeDelta();
 
     // Find features
+    timeStart();
     try
     {
         tTrackDetection.find_features(mFeatures);
@@ -235,6 +237,7 @@ cv::Mat MainWindow::processFrame(cv::Mat &iFrame)
     {
         std::cout << "  Error finding tracks: " << e.what() << std::endl;
     }
+    mTimeTrack += timeDelta();
     try
     {
         tTramDetection.find_features(mFeatures);
@@ -243,8 +246,10 @@ cv::Mat MainWindow::processFrame(cv::Mat &iFrame)
     {
         std::cout << "  Error finding tram: " << e.what() << std::endl;
     }
+    mTimeTram += timeDelta();
 
     // Draw image
+    timeStart();
     cv::Mat tVisualisation;
     if (mUI->slcType->currentIndex() == 0)
         tVisualisation = iFrame.clone();
@@ -268,9 +273,9 @@ cv::Mat MainWindow::processFrame(cv::Mat &iFrame)
 
         // Draw tram
         cv::rectangle(tVisualisation, mFeatures.tram, cv::Scalar(0, 255, 0), 1);
-    }
-
-    return tVisualisation;
+    }    
+    mGLWidget->sendImage(&tVisualisation);
+    mTimeDraw += timeDelta();
 }
 
 
@@ -325,4 +330,17 @@ void MainWindow::setTitle(QString iFilename)
         setWindowTitle(tr("%1 - %2").arg(strippedName(iFilename))
                                     .arg("Tram Collision Detection"));
 
+}
+
+void MainWindow::timeStart()
+{
+    mTime = QDateTime::currentMSecsSinceEpoch();
+}
+
+unsigned long MainWindow::timeDelta()
+{
+    unsigned long tCurrentTime = QDateTime::currentMSecsSinceEpoch();
+    unsigned long tDelta = tCurrentTime - mTime;
+    mTime = tCurrentTime;
+    return tDelta;
 }

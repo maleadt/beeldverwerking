@@ -53,7 +53,7 @@ private slots:
 private slots:
     bool openFile(QString iFilename);
     void process();
-    cv::Mat processFrame(cv::Mat& iFrame);
+    void processFrame(cv::Mat& iFrame);
 
     // Auxiliary
 private slots:
@@ -61,6 +61,8 @@ private slots:
     void setCurrentFile(const QString &fileName);
     QString strippedName(const QString &fullFileName);
     void setTitle(QString iFilename = "");
+    unsigned long timeDelta();
+    void timeStart();
 
 private:
     // Member data
@@ -83,7 +85,7 @@ private:
     bool mProcessing;
     FrameFeatures mFeatures;
     unsigned int mFrames;
-    unsigned long mStartTime;
+    unsigned long mTime, mTimePreprocess, mTimeTrack, mTimeTram, mTimeDraw;
 };
 
 #endif // MAINWINDOW_H
