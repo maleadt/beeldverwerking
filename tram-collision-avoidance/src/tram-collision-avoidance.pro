@@ -31,3 +31,7 @@ profile {
 
 FORMS += \
     mainwindow.ui
+
+# OpenMP
+QMAKE_CXXFLAGS += -fopenmp
+QMAKE_LFLAGS += -fopenmp
