@@ -134,7 +134,7 @@ bool MainWindow::openFile(QString iFilename)
         mVideoCapture = 0;
 
         // Update the interface
-        mUI->actionStart->setEnabled(false);
+        mUI->buttonStart->setEnabled(false);
         setTitle();
     }
 
@@ -164,7 +164,7 @@ bool MainWindow::openFile(QString iFilename)
 #endif
 
     statusBar()->showMessage("File opened and loaded");
-    mUI->actionStart->setEnabled(true);
+    mUI->buttonStart->setEnabled(true);
     setTitle(iFilename);
     return true;
 }
