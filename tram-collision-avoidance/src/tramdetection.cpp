@@ -5,10 +5,13 @@
 // Includes
 #include "tramdetection.h"
 #include <QString>
+#include <iostream>
 
 // Feature properties
-#define MAX_THRESHOLD 0.89
+#define MAX_THRESHOLD 0.895
 #define MIN_THRESHOLD 0
+#define DELTA_X 100
+#define DELTA_Y 100
 
 //
 // Construction and destruction
@@ -49,7 +52,7 @@ void TramDetection::preprocess()
 
 void TramDetection::find_features(FrameFeatures &iFrameFeatures) throw(FeatureException) {
     // Loading template to match with the mPreProcessedFrame
-    cv::Mat tTemplate = cv::imread("../res/tram_back001.jpeg");
+    cv::Mat tTemplate = cv::imread("../res/tram_back004.jpg");
     if( !tTemplate.data )
         throw std::exception();
 
@@ -79,30 +82,43 @@ void TramDetection::find_features(FrameFeatures &iFrameFeatures) throw(FeatureEx
     // Afhankelijk van gebruikte methode moet globaal minimum of globaal maximum gebruikt worden
     if(currMethod < 3 ) {
         // Is er echt wel een tram?
+        std::cout << "MinValue=" << tMinValue;
         if(tMinValue > MIN_THRESHOLD){
             throw FeatureException("no tram found (" + QString::number(tMaxValue) + ")");
         }
         // Gebruik globaal minimum
         tLocation = tMinLocation;
+        iFrameFeatures.minValue = tMinValue;
     } else {
         // Is er echt wel een tram?
+        std::cout << "MaxValue=" << tMaxValue;
         if(tMaxValue < MAX_THRESHOLD){
             throw FeatureException("no tram found (" + QString::number(tMaxValue) + ")");
         }
         // Gebruik globaal maximum
         tLocation = tMaxLocation;
+        iFrameFeatures.maxValue = tMaxValue;
     }
 
+
     // Controle invoeren of de tram zich plots niet op een heel andere plaats bevind door middel van toegelaten afwijkingen
+    if(tLocation.x - iFrameFeatures.location.x > DELTA_X){
+
+    }
 
     cv::Point tOppositeLocaction;
     // Tegenovergestelde punten zoeken om rechthoek te tekenen
     tOppositeLocaction.y = tLocation.y + tTemplate.size().height;
     tOppositeLocaction.x = tLocation.x + tTemplate.size().width;
 
+    // Opslaan van de gevonden waarden om bij volgende frame te gebruiken
+    if(currMethod < 3 ) {
+        iFrameFeatures.minValue = tMinValue;
+    } else {
+        iFrameFeatures.maxValue = tMaxValue;
+    }
+    iFrameFeatures.location = tLocation;
     iFrameFeatures.tram = cv::Rect(tLocation,tOppositeLocaction);
-
-    cvtColor(tFrame, mFrameDebug, CV_GRAY2BGR);
 }
 
 cv::Mat TramDetection::frameDebug() const
