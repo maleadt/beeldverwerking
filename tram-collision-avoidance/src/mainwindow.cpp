@@ -11,6 +11,9 @@
 #include "tramdetection.h"
 #include <QFileDialog>
 #include <QDebug>
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 
 //
@@ -55,6 +58,13 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), mUI(new Ui::MainW
     fileMenu->addSeparator();
     fileMenu->addAction(mActionExit);
     updateRecentFileActions();
+
+    // Print a message
+#ifdef _OPENMP
+    mUI->statusBar->showMessage("Application initialized (multithreaded execution, using up to " + QString::number(omp_get_max_threads()) + " core(s)");
+#else
+    mUI->statusBar->showMessage("Application initialized (singelthreaded execution)");
+#endif
 }
 
 MainWindow::~MainWindow()
@@ -187,15 +197,11 @@ void MainWindow::process()
 
 cv::Mat MainWindow::processFrame(cv::Mat &iFrame)
 {
-    // Initialisation
-    std::cout << "-- PROCESSING FRAME -- " << std::endl;
-
     // Load objects
     TrackDetection tTrackDetection(&iFrame);
     TramDetection tTramDetection(&iFrame);
 
     // Preprocess
-    std::cout << "* Preprocessing" << std::endl;
     #pragma omp sections
     {
         { tTrackDetection.preprocess(); }
@@ -203,7 +209,6 @@ cv::Mat MainWindow::processFrame(cv::Mat &iFrame)
     }
 
     // Find features
-    std::cout << "* Finding features" << std::endl;
     try
     {
         tTrackDetection.find_features(mFeatures);
@@ -222,7 +227,6 @@ cv::Mat MainWindow::processFrame(cv::Mat &iFrame)
     }
 
     // Draw image
-    std::cout << "* Drawing image" << std::endl;
     cv::Mat tVisualisation;
     if (mUI->visualisationType->currentIndex() == 0)
         tVisualisation = iFrame.clone();
