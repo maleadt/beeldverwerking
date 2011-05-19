@@ -44,12 +44,12 @@ public:
 
     // UI slots
 private slots:
-    void on_buttonStart_clicked();
-    void on_buttonStop_clicked();
-    void on_actionOpen_triggered();
-    void on_actionRecentFile_triggered();
+    void on_btnStart_clicked();
+    void on_btnStop_clicked();
+    void on_actOpen_triggered();
+    void on_actRecentFile_triggered();
 
-    // File and vidoe processing
+    // File and video processing
 private slots:
     bool openFile(QString iFilename);
     void process();

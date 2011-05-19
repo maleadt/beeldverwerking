@@ -32,9 +32,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), mUI(new Ui::MainW
     // Setup interface
     mUI->setupUi(this);
     mGLWidget = new GLWidget();
-    mUI->videoLayout->addWidget(mGLWidget);
-    mUI->buttonStart->setEnabled(false);
-    mUI->buttonStop->setEnabled(false);
+    mUI->lytVideo->addWidget(mGLWidget);
+    mUI->btnStart->setEnabled(false);
+    mUI->btnStop->setEnabled(false);
 
     // Exit action
     mActionExit = new QAction(tr("E&xit"), this);
@@ -46,8 +46,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), mUI(new Ui::MainW
     for (int i = 0; i < MaxRecentFiles; ++i) {
         mActionsRecentFiles[i] = new QAction(this);
         mActionsRecentFiles[i]->setVisible(false);
-        connect(mActionsRecentFiles[i], SIGNAL(triggered()),
-                this, SLOT(on_actionRecentFile_triggered()));
+        connect(mActionsRecentFiles[i], SIGNAL(triggered()), this, SLOT(on_actRecentFile_triggered()));
     }
 
     // Build recent files
@@ -93,34 +92,34 @@ MainWindow::~MainWindow()
 // UI slots
 //
 
-void MainWindow::on_buttonStart_clicked()
+void MainWindow::on_btnStart_clicked()
 {
     // Statusbar message
     mUI->statusBar->showMessage("Starting processing...");
-    mUI->buttonStart->setEnabled(false);
+    mUI->btnStart->setEnabled(false);
 
     // Schedule processing
-    mUI->buttonStop->setEnabled(true);
+    mUI->btnStop->setEnabled(true);
     mProcessing = true;
     process();
 }
 
-void MainWindow::on_buttonStop_clicked()
+void MainWindow::on_btnStop_clicked()
 {
     // Statusbar message
     mUI->statusBar->showMessage("Stopped processing");
     mProcessing = false;
-    mUI->buttonStart->setEnabled(true);
-    mUI->buttonStop->setEnabled(false);
+    mUI->btnStart->setEnabled(true);
+    mUI->btnStop->setEnabled(false);
 }
 
-void MainWindow::on_actionOpen_triggered()
+void MainWindow::on_actOpen_triggered()
 {
     QString tFilename = QFileDialog::getOpenFileName(this, tr("Open Video"), "", tr("Video Files (*.avi *.mp4)"));
     openFile(tFilename);
 }
 
-void MainWindow::on_actionRecentFile_triggered()
+void MainWindow::on_actRecentFile_triggered()
 {
     QAction *tAction = qobject_cast<QAction *>(sender());
     if (tAction)
@@ -144,7 +143,7 @@ bool MainWindow::openFile(QString iFilename)
         mVideoCapture = 0;
 
         // Update the interface
-        mUI->buttonStart->setEnabled(false);
+        mUI->btnStart->setEnabled(false);
         setTitle();
     }
 
@@ -174,7 +173,7 @@ bool MainWindow::openFile(QString iFilename)
 #endif
 
     statusBar()->showMessage("File opened and loaded");
-    mUI->buttonStart->setEnabled(true);
+    mUI->btnStart->setEnabled(true);
     setTitle(iFilename);
     return true;
 }
@@ -202,10 +201,16 @@ cv::Mat MainWindow::processFrame(cv::Mat &iFrame)
     TramDetection tTramDetection(&iFrame);
 
     // Preprocess
-    #pragma omp sections
+    #pragma omp parallel sections
     {
-        { tTrackDetection.preprocess(); }
-        { tTramDetection.preprocess(); }
+        #pragma omp section
+        {
+            tTrackDetection.preprocess();
+        }
+        #pragma omp section
+        {
+            tTramDetection.preprocess();
+        }
     }
 
     // Find features
@@ -228,13 +233,13 @@ cv::Mat MainWindow::processFrame(cv::Mat &iFrame)
 
     // Draw image
     cv::Mat tVisualisation;
-    if (mUI->visualisationType->currentIndex() == 0)
+    if (mUI->slcType->currentIndex() == 0)
         tVisualisation = iFrame.clone();
-    else if (mUI->visualisationType->currentIndex() == 1)
+    else if (mUI->slcType->currentIndex() == 1)
         tVisualisation = tTrackDetection.frameDebug();
-    else if (mUI->visualisationType->currentIndex() == 2)
+    else if (mUI->slcType->currentIndex() == 2)
         tVisualisation = tTramDetection.frameDebug();
-    if (mUI->drawFeatures->isChecked())
+    if (mUI->chkFeatures->isChecked())
     {
         // Draw tracks
         if (mFeatures.track_left.size())

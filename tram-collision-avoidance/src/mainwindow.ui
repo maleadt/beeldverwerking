@@ -22,20 +22,20 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <layout class="QGridLayout" name="mainLayout">
+     <layout class="QGridLayout" name="lytMain">
       <item row="1" column="1">
-       <layout class="QHBoxLayout" name="buttonLayout">
+       <layout class="QHBoxLayout" name="lytControl">
         <item>
-         <layout class="QVBoxLayout" name="verticalLayout">
+         <layout class="QVBoxLayout" name="lytFeatures">
           <item>
-           <widget class="QCheckBox" name="drawFeatures">
+           <widget class="QCheckBox" name="chkFeatures">
             <property name="text">
              <string>Draw detected features</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="visualisationType">
+           <widget class="QComboBox" name="slcType">
             <item>
              <property name="text">
               <string>Input frame</string>
@@ -56,16 +56,16 @@
          </layout>
         </item>
         <item>
-         <layout class="QVBoxLayout" name="verticalLayout_2">
+         <layout class="QVBoxLayout" name="lytButtons">
           <item>
-           <widget class="QPushButton" name="buttonStart">
+           <widget class="QPushButton" name="btnStart">
             <property name="text">
              <string>Start</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="buttonStop">
+           <widget class="QPushButton" name="btnStop">
             <property name="text">
              <string>Stop</string>
             </property>
@@ -76,7 +76,7 @@
        </layout>
       </item>
       <item row="2" column="1">
-       <layout class="QHBoxLayout" name="videoLayout"/>
+       <layout class="QHBoxLayout" name="lytVideo"/>
       </item>
      </layout>
     </item>
@@ -95,7 +95,7 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
-    <addaction name="actionOpen"/>
+    <addaction name="actOpen"/>
     <addaction name="separator"/>
    </widget>
    <addaction name="menuFile"/>
@@ -111,7 +111,7 @@
     <string>Stop processing</string>
    </property>
   </action>
-  <action name="actionOpen">
+  <action name="actOpen">
    <property name="text">
     <string>Open Video</string>
    </property>
