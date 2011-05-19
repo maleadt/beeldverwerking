@@ -69,22 +69,21 @@
      <height>27</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuAction">
+   <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string>&amp;File</string>
     </property>
     <addaction name="actionOpen"/>
     <addaction name="separator"/>
-    <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuVideo">
     <property name="title">
-     <string>Video</string>
+     <string>&amp;Video</string>
     </property>
     <addaction name="actionStart"/>
     <addaction name="actionStop"/>
    </widget>
-   <addaction name="menuAction"/>
+   <addaction name="menuFile"/>
    <addaction name="menuVideo"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>

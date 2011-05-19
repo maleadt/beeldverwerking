@@ -47,22 +47,37 @@ private slots:
     void on_actionStart_triggered();
     void on_actionStop_triggered();
     void on_actionOpen_triggered();
+    void on_actionRecentFile_triggered();
+
+    // File and vidoe processing
+private:
+    void openFile(QString iFilename);
+    void process();
+    cv::Mat processFrame(cv::Mat& iFrame);
 
     // Auxiliary
 private slots:
-    void process();
-    cv::Mat processFrame(cv::Mat& iFrame);
+    void updateRecentFileActions();
+    void setCurrentFile(const QString &fileName);
+    QString strippedName(const QString &fullFileName);
 
 private:
     // Member data
     QString mVideoFilename;
     QTime mTimer;
-    Ui::MainWindow* mUI;
     GLWidget* mGLWidget;
     cv::VideoCapture* mVideoCapture;
 #if WRITE_VIDEO
     cv::VideoWriter* mVideoWriter;
 #endif
+    QSettings* mSettings;
+
+    // UI members
+    Ui::MainWindow* mUI;
+    QAction *mActionSeparator;
+    QAction *mActionExit;
+    enum { MaxRecentFiles = 5 };
+    QAction *mActionsRecentFiles[MaxRecentFiles];
 
     // Detection state
     FrameFeatures mFeatures;
