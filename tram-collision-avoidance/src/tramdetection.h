@@ -25,6 +25,9 @@ private:
     // Frames
     cv::Mat mFramePreprocessed;
     cv::Mat mFrameDebug;
+
+    cv::Point mROIPoint;
+    cv::Size mROISize;
 };
 
 #endif // TRAMDETECTION_H
