@@ -172,6 +172,9 @@ bool MainWindow::openFile(QString iFilename)
                              true);
 #endif
 
+    mFrames = 0;
+    mStartTime = QDateTime::currentMSecsSinceEpoch();
+
     statusBar()->showMessage("File opened and loaded");
     mUI->btnStart->setEnabled(true);
     setTitle(iFilename);
@@ -189,6 +192,16 @@ void MainWindow::process()
         {
             cv::Mat tOutput = processFrame(tFrame);
             mGLWidget->sendImage(&tOutput);
+
+            mFrames++;
+            unsigned long tCurrentTime = QDateTime::currentMSecsSinceEpoch();
+            mUI->lblFrames->setText("Count: " + QString::number(mFrames) + " frames");
+            unsigned long tTimeProcessing = tCurrentTime - mStartTime;
+            if (tTimeProcessing > 0)
+                mUI->lblFps->setText("Speed: " + QString::number((double) 1000*mFrames / tTimeProcessing, 'g', 2) + " FPS");
+            else
+                 mUI->lblFps->setText("Speed: NaN");
+
             QTimer::singleShot(25, this, SLOT(process()));
         }
     }

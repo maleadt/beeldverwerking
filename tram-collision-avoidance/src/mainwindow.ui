@@ -56,6 +56,24 @@
          </layout>
         </item>
         <item>
+         <layout class="QVBoxLayout" name="lytStats">
+          <item>
+           <widget class="QLabel" name="lblFrames">
+            <property name="text">
+             <string>Count</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="lblFps">
+            <property name="text">
+             <string>Speed</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
          <layout class="QVBoxLayout" name="lytButtons">
           <item>
            <widget class="QPushButton" name="btnStart">
