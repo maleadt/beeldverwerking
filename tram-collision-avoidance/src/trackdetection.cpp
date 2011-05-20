@@ -132,6 +132,7 @@ QList<Line> TrackDetection::find_representatives(const QList<QList<Line> >& iGro
             cv::Point tBottom(tHorizontalAverage - tHorizontalLength/2, tVerticalLowest);
             cv::Point tTop(tHorizontalAverage + tHorizontalLength/2, tVerticalHighest);
             oRepresentatives.append(Line(tBottom, tTop));
+        }
     }
 
     return oRepresentatives;
