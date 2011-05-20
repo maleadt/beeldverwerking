@@ -5,21 +5,12 @@
 // Includes
 #include "trackdetection.h"
 #include "auxiliary.h"
+#include <limits>
+#include <QDebug>
 
 // Feature properties
-#define TRACK_WIDTH 15
-#define TRACK_COUNT 2
-#define TRACK_START_OFFSET_MIN 10
-#define TRACK_START_OFFSET_MAX 50
-#define TRACK_START_OFFSET_DELTA 5
-#define TRACK_SPACE_MIN 100
-#define TRACK_SPACE_MAX 175
-#define SEGMENT_LENGTH_MIN 25
-#define SEGMENT_LENGTH_DELTA 10
-#define SEGMENT_ANGLE_MIN -M_PI_4
-#define SEGMENT_ANGLE_MAX M_PI_4
-#define SEGMENT_ANGLE_DELTA M_PI_4/64.0
-#define SEGMENT_ANGLE_DELTA_MAX M_PI/6.0
+#define GROUP_SLOPE_DELTA M_PI_4/8.0    // about 5 degrees
+#define GROUP_DISTANCE_DELTA 10         // in pixels
 
 
 //
@@ -55,7 +46,7 @@ void TrackDetection::preprocess()
 
     // Blank out useless region
     rectangle(tFrameThresholded, cv::Rect(0, 0, frame()->size().width, frame()->size().height * 0.50), cv::Scalar::all(0), CV_FILLED);
-    std::vector<cv::Point> tRectRight, tRectLeft;
+    QVector<cv::Point> tRectRight, tRectLeft;
     tRectRight.push_back(cv::Point(frame()->size().width, frame()->size().height));
     tRectRight.push_back(cv::Point(frame()->size().width-frame()->size().width*0.25, frame()->size().height));
     tRectRight.push_back(cv::Point(frame()->size().width, 0));
@@ -73,41 +64,27 @@ void TrackDetection::preprocess()
 void TrackDetection::find_features(FrameFeatures& iFrameFeatures) throw(FeatureException)
 {
     // Detect lines
-    std::vector<cv::Vec4i> tLines = find_lines();
+    QList<Line> tLines = find_lines();
 
-    // Find track start candidates
-    std::vector<cv::Point> tTrackCandidates;
-    for (int tScanlineOffset = TRACK_START_OFFSET_MIN; tScanlineOffset < TRACK_START_OFFSET_MAX; tScanlineOffset += TRACK_START_OFFSET_DELTA)
+    // Classify the lines
+    QList<QList<Line> > tGroups = find_groups(tLines);
+    qDebug() << "Found" << tGroups.size() << "groups";
+    foreach (const QList<Line>& tGroup, tGroups)
     {
-        unsigned int tScanline = mFramePreprocessed.size().height - tScanlineOffset;
-        tTrackCandidates = find_track_start(tLines, tScanline);
-        if (tTrackCandidates.size() == 2)
-            break;
+        int tRandom = mRng;
+        cv::Scalar tColour = CV_RGB(tRandom&255, (tRandom>>8)&255, (tRandom>>16)&255);
+        foreach (const Line& tLine, tGroup)
+        {
+            line(mFrameDebug,
+                 tLine.first,
+                 tLine.second,
+                 tColour,
+                 3,
+                 8
+                 );
+        }
     }
-    for (size_t i = 0; i < tTrackCandidates.size(); i++)
-        circle(mFrameDebug, tTrackCandidates[i], 5, cv::Scalar(0, 255, 255), -1);
-    if (tTrackCandidates.size() != 2)
-        throw FeatureException("could not find track start candidates (incorrect amount)");
 
-    // Detect track segments
-    int tTrackSpacing = abs(tTrackCandidates[0].x - tTrackCandidates[1].x);
-    if (tTrackSpacing < TRACK_SPACE_MIN || tTrackSpacing > TRACK_SPACE_MAX)
-        throw FeatureException("could not find track start candidates (incorrect spacing)");
-
-    // Detect both tracks
-    std::vector<cv::Point> tTrack1 = find_track(tTrackCandidates[0], tLines);
-    if (tTrack1.size() <= 1)
-        throw FeatureException("could not find first track");
-    std::vector<cv::Point> tTrack2 = find_track(tTrackCandidates[1], tLines);
-    if (tTrack2.size() <= 1)
-        throw FeatureException("could not find second track");
-
-    // TODO: detect left and right
-
-    // TODO: check validity
-
-    iFrameFeatures.track_left = tTrack1;
-    iFrameFeatures.track_right = tTrack2;
 }
 
 cv::Mat TrackDetection::frameDebug() const
@@ -121,12 +98,12 @@ cv::Mat TrackDetection::frameDebug() const
 //
 
 // Find lines in a frams
-std::vector<cv::Vec4i> TrackDetection::find_lines()
+QList<Line> TrackDetection::find_lines()
 {
     // Find the lines through Hough transform
-    std::vector<cv::Vec4i> oLines;
+    std::vector<cv::Vec4i> tLines;
     cv::HoughLinesP(mFramePreprocessed, // Image
-                oLines,                 // Lines
+                tLines,                 // Lines
                 1,                      // Rho
                 CV_PI/180,              // Theta
                 20,                     // Threshold
@@ -134,258 +111,215 @@ std::vector<cv::Vec4i> TrackDetection::find_lines()
                 3                       // Maximum line gap
                 );
 
-    // Draw lines
-    for(size_t i = 0; i < oLines.size(); i++)
+    // Convert to a list of lines
+    QList<Line> oLines;
+    for(size_t i = 0; i < tLines.size(); i++)
     {
-        line(mFrameDebug,
-             cv::Point(oLines[i][0],
-                       oLines[i][1]),
-             cv::Point(oLines[i][2],
-                       oLines[i][3]),
-             cv::Scalar(0,0,255),
-             3,
-             8
-             );
+        cv::Point tPointA(tLines[i][0], tLines[i][1]);
+        cv::Point tPointB(tLines[i][2], tLines[i][3]);
+        oLines.push_back(Line(tPointA, tPointB));
     }
 
     return oLines;
 }
 
-// Find the start candidates of a track
-std::vector<cv::Point> TrackDetection::find_track_start(const std::vector<cv::Vec4i>& iLines, unsigned int iScanline)
+QList<QList<Line> > TrackDetection::find_groups(const QList<Line>& iLines)
 {
-    // Find track start candidates
-    std::vector<int> track_points, track_intersections;
-    int y = iScanline;
-    for (int x = mFramePreprocessed.size().width-TRACK_WIDTH/2; x > TRACK_WIDTH/2; x--)
+    // Populate initial group
+    QList<QList<Line> > oGroups;
+    for (int i = 0; i < iLines.size(); i++)
     {
-        // Count the amount of segments intersecting with the current track start point
-        int segments = 0;
-        cv::Vec2i p1(x+TRACK_WIDTH/2, y);
-        cv::Vec2i p2(x-TRACK_WIDTH/2, y);
-        for(size_t i = 0; i < iLines.size(); i++)
-        {
-            cv::Vec2i p3(iLines[i][0], iLines[i][1]);
-            cv::Vec2i p4(iLines[i][2], iLines[i][3]);
+        QList<Line> tGroup;
+        tGroup.push_back(iLines[i]);
+        oGroups.push_back(tGroup);
+    }
 
-            if (intersect(p1, p2, p3, p4))
-            {
-                segments++;
-            }
-        }
-        if (segments == 0)
-            continue;
+    // Classify
+    bool tFlux = true;
+    while (tFlux)
+    {
+        tFlux = false;
+        QList<QList<Line> > tGroupsNew;
 
-        // Check if we are updating an existing track
-        bool tUpdateExisting = false;
-        for (size_t i = 0; i < track_points.size(); i++)
+        // Process each old group
+        while (oGroups.size() > 0)
         {
-            if ((track_points[i] - x) < TRACK_WIDTH)
+            QList<Line> tGroup = oGroups.back();
+            oGroups.pop_back();
+
+            // Check if it fits in another existing group
+            if (tGroupsNew.size() > 0)
             {
-                tUpdateExisting = true;
-                if (track_intersections[i] < segments)
+                bool tFits = false;
+                for (int i = 0; i < tGroupsNew.size(); i++)
                 {
-                    track_intersections[i] = segments;
-                    track_points[i] = x;
+                    if (groups_match(tGroup, tGroupsNew[i]))
+                    {
+                        foreach (Line tLine, tGroup)
+                            tGroupsNew[i].push_back(tLine);
+                        tFits = true;
+                        break;
+                    }
                 }
-                break;
+
+                // Doesn't fit, just add it
+                if (! tFits)
+                    tGroupsNew.push_back(tGroup);
             }
-        }
-        if (!tUpdateExisting)   // New track point!
-        {
-            if (track_points.size() < TRACK_COUNT)
-            {
-                track_points.push_back(x);
-                track_intersections.push_back(segments);
-            }
+
+            // The first group cannot be matched, just add it
             else
-            {
-                // Look for the track point with the least intersecting segments
-                int least = 0;
-                for (size_t i = 1; i < track_points.size(); i++)
-                {
-                    if (track_intersections[i] < track_intersections[least])
-                        least = i;
-                }
-
-                // Replace it
-                track_intersections[least] = segments;
-                track_points[least] = x;
-            }
+                tGroupsNew.push_back(tGroup);
         }
+
+        oGroups = tGroupsNew;
     }
 
-    // Draw and generate output array
-    std::vector<cv::Point> oTrackCandidates;
-    for (size_t i = 0; i < track_points.size(); i++)
-    {
-        if (track_intersections[i] % 2)                                          // Small hack to improve detection
-            track_points[i] -= TRACK_WIDTH/(2 * (track_intersections[i] % 2));   // of the track center.
-        int x = track_points[i];
-        oTrackCandidates.push_back(cv::Point(x, y));
-    }
-
-    return oTrackCandidates;
+    return oGroups;
 }
 
-// Find the segments of a track
-std::vector<cv::Point> TrackDetection::find_track(const cv::Point& iStart,
-                                                  const std::vector<cv::Vec4i>& iLines)
+// Check if two groups match
+bool TrackDetection::groups_match(const QList<Line>& iGroupA, const QList<Line>& iGroupB)
 {
-    // Create output vector
-    std::vector<cv::Point> oTrack;
-    oTrack.push_back(iStart);
-
-    // Detect new segments
-    bool tNewSegment = true;
-    while (tNewSegment)
+    foreach (const Line& tLineA, iGroupA)
     {
-        // Display segment
-        cv::Point segment_last = oTrack.back();
-        circle(mFrameDebug, segment_last, 5, cv::Scalar(0, 255, 0), -1);
-        tNewSegment = false;
+        double tSlopeA = abs(atan2(tLineA.first.y - tLineA.second.y, tLineA.first.x - tLineA.second.x));
 
-        // Convenience variables for segment center
-        int x = segment_last.x;
-        int y = segment_last.y;
-
-        // Scan
-        double max_overlap = 0;
-        int optimal_length;
-        double optimal_angle;
-        for (int length = SEGMENT_LENGTH_MIN; ; length += SEGMENT_LENGTH_DELTA)
+        foreach (const Line& tLineB, iGroupB)
         {
-            bool has_improved = false;
+            double tSlopeB = abs(atan2(tLineB.first.y - tLineB.second.y, tLineB.first.x - tLineB.second.x));
 
-            for (double angle = SEGMENT_ANGLE_MIN; angle < SEGMENT_ANGLE_MAX; angle += SEGMENT_ANGLE_DELTA)
+            // Almost parallel
+            if (abs(tSlopeA - tSlopeB) <= GROUP_SLOPE_DELTA)
             {
-                // Track segment coordinates (not rotated)
-                cv::Rect r(cv::Point(x-TRACK_WIDTH/2, y),
-                           cv::Point(x+TRACK_WIDTH/2, y-length));
-                cv::Point r1(x - TRACK_WIDTH/2, y);
-                cv::Point r2(x + TRACK_WIDTH/2, y);
-                cv::Point r3(x + TRACK_WIDTH/2, y - length);
-                cv::Point r4(x - TRACK_WIDTH/2, y - length);
-
-                // Process all lines
-                double tOverlap = 0;
-                for(size_t i = 0; i < iLines.size(); i++)
-                {
-                    // Line coordinates (inversly rotated)
-                    cv::Point p1(iLines[i][0], iLines[i][1]);
-                    cv::Point p1_rot(x + cos(-angle)*(p1.x-x) - sin(-angle)*(p1.y-y),
-                                     y + sin(-angle)*(p1.x-x) + cos(-angle)*(p1.y-y));
-                    cv::Point p2(iLines[i][2], iLines[i][3]);
-                    cv::Point p2_rot(x + cos(-angle)*(p2.x-x) - sin(-angle)*(p2.y-y),
-                                     y + sin(-angle)*(p2.x-x) + cos(-angle)*(p2.y-y));
-
-                    // Full overlap
-                    if (r.contains(p1_rot) && r.contains(p2_rot))
-                        tOverlap += sqrt((p1.x-p2.x)*(p1.x-p2.x) + (p1.y-p2.y)*(p1.y-p2.y));
-
-                    // Partial overlap with one point contained
-                    else if (r.contains(p1_rot) || r.contains(p2_rot))
-                    {
-                        // First point (the one within the rectangle)
-                        cv::Point p3;
-                        if (r.contains(p1_rot))
-                            p3 = p1_rot;
-                        else
-                            p3 = p2_rot;
-
-                        // Second point (intersecting the rectangle)
-                        cv::Point p4;
-                        if (intersect(p1_rot, p2_rot, r1, r2))
-                            p4 = intersect_point(p1_rot, p2_rot, r1, r2);
-                        else if (intersect(p1_rot, p2_rot, r2, r3))
-                            p4 = intersect_point(p1_rot, p2_rot, r2, r3);
-                        else if (intersect(p1_rot, p2_rot, r3, r4))
-                            p4 = intersect_point(p1_rot, p2_rot, r3, r4);
-                        else if (intersect(p1_rot, p2_rot, r4, r1))
-                            p4 = intersect_point(p1_rot, p2_rot, r4, r1);
-
-                        // Calculate the distance
-                        tOverlap += sqrt((p3.x-p4.x)*(p3.x-p4.x) + (p3.y-p4.y)*(p3.y-p4.y));
-                    }
-
-                    // Partial overlap with no point contained
-                    else
-                    {
-                        std::vector<cv::Point> p;
-
-                        if (intersect(p1_rot, p2_rot, r1, r2))
-                            p.push_back(intersect_point(p1_rot, p2_rot, r1, r2));
-                        if (intersect(p1_rot, p2_rot, r2, r3))
-                            p.push_back(intersect_point(p1_rot, p2_rot, r2, r3));
-                        if (intersect(p1_rot, p2_rot, r3, r4))
-                            p.push_back(intersect_point(p1_rot, p2_rot, r3, r4));
-                        if (intersect(p1_rot, p2_rot, r4, r1))
-                            p.push_back(intersect_point(p1_rot, p2_rot, r4, r1));
-
-                        if (p.size() == 2)
-                            tOverlap += sqrt((p[0].x-p[1].x)*(p[0].x-p[1].x) + (p[0].y-p[1].y)*(p[0].y-p[1].y));
-                    }
-                }
-
-                // Have the new values increased the overlap?
-                if (tOverlap > max_overlap)
-                {
-                    max_overlap = tOverlap;
-                    optimal_angle = angle;
-                    optimal_length = length;
-                    has_improved = true;
-                }
-            }
-
-            // Check if the optimal segment has been found
-            // (i.e. no improvement in the last iteration)
-            if (!has_improved)
-            {
-                // If a segment had been found, save it
-                if (max_overlap > 0)
-                {
-                    // Track segment coordinates (forwardly rotated)
-                    cv::Point r1_rot(x - cos(optimal_angle) * TRACK_WIDTH/2,
-                                     y - sin(optimal_angle) * TRACK_WIDTH/2);
-                    cv::Point r2_rot(x + cos(optimal_angle) * TRACK_WIDTH/2,
-                                     y + sin(optimal_angle) * TRACK_WIDTH/2);
-                    cv::Point r3_rot(x + cos(optimal_angle) * TRACK_WIDTH/2 + sin(optimal_angle) * optimal_length,
-                                     y + sin(optimal_angle) * TRACK_WIDTH/2 - cos(optimal_angle) * optimal_length);
-                    cv::Point r4_rot(x - cos(optimal_angle) * TRACK_WIDTH/2 + sin(optimal_angle) * optimal_length,
-                                     y - sin(optimal_angle) * TRACK_WIDTH/2 - cos(optimal_angle) * optimal_length);
-
-                    // Segment coordinates (center point of the top of the segment)
-                    double x_new = x + optimal_length * sin(optimal_angle);
-                    double y_new = y - optimal_length * cos(optimal_angle);
-
-                    // Check the slope
-                    double slope_current = atan2(y_new - oTrack.back().y,
-                                                 x_new - oTrack.back().x);
-                    double slope_prev;
-                    if (oTrack.size() >= 2)
-                    {
-                        slope_prev = atan2(oTrack[oTrack.size()-1].y - oTrack[oTrack.size()-2].y,
-                                           oTrack[oTrack.size()-1].x - oTrack[oTrack.size()-2].x);
-                    }
-                    if (oTrack.size() == 1 || abs(slope_current - slope_prev) <= SEGMENT_ANGLE_DELTA_MAX)
-                    {
-                        // Draw the segment
-                        cv::line(mFrameDebug, r1_rot, r2_rot, cv::Scalar(0, 255, 0), 1);
-                        cv::line(mFrameDebug, r2_rot, r3_rot, cv::Scalar(0, 255, 0), 1);
-                        cv::line(mFrameDebug, r3_rot, r4_rot, cv::Scalar(0, 255, 0), 1);
-                        cv::line(mFrameDebug, r4_rot, r1_rot, cv::Scalar(0, 255, 0), 1);
-
-                        // Save the segment
-                        oTrack.push_back(cv::Point(x_new, y_new));
-                        tNewSegment = true;
-                    }
-                }
-
-                // Stop the current iteration
-                break;
+                cv::Point tPointA, tPointB;
+                double tDistance = distance_segment2segment(tLineA, tLineB, tPointA, tPointB);
+                if (tDistance < GROUP_DISTANCE_DELTA)
+                    return true;
             }
         }
     }
 
-    return oTrack;
+    return false;
+}
+
+// Calculate the distance between
+// the segment (a.first.x, a.first.y)-(a.second.x, a.second.y) and
+// the segment (b.first.x, b.first.y)-(b.second.x, b.second.y).
+// Return the distance. Return the closest points
+// on the segments through parameters
+// (near_x1, near_y1) and (near_x2, near_y2).
+double TrackDetection::distance_segment2segment(const Line& iSegmentA, const Line& iSegmentB, cv::Point& oIntersectA, cv::Point& oIntersectB) const
+{
+    // See if the segments intersect.
+    cv::Point tIntersect;
+    if (intersect_segments(iSegmentA, iSegmentB, tIntersect))
+    {
+        return 0;
+        oIntersectA = tIntersect;
+        oIntersectA = tIntersect;
+    }
+
+    // Check (a.first.x, a.first.y) with segment 2.
+    double tDistanceCurrent = distance_point2segment(cv::Point(iSegmentA.first.x, iSegmentA.first.y), iSegmentB, tIntersect);
+    double tDistanceBest = std::numeric_limits<double>::max();
+    if (tDistanceCurrent < tDistanceBest)
+    {
+        tDistanceBest = tDistanceCurrent;
+        oIntersectA = tIntersect;
+        oIntersectB = iSegmentA.first;
+    }
+
+    // Check (a.second.x, a.second.y) with segment 2.
+    tDistanceCurrent = distance_point2segment(cv::Point(iSegmentA.second.x, iSegmentA.second.y), iSegmentB, tIntersect);
+    if (tDistanceCurrent < tDistanceBest)
+    {
+        tDistanceBest = tDistanceCurrent;
+        oIntersectA = iSegmentA.second;
+        oIntersectB = tIntersect;
+    }
+
+    // Check (b.first.x, b.first.y) with segment 1.
+    tDistanceCurrent = distance_point2segment(cv::Point(iSegmentB.first.x, iSegmentB.first.y), iSegmentA, tIntersect);
+    if (tDistanceCurrent < tDistanceBest)
+    {
+        tDistanceBest = tDistanceCurrent;
+        oIntersectA = tIntersect;
+        oIntersectB = iSegmentB.first;
+    }
+
+    // Check (b.second.x, b.second.y) with segment 1.
+    tDistanceCurrent = distance_point2segment(cv::Point(iSegmentB.second.x, iSegmentB.second.y), iSegmentA, tIntersect);
+    if (tDistanceCurrent < tDistanceBest)
+    {
+        tDistanceBest = tDistanceCurrent;
+        oIntersectA = tIntersect;
+        oIntersectB = iSegmentB.second;
+    }
+
+    return tDistanceBest;
+}
+
+// Calculate the distance between the point and the segment.
+double TrackDetection::distance_point2segment(cv::Point iPoint, Line iSegment, cv::Point& oIntersect) const
+{
+    double tDx = iSegment.second.x - iSegment.first.x;
+    double tDy = iSegment.second.y - iSegment.first.y;
+    if (tDx == 0 && tDy == 0)
+    {
+        // It's a point not a line segment.
+        tDx = iPoint.x - iSegment.first.x;
+        tDy = iPoint.y - iSegment.first.y;
+        oIntersect = iSegment.first;
+        return sqrt(tDx * tDx + tDy * tDy);
+    }
+
+    // Calculate the t that minimizes the distance.
+    double t = ((iPoint.x - iSegment.first.x) * tDx + (iPoint.y - iSegment.first.y) * tDy) / (tDx * tDx + tDy * tDy);
+
+    // See if this represents one of the segment's
+    // end points or a point in the middle.
+    if (t < 0)
+    {
+        tDx = iPoint.x - iSegment.first.x;
+        tDy = iPoint.y - iSegment.first.y;
+        oIntersect = iSegment.first;
+    }
+    else if (t > 1)
+    {
+        tDx = iPoint.x - iSegment.second.x;
+        tDy = iPoint.y - iSegment.second.y;
+        oIntersect = iSegment.second;
+    }
+    else
+    {
+        oIntersect.x = iSegment.first.x + t * tDx;
+        oIntersect.y = iSegment.first.y + t * tDy;
+        tDx = iPoint.x - oIntersect.x;
+        tDy = iPoint.y - oIntersect.y;
+    }
+
+    return sqrt(tDx * tDx + tDy * tDy);
+}
+
+// Return True if the segments intersect.
+bool TrackDetection::intersect_segments(const Line& iSegmentA, const Line& iSegmentB, cv::Point& oIntersect) const
+{
+    double tDxA = iSegmentA.second.x - iSegmentA.first.x;
+    double tDyA = iSegmentA.second.y - iSegmentA.first.y;
+    double tDxB = iSegmentB.second.x - iSegmentB.first.x;
+    double tDyB = iSegmentB.second.y - iSegmentB.first.y;
+    if ((tDxB * tDyA - tDyB * tDxA) == 0)
+    {
+        // The segments are parallel.
+        return false;
+    }
+
+    double s = (tDxA * (iSegmentB.first.y - iSegmentA.first.y) + tDyA * (iSegmentA.first.x - iSegmentB.first.x)) / (tDxB * tDyA - tDyB * tDxA);
+    double t = (tDxB * (iSegmentA.first.y - iSegmentB.first.y) + tDyB * (iSegmentB.first.x - iSegmentA.first.x)) / (tDyB * tDxA - tDxB * tDyA);
+
+    oIntersect.x = iSegmentA.first.x + t * tDxA;
+    oIntersect.y = iSegmentA.first.y + t * tDyA;
+
+    return ((s >= 0 && s <= 1 && t >= 0 && t <= 1));
 }

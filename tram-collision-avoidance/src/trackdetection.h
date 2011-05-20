@@ -9,9 +9,12 @@
 // Includes
 #include "opencv/cv.h"
 #include <cmath>
-#include <vector>
+#include <QVector>
+#include <QPair>
 #include "component.h"
 #include "framefeatures.h"
+
+typedef QPair<cv::Point, cv::Point> Line;
 
 class TrackDetection : public Component
 {
@@ -26,13 +29,21 @@ public:
 
 private:
     // Feature detection
-    std::vector<cv::Vec4i> find_lines();
-    std::vector<cv::Point> find_track_start(const std::vector<cv::Vec4i>& iLines, unsigned int iScanline);
-    std::vector<cv::Point> find_track(const cv::Point& iStart, const std::vector<cv::Vec4i>& iLines);
+    QList<Line > find_lines();
+    QList<QList<Line> > find_groups(const QList<Line>& iLines);
+    bool groups_match(const QList<Line>& iGroupA, const QList<Line>& iGroupB);
+
+    // Auxiliary math
+    double distance_segment2segment(const Line& iSegmentA, const Line& iSegmentB, cv::Point& oIntersectA, cv::Point& oIntersectB) const;
+    double distance_point2segment(cv::Point iPoint, Line iSegment, cv::Point& oIntersect) const;
+    bool intersect_segments(const Line& iSegmentA, const Line& iSegmentB, cv::Point& oIntersect) const;
 
     // Frames
     cv::Mat mFramePreprocessed;
     cv::Mat mFrameDebug;
+
+    // Member data
+    cv::RNG mRng;
 };
 
 #endif // TRACKDETECTION_H

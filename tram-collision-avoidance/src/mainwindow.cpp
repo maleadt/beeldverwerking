@@ -165,6 +165,7 @@ bool MainWindow::openFile(QString iFilename)
         statusBar()->showMessage("Error: could not open file");
         return false;
     }
+    //mGLWidget->setMinimumSize(mVideoCapture->get(CV_CAP_PROP_FRAME_WIDTH), mVideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT));
 
     // Open output video
 #if WRITE_VIDEO
@@ -172,7 +173,7 @@ bool MainWindow::openFile(QString iFilename)
     mVideoWriter = new cv::VideoWriter(oVideoFile,
                              CV_FOURCC('M', 'J', 'P', 'G'),
                              mVideoCapture->get(CV_CAP_PROP_FPS),
-                             cv::Size(mVideoCapture->get(CV_CAP_PROP_FRAME_WIDTH),mVideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT)),
+                             cv::Size(mVideoCapture->get(CV_CAP_PROP_FRAME_WIDTH), mVideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT)),
                              true);
 #endif
 
