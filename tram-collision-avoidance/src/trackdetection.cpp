@@ -9,8 +9,8 @@
 #include <QDebug>
 
 // Feature properties
-#define GROUP_SLOPE_DELTA M_PI_4/8.0    // about 5 degrees
-#define GROUP_DISTANCE_DELTA 10         // in pixels
+#define GROUP_SLOPE_DELTA M_PI_4/4.0    // about 10 degrees
+#define GROUP_DISTANCE_DELTA 30         // in pixels
 
 
 //
@@ -68,7 +68,6 @@ void TrackDetection::find_features(FrameFeatures& iFrameFeatures) throw(FeatureE
 
     // Classify the lines
     QList<QList<Line> > tGroups = find_groups(tLines);
-    qDebug() << "Found" << tGroups.size() << "groups";
     foreach (const QList<Line>& tGroup, tGroups)
     {
         int tRandom = mRng;
