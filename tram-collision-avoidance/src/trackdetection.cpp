@@ -11,6 +11,7 @@
 // Feature properties
 #define GROUP_SLOPE_DELTA M_PI_4/4.0    // about 10 degrees
 #define GROUP_DISTANCE_DELTA 30         // in pixels
+#define GROUP_SIZE 2
 
 
 //
@@ -84,6 +85,56 @@ void TrackDetection::find_features(FrameFeatures& iFrameFeatures) throw(FeatureE
         }
     }
 
+    // Generate representatives
+    QList<Line> tRepresentatives = find_representatives(tGroups);
+    foreach (const Line& tRepresentative, tRepresentatives)
+    {
+        line(mFrameDebug,
+             tRepresentative.first,
+             tRepresentative.second,
+             cv::Scalar(0, 0, 255),
+             5,
+             8
+             );
+    }
+}
+
+QList<Line> TrackDetection::find_representatives(const QList<QList<Line> >& iGroups)
+{
+    QList<Line> oRepresentatives;
+    foreach (const QList<Line>& tGroup, iGroups)
+    {
+        if (tGroup.size() >= GROUP_SIZE)
+        {
+            int tVerticalLowest = std::numeric_limits<int>::max(), tVerticalHighest = 0;
+            double tSlopeTotal = 0;
+            long tHorizontalTotal = 0;
+            foreach (const Line& tLine, tGroup)
+            {
+                int tVerticalLow = min(tLine.first.y, tLine.second.y);
+                int tVerticalHigh = max(tLine.first.y, tLine.second.y);
+                if (tVerticalLow < tVerticalLowest)
+                    tVerticalLowest = tVerticalLow;
+                if (tVerticalHigh > tVerticalHighest)
+                    tVerticalHighest = tVerticalHigh;
+
+                int tHorizontalMidpoint = (tLine.first.x + tLine.second.x) / 2;
+                tHorizontalTotal += tHorizontalMidpoint;
+
+                double tSlope = atan2(tLine.first.y - tLine.second.y, tLine.first.x - tLine.second.x);
+                tSlopeTotal += tSlope;
+            }
+
+            double tSlopeAverage = tSlopeTotal / tGroup.size();
+            int tHorizontalAverage = tHorizontalTotal / tGroup.size();
+            double tHorizontalLength = (tVerticalHighest - tVerticalLowest) / tan(tSlopeAverage);
+
+            cv::Point tBottom(tHorizontalAverage - tHorizontalLength/2, tVerticalLowest);
+            cv::Point tTop(tHorizontalAverage + tHorizontalLength/2, tVerticalHighest);
+            oRepresentatives.append(Line(tBottom, tTop));
+    }
+
+    return oRepresentatives;
 }
 
 cv::Mat TrackDetection::frameDebug() const
