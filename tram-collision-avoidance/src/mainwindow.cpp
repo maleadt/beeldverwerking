@@ -102,6 +102,7 @@ void MainWindow::on_btnStart_clicked()
 
     // Schedule processing
     mUI->btnStop->setEnabled(true);
+    mUI->btnStop->setFocus();
     mProcessing = true;
     process();
 }
@@ -112,6 +113,7 @@ void MainWindow::on_btnStop_clicked()
     mUI->statusBar->showMessage("Stopped processing");
     mProcessing = false;
     mUI->btnStart->setEnabled(true);
+    mUI->btnStart->setFocus();
     mUI->btnStop->setEnabled(false);
 }
 
@@ -119,6 +121,7 @@ void MainWindow::on_actOpen_triggered()
 {
     QString tFilename = QFileDialog::getOpenFileName(this, tr("Open Video"), "", tr("Video Files (*.avi *.mp4)"));
     openFile(tFilename);
+    mUI->btnStart->setEnabled(true);
 }
 
 void MainWindow::on_actRecentFile_triggered()
