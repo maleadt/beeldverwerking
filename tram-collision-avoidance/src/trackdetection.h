@@ -17,7 +17,6 @@
 
 // Type definitions
 typedef QPair<cv::Point, cv::Point> TrackStart;
-typedef QList<cv::Point> Track;
 
 class TrackDetection : public Component
 {

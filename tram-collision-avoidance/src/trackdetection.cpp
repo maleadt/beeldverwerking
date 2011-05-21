@@ -114,7 +114,7 @@ void TrackDetection::find_features(FrameFeatures& iFrameFeatures) throw(FeatureE
             cv::line(mFrameDebug,
                  tPrevious,
                  tPoint,
-                 cv::Scalar(0, 255, 0),
+                 cv::Scalar(0, 255, 255),
                  5,
                  8
                  );
@@ -137,6 +137,9 @@ void TrackDetection::find_features(FrameFeatures& iFrameFeatures) throw(FeatureE
                    8,
                    cv::Scalar(0, 255, 255),
                    2);
+
+        iFrameFeatures.track_left = tTramTrack.first;
+        iFrameFeatures.track_right = tTramTrack.second;
     }
 }
 
