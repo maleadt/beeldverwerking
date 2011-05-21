@@ -10,7 +10,8 @@ SOURCES += \
     mainwindow.cpp \
     tramdetection.cpp \
     pedestriandetection.cpp \
-    vehicledetection.cpp
+    vehicledetection.cpp \
+    auxiliary.cpp
 
 HEADERS += \
     trackdetection.h \
