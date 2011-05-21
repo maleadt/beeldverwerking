@@ -12,6 +12,8 @@
 #define GROUP_SLOPE_DELTA M_PI_4/4.0    // about 10 degrees
 #define GROUP_DISTANCE_DELTA 30         // in pixels
 #define GROUP_SIZE 2
+#define STITCH_SLOPE_DELTA M_PI_4       // 45 degrees
+#define STITCH_DISTANCE_DELTA 50
 
 
 //
@@ -97,6 +99,27 @@ void TrackDetection::find_features(FrameFeatures& iFrameFeatures) throw(FeatureE
              8
              );
     }
+
+    // Stitch representative lines
+    QList<QList<cv::Point> > tStitches = find_stitches(tRepresentatives);
+    foreach (const QList<cv::Point>& tStitch, tStitches)
+    {
+        QList<cv::Point>::const_iterator tIterator = tStitch.begin();
+        cv::Point tPrevious = *tIterator++;
+        while (tIterator != tStitch.end())
+        {
+            cv::Point tPoint = *tIterator++;
+            line(mFrameDebug,
+                 tPrevious,
+                 tPoint,
+                 cv::Scalar(0, 255, 0),
+                 5,
+                 8
+                 );
+            tPrevious = tPoint;
+        }
+    }
+
 }
 
 cv::Mat TrackDetection::frameDebug() const
@@ -202,17 +225,19 @@ QList<Line> TrackDetection::find_representatives(const QList<QList<Line> >& iGro
             long tHorizontalTotal = 0;
             foreach (const Line& tLine, tGroup)
             {
-                int tVerticalLow = min(tLine.first.y, tLine.second.y);
-                int tVerticalHigh = max(tLine.first.y, tLine.second.y);
-                if (tVerticalLow < tVerticalLowest)
-                    tVerticalLowest = tVerticalLow;
-                if (tVerticalHigh > tVerticalHighest)
-                    tVerticalHighest = tVerticalHigh;
+                cv::Point tLineLow = tLine.first, tLineHigh = tLine.second;
+                if (tLineLow.y > tLineHigh.y)
+                    swap(tLineLow, tLineHigh);
+
+                if (tLineLow.y < tVerticalLowest)
+                    tVerticalLowest = tLineLow.y;
+                if (tLineHigh.y > tVerticalHighest)
+                    tVerticalHighest = tLineHigh.y;
 
                 int tHorizontalMidpoint = (tLine.first.x + tLine.second.x) / 2;
                 tHorizontalTotal += tHorizontalMidpoint;
 
-                double tSlope = atan2(tLine.first.y - tLine.second.y, tLine.first.x - tLine.second.x);
+                double tSlope = atan2(tLineLow.y - tLineHigh.y, tLineLow.x - tLineHigh.x);
                 tSlopeTotal += tSlope;
             }
 
@@ -220,8 +245,10 @@ QList<Line> TrackDetection::find_representatives(const QList<QList<Line> >& iGro
             int tHorizontalAverage = tHorizontalTotal / tGroup.size();
             double tHorizontalLength = (tVerticalHighest - tVerticalLowest) / tan(tSlopeAverage);
 
+
             cv::Point tBottom(tHorizontalAverage - tHorizontalLength/2, tVerticalLowest);
             cv::Point tTop(tHorizontalAverage + tHorizontalLength/2, tVerticalHighest);
+
             oRepresentatives.append(Line(tBottom, tTop));
         }
     }
@@ -229,6 +256,62 @@ QList<Line> TrackDetection::find_representatives(const QList<QList<Line> >& iGro
     return oRepresentatives;
 }
 
+QList<QList<cv::Point> > TrackDetection::find_stitches(const QList<Line>& iRepresentatives)
+{
+    QList<QList<cv::Point> > oStitches;
+    foreach (Line tRepresentative, iRepresentatives)
+    {
+        QList<cv::Point> tInitialStitch;
+        tInitialStitch.append(tRepresentative.first);
+        tInitialStitch.append(tRepresentative.second);
+        oStitches.append(tInitialStitch);
+    }
+
+    bool tFlux = true;
+    while (tFlux)
+    {
+        tFlux = false;
+        QList<QList<cv::Point> > tStitchesNew;
+
+        while (oStitches.size() > 0)
+        {
+            QList<cv::Point> tStitch = oStitches.back();
+            oStitches.pop_back();
+
+            // Check if it fits in another existing group of stitches
+            if (tStitchesNew.size() > 0)
+            {
+                bool tFits = false;
+                for (int i = 0; i < tStitchesNew.size(); i++)
+                {
+                    cv::Point tStitchPoint;
+                    if (stitches_match(tStitch, tStitchesNew[i], tStitchPoint))
+                    {
+                        tStitchesNew[i].pop_back();
+                        tStitchesNew[i].append(tStitchPoint);
+                        tStitch.pop_front();
+                        foreach (cv::Point tPoint, tStitch)
+                            tStitchesNew[i].push_back(tPoint);
+                        tFits = true;
+                        break;
+                    }
+                }
+
+                // Doesn't fit, just add it
+                if (! tFits)
+                    tStitchesNew.push_back(tStitch);
+            }
+
+            // The first stitch cannot be matched, just add it
+            else
+                tStitchesNew.push_back(tStitch);
+        }
+
+        oStitches = tStitchesNew;
+    }
+
+    return oStitches;
+}
 
 //
 // Auxiliary math
@@ -253,6 +336,37 @@ bool TrackDetection::groups_match(const QList<Line>& iGroupA, const QList<Line>&
                 if (tDistance < GROUP_DISTANCE_DELTA)
                     return true;
             }
+        }
+    }
+
+    return false;
+}
+
+// Check if two stitches match
+bool TrackDetection::stitches_match(const QList<cv::Point>& iStitchA, const QList<cv::Point>& iStitchB, cv::Point& oIntersection)
+{
+    // Extract the relevant segments
+    QList<cv::Point>::const_iterator tIterator = iStitchA.end();
+    Line tLineA;
+    tLineA.second = *--tIterator;
+    tLineA.first = *--tIterator;
+    tIterator = iStitchB.end();
+    Line tLineB;
+    tLineB.second = *--tIterator;
+    tLineB.first = *--tIterator;
+
+    double tSlopeA = abs(atan2(tLineA.first.y - tLineA.second.y, tLineA.first.x - tLineA.second.x));
+    double tSlopeB = abs(atan2(tLineB.first.y - tLineB.second.y, tLineB.first.x - tLineB.second.x));
+
+    if (abs(tSlopeA - tSlopeB) <= STITCH_SLOPE_DELTA)
+    {
+        cv::Point tPointA, tPointB;
+        double tDistance = distance_segment2segment(tLineA, tLineB, tPointA, tPointB);
+        if (tDistance < STITCH_DISTANCE_DELTA)
+        {
+            oIntersection.x = (tPointA.x + tPointB.x)/2;
+            oIntersection.y = (tPointA.y + tPointB.y)/2;
+            return true;
         }
     }
 

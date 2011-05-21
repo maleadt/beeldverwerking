@@ -32,12 +32,14 @@ private:
     QList<Line > find_lines();
     QList<QList<Line> > find_groups(const QList<Line>& iLines);
     QList<Line> find_representatives(const QList<QList<Line> >& iGroups);
+    QList<QList<cv::Point> > find_stitches(const QList<Line>& iRepresentatives);
 
     // Auxiliary math
     double distance_segment2segment(const Line& iSegmentA, const Line& iSegmentB, cv::Point& oIntersectA, cv::Point& oIntersectB) const;
     double distance_point2segment(cv::Point iPoint, Line iSegment, cv::Point& oIntersect) const;
     bool intersect_segments(const Line& iSegmentA, const Line& iSegmentB, cv::Point& oIntersect) const;
     bool groups_match(const QList<Line>& iGroupA, const QList<Line>& iGroupB);
+    bool stitches_match(const QList<cv::Point>& iStitchA, const QList<cv::Point>& iStitchB, cv::Point& oIntersection);
 
     // Frames
     cv::Mat mFramePreprocessed;
