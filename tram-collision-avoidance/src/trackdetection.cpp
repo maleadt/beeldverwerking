@@ -14,6 +14,8 @@
 #define STITCH_SLOPE_DELTA M_PI_4       // 45 degrees
 #define STITCH_DISTANCE_DELTA_X 30
 #define STITCH_DISTANCE_DELTA_Y 60
+#define TRACK_SPACE_MIN 100
+#define TRACK_SPACE_MAX 175
 
 
 //
@@ -77,7 +79,7 @@ void TrackDetection::find_features(FrameFeatures& iFrameFeatures) throw(FeatureE
         cv::Scalar tColour = CV_RGB(tRandom&255, (tRandom>>8)&255, (tRandom>>16)&255);
         foreach (const Line& tLine, tGroup)
         {
-            line(mFrameDebug,
+            cv::line(mFrameDebug,
                  tLine.first,
                  tLine.second,
                  tColour,
@@ -91,7 +93,7 @@ void TrackDetection::find_features(FrameFeatures& iFrameFeatures) throw(FeatureE
     QList<Line> tRepresentatives = find_representatives(tGroups);
     foreach (const Line& tRepresentative, tRepresentatives)
     {
-        line(mFrameDebug,
+        cv::line(mFrameDebug,
              tRepresentative.first,
              tRepresentative.second,
              cv::Scalar(0, 0, 255),
@@ -101,15 +103,15 @@ void TrackDetection::find_features(FrameFeatures& iFrameFeatures) throw(FeatureE
     }
 
     // Stitch representative lines
-    QList<QList<cv::Point> > tStitches = find_stitches(tRepresentatives);
-    foreach (const QList<cv::Point>& tStitch, tStitches)
+    QList<Track > tStitches = find_stitches(tRepresentatives);
+    foreach (const Track& tStitch, tStitches)
     {
-        QList<cv::Point>::const_iterator tIterator = tStitch.begin();
+        Track::const_iterator tIterator = tStitch.begin();
         cv::Point tPrevious = *tIterator++;
         while (tIterator != tStitch.end())
         {
             cv::Point tPoint = *tIterator++;
-            line(mFrameDebug,
+            cv::line(mFrameDebug,
                  tPrevious,
                  tPoint,
                  cv::Scalar(0, 255, 0),
@@ -118,6 +120,23 @@ void TrackDetection::find_features(FrameFeatures& iFrameFeatures) throw(FeatureE
                  );
             tPrevious = tPoint;
         }
+    }
+
+    // Find valid tracks
+    TrackStart tTrackStart;
+    QPair<Track, Track> tTramTrack;
+    if (find_trackstart(tStitches, 10, tTrackStart, tTramTrack))
+    {
+        cv::circle(mFrameDebug,
+                   tTrackStart.first,
+                   8,
+                   cv::Scalar(0, 255, 255),
+                   2);
+        cv::circle(mFrameDebug,
+                   tTrackStart.second,
+                   8,
+                   cv::Scalar(0, 255, 255),
+                   2);
     }
 }
 
@@ -256,12 +275,12 @@ QList<Line> TrackDetection::find_representatives(const QList<QList<Line> >& iGro
     return oRepresentatives;
 }
 
-QList<QList<cv::Point> > TrackDetection::find_stitches(const QList<Line>& iRepresentatives)
+QList<Track > TrackDetection::find_stitches(const QList<Line>& iRepresentatives)
 {
-    QList<QList<cv::Point> > oStitches;
+    QList<Track > oStitches;
     foreach (Line tRepresentative, iRepresentatives)
     {
-        QList<cv::Point> tInitialStitch;
+        Track tInitialStitch;
         tInitialStitch.append(tRepresentative.first);
         tInitialStitch.append(tRepresentative.second);
         oStitches.append(tInitialStitch);
@@ -271,11 +290,11 @@ QList<QList<cv::Point> > TrackDetection::find_stitches(const QList<Line>& iRepre
     while (tFlux)
     {
         tFlux = false;
-        QList<QList<cv::Point> > tStitchesNew;
+        QList<Track > tStitchesNew;
 
         while (oStitches.size() > 0)
         {
-            QList<cv::Point> tStitch = oStitches.back();
+            Track tStitch = oStitches.back();
             oStitches.pop_back();
 
             // Check if it fits in another existing group of stitches
@@ -315,8 +334,74 @@ QList<QList<cv::Point> > TrackDetection::find_stitches(const QList<Line>& iRepre
     return oStitches;
 }
 
+
+bool TrackDetection::find_trackstart(const QList<Track >& iStitches, int iScanlineOffset, TrackStart& oTrackStart, QPair<Track, Track>& oTracks)
+{
+    int tScanlineHeight = mFramePreprocessed.size().height - iScanlineOffset;
+    Line tScanline(
+                cv::Point(0, tScanlineHeight),
+                cv::Point(mFramePreprocessed.size().width, tScanlineHeight)
+                );
+
+    Track tScanlineIntersections;
+    QMap<int, Track> tTrackMap;
+    foreach (Track tStitch, iStitches)
+    {
+        Track::const_iterator tIterator = tStitch.end();
+        Line tLowestSegment;
+        tLowestSegment.second = *--tIterator;
+        tLowestSegment.first = *--tIterator;
+
+        cv::Point tTrackStart;
+        if (intersect_segments(tScanline, tLowestSegment, tTrackStart))
+        {
+            tScanlineIntersections.append(tTrackStart);
+            tTrackMap.insert(tTrackStart.x, tStitch);
+        }
+    }
+
+    QList<TrackStart> tTrackStarts;
+    while (tScanlineIntersections.size() > 0)
+    {
+        cv::Point tPointA = tScanlineIntersections.back();
+        tScanlineIntersections.pop_back();
+
+        Track::iterator tIterator = tScanlineIntersections.begin();
+        while (tIterator != tScanlineIntersections.end())
+        {
+            cv::Point tPointB = *tIterator;
+            double tDistance = abs(tPointA.x - tPointB.x);
+            if (tDistance > TRACK_SPACE_MIN && tDistance < TRACK_SPACE_MAX)
+            {
+                tTrackStarts.append(TrackStart(tPointA, tPointB));
+                tScanlineIntersections.erase(tIterator);
+                break;
+            }
+
+            tIterator++;
+        }
+    }
+    if (tTrackStarts.size() > 0)
+    {
+        int tBestTrackStartPosition = std::numeric_limits<int>::max();
+        foreach (TrackStart tTrackStart, tTrackStarts)
+        {
+            int tTrackStartPosition = (tTrackStart.first.x + tTrackStart.second.x)/2 - mFrameDebug.size().width/2;
+            if (abs(tTrackStartPosition) < abs(tBestTrackStartPosition))
+            {
+                oTrackStart = tTrackStart;
+                oTracks.first = tTrackMap.value(tTrackStart.first.x);
+                oTracks.second = tTrackMap.value(tTrackStart.second.x);
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
+
 //
-// Auxiliary math
+// Auxiliary
 //
 
 // Check if two groups match
@@ -345,10 +430,10 @@ bool TrackDetection::groups_match(const QList<Line>& iGroupA, const QList<Line>&
 }
 
 // Check if two stitches match
-bool TrackDetection::stitches_match(const QList<cv::Point>& iStitchA, const QList<cv::Point>& iStitchB, cv::Point& oIntersection)
+bool TrackDetection::stitches_match(const Track& iStitchA, const Track& iStitchB, cv::Point& oIntersection)
 {
     // Extract the relevant segments
-    QList<cv::Point>::const_iterator tIterator = iStitchA.end();
+    Track::const_iterator tIterator = iStitchA.end();
     Line tLineA;
     tLineA.second = *--tIterator;
     tLineA.first = *--tIterator;

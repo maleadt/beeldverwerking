@@ -15,6 +15,10 @@
 #include "framefeatures.h"
 #include "auxiliary.h"
 
+// Type definitions
+typedef QPair<cv::Point, cv::Point> TrackStart;
+typedef QList<cv::Point> Track;
+
 class TrackDetection : public Component
 {
 public:
@@ -31,11 +35,12 @@ private:
     QList<Line > find_lines();
     QList<QList<Line> > find_groups(const QList<Line>& iLines);
     QList<Line> find_representatives(const QList<QList<Line> >& iGroups);
-    QList<QList<cv::Point> > find_stitches(const QList<Line>& iRepresentatives);
+    QList<Track > find_stitches(const QList<Line>& iRepresentatives);
+    bool find_trackstart(const QList<Track>& iStitches, int iScanlineOffset, TrackStart& oTrackStart, QPair<Track, Track>& oTracks);
 
     // Auxiliary methods
     bool groups_match(const QList<Line>& iGroupA, const QList<Line>& iGroupB);
-    bool stitches_match(const QList<cv::Point>& iStitchA, const QList<cv::Point>& iStitchB, cv::Point& oIntersection);
+    bool stitches_match(const Track& iStitchA, const Track& iStitchB, cv::Point& oIntersection);
 
     // Frames
     cv::Mat mFramePreprocessed;
