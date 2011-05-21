@@ -99,45 +99,6 @@ void TrackDetection::find_features(FrameFeatures& iFrameFeatures) throw(FeatureE
     }
 }
 
-QList<Line> TrackDetection::find_representatives(const QList<QList<Line> >& iGroups)
-{
-    QList<Line> oRepresentatives;
-    foreach (const QList<Line>& tGroup, iGroups)
-    {
-        if (tGroup.size() >= GROUP_SIZE)
-        {
-            int tVerticalLowest = std::numeric_limits<int>::max(), tVerticalHighest = 0;
-            double tSlopeTotal = 0;
-            long tHorizontalTotal = 0;
-            foreach (const Line& tLine, tGroup)
-            {
-                int tVerticalLow = min(tLine.first.y, tLine.second.y);
-                int tVerticalHigh = max(tLine.first.y, tLine.second.y);
-                if (tVerticalLow < tVerticalLowest)
-                    tVerticalLowest = tVerticalLow;
-                if (tVerticalHigh > tVerticalHighest)
-                    tVerticalHighest = tVerticalHigh;
-
-                int tHorizontalMidpoint = (tLine.first.x + tLine.second.x) / 2;
-                tHorizontalTotal += tHorizontalMidpoint;
-
-                double tSlope = atan2(tLine.first.y - tLine.second.y, tLine.first.x - tLine.second.x);
-                tSlopeTotal += tSlope;
-            }
-
-            double tSlopeAverage = tSlopeTotal / tGroup.size();
-            int tHorizontalAverage = tHorizontalTotal / tGroup.size();
-            double tHorizontalLength = (tVerticalHighest - tVerticalLowest) / tan(tSlopeAverage);
-
-            cv::Point tBottom(tHorizontalAverage - tHorizontalLength/2, tVerticalLowest);
-            cv::Point tTop(tHorizontalAverage + tHorizontalLength/2, tVerticalHighest);
-            oRepresentatives.append(Line(tBottom, tTop));
-        }
-    }
-
-    return oRepresentatives;
-}
-
 cv::Mat TrackDetection::frameDebug() const
 {
     return mFrameDebug;
@@ -228,6 +189,50 @@ QList<QList<Line> > TrackDetection::find_groups(const QList<Line>& iLines)
 
     return oGroups;
 }
+
+QList<Line> TrackDetection::find_representatives(const QList<QList<Line> >& iGroups)
+{
+    QList<Line> oRepresentatives;
+    foreach (const QList<Line>& tGroup, iGroups)
+    {
+        if (tGroup.size() >= GROUP_SIZE)
+        {
+            int tVerticalLowest = std::numeric_limits<int>::max(), tVerticalHighest = 0;
+            double tSlopeTotal = 0;
+            long tHorizontalTotal = 0;
+            foreach (const Line& tLine, tGroup)
+            {
+                int tVerticalLow = min(tLine.first.y, tLine.second.y);
+                int tVerticalHigh = max(tLine.first.y, tLine.second.y);
+                if (tVerticalLow < tVerticalLowest)
+                    tVerticalLowest = tVerticalLow;
+                if (tVerticalHigh > tVerticalHighest)
+                    tVerticalHighest = tVerticalHigh;
+
+                int tHorizontalMidpoint = (tLine.first.x + tLine.second.x) / 2;
+                tHorizontalTotal += tHorizontalMidpoint;
+
+                double tSlope = atan2(tLine.first.y - tLine.second.y, tLine.first.x - tLine.second.x);
+                tSlopeTotal += tSlope;
+            }
+
+            double tSlopeAverage = tSlopeTotal / tGroup.size();
+            int tHorizontalAverage = tHorizontalTotal / tGroup.size();
+            double tHorizontalLength = (tVerticalHighest - tVerticalLowest) / tan(tSlopeAverage);
+
+            cv::Point tBottom(tHorizontalAverage - tHorizontalLength/2, tVerticalLowest);
+            cv::Point tTop(tHorizontalAverage + tHorizontalLength/2, tVerticalHighest);
+            oRepresentatives.append(Line(tBottom, tTop));
+        }
+    }
+
+    return oRepresentatives;
+}
+
+
+//
+// Auxiliary math
+//
 
 // Check if two groups match
 bool TrackDetection::groups_match(const QList<Line>& iGroupA, const QList<Line>& iGroupB)
