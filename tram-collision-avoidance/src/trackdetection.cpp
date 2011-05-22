@@ -139,11 +139,14 @@ void TrackDetection::find_features(FrameFeatures& iFrameFeatures) throw(FeatureE
                    cv::Scalar(0, 255, 255),
                    2);
 
-        if (is_valid(iFrameFeatures.tracks, tTramTrack))
-        {
-            iFrameFeatures.tracks = tTramTrack;
-        }
+        if (tTramTrack.first.back().x > tTramTrack.second.back().x)
+            swap(tTramTrack.first, tTramTrack.second);
+
+        check_validity(iFrameFeatures.tracks, tTramTrack);
+        iFrameFeatures.tracks = tTramTrack;
     }
+    else
+        throw FeatureException("Could not identify track start");
 }
 
 cv::Mat TrackDetection::frameDebug() const
@@ -405,21 +408,21 @@ bool TrackDetection::find_trackstart(const QList<Track >& iStitches, int iScanli
     return false;
 }
 
-bool TrackDetection::is_valid(const QPair<Track, Track>& iOldTracks, QPair<Track, Track> iNewTracks)
+void TrackDetection::check_validity(const QPair<Track, Track>& iOldTracks, QPair<Track, Track> iNewTracks) throw(FeatureException)
 {
     // Check if we uberhaupt have points
     if (iNewTracks.first.size() == 0 || iNewTracks.second.size() == 0)
-        return false;
+        throw FeatureException("Found empty track");
 
     // Check if first track is left and second one is right
     int tX0 = iNewTracks.first.back().x;
     int tX1 = iNewTracks.second.back().x;
     if (tX0 > tX1)
-        return false;
+        throw FeatureException("Left/Right not respected");
 
     // Check if new track starts at a sensible location
     if (tX0 < 300 || tX1 > 700)
-        return false;
+        throw FeatureException("Track not starting at sensible location");
 
     if (iOldTracks.first.size() != 0 && iOldTracks.second.size() != 0)
     {
@@ -433,11 +436,9 @@ bool TrackDetection::is_valid(const QPair<Track, Track>& iOldTracks, QPair<Track
         {
             // Track is moving away from the center, check if the delta isn't too high
             if (abs(tOldCenter - tNewCenter) > VALIDITY_TRACK_DELTA)
-                return false;
+                throw FeatureException("Track moving too much away from the previous one");
         }
     }
-
-    return true;
 }
 
 
