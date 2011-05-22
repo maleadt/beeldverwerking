@@ -16,6 +16,9 @@
 #define STITCH_DISTANCE_DELTA_Y 60
 #define TRACK_SPACE_MIN 100
 #define TRACK_SPACE_MAX 175
+#define TRACK_START_LOWER 10
+#define TRACK_START_UPPER 50
+#define TRACK_START_DELTA 10
 #define VALIDITY_TRACK_DELTA 30
 
 
@@ -124,29 +127,32 @@ void TrackDetection::find_features(FrameFeatures& iFrameFeatures) throw(FeatureE
     }
 
     // Find valid tracks
-    TrackStart tTrackStart;
-    QPair<Track, Track> tTramTrack;
-    if (find_trackstart(tStitches, 10, tTrackStart, tTramTrack))
+    for (int tScanheight = TRACK_START_LOWER; tScanheight < TRACK_START_UPPER; tScanheight += TRACK_START_DELTA)
     {
-        cv::circle(mFrameDebug,
-                   tTrackStart.first,
-                   8,
-                   cv::Scalar(0, 255, 255),
-                   2);
-        cv::circle(mFrameDebug,
-                   tTrackStart.second,
-                   8,
-                   cv::Scalar(0, 255, 255),
-                   2);
+        TrackStart tTrackStart;
+        QPair<Track, Track> tTramTrack;
+        if (find_trackstart(tStitches, tScanheight, tTrackStart, tTramTrack))
+        {
+            cv::circle(mFrameDebug,
+                       tTrackStart.first,
+                       8,
+                       cv::Scalar(0, 255, 255),
+                       2);
+            cv::circle(mFrameDebug,
+                       tTrackStart.second,
+                       8,
+                       cv::Scalar(0, 255, 255),
+                       2);
 
-        if (tTramTrack.first.back().x > tTramTrack.second.back().x)
-            swap(tTramTrack.first, tTramTrack.second);
+            if (tTramTrack.first.back().x > tTramTrack.second.back().x)
+                swap(tTramTrack.first, tTramTrack.second);
 
-        check_validity(iFrameFeatures.tracks, tTramTrack);
-        iFrameFeatures.tracks = tTramTrack;
+            check_validity(iFrameFeatures.tracks, tTramTrack);
+            iFrameFeatures.tracks = tTramTrack;
+            return;
+        }
     }
-    else
-        throw FeatureException("Could not identify track start");
+    throw FeatureException("Could not identify track start");
 }
 
 cv::Mat TrackDetection::frameDebug() const
