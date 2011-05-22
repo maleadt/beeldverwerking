@@ -294,8 +294,8 @@ void MainWindow::processFrame(cv::Mat &iFrame)
     // Check for outdated features
     if (mFrameCounter - mAgeTrack > FEATURES_MAX_AGE)
     {
-        mFeatures.track_left.clear();
-        mFeatures.track_right.clear();
+        mFeatures.tracks.first.clear();
+        mFeatures.tracks.second.clear();
     }
     if (mFrameCounter - mAgeTram > FEATURES_MAX_AGE)
         mFeatures.tram = cv::Rect();
