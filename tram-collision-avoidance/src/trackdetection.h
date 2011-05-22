@@ -36,6 +36,7 @@ private:
     QList<Line> find_representatives(const QList<QList<Line> >& iGroups);
     QList<Track > find_stitches(const QList<Line>& iRepresentatives);
     bool find_trackstart(const QList<Track>& iStitches, int iScanlineOffset, TrackStart& oTrackStart, QPair<Track, Track>& oTracks);
+    bool is_valid(const QPair<Track, Track>& iOldTracks, QPair<Track, Track> iNewTracks);
 
     // Auxiliary methods
     bool groups_match(const QList<Line>& iGroupA, const QList<Line>& iGroupB);

@@ -264,15 +264,15 @@ void MainWindow::processFrame(cv::Mat &iFrame)
     if (mUI->chkFeatures->isChecked())
     {
         // Draw tracks
-        if (mFeatures.track_left.size())
+        if (mFeatures.tracks.first.size())
         {
-            for (size_t i = 0; i < mFeatures.track_left.size()-1; i++)
-                cv::line(tVisualisation, mFeatures.track_left[i], mFeatures.track_left[i+1], cv::Scalar(0, 255, 0), 3);
+            for (int i = 0; i < mFeatures.tracks.first.size()-1; i++)
+                cv::line(tVisualisation, mFeatures.tracks.first[i], mFeatures.tracks.first[i+1], cv::Scalar(0, 255, 0), 3);
         }
-        if (mFeatures.track_right.size())
+        if (mFeatures.tracks.second.size())
         {
-            for (size_t i = 0; i < mFeatures.track_right.size()-1; i++)
-                cv::line(tVisualisation, mFeatures.track_right[i], mFeatures.track_right[i+1], cv::Scalar(0, 255, 0), 3);
+            for (int i = 0; i < mFeatures.tracks.second.size()-1; i++)
+                cv::line(tVisualisation, mFeatures.tracks.second[i], mFeatures.tracks.second[i+1], cv::Scalar(0, 255, 0), 3);
         }
 
         // Draw tram

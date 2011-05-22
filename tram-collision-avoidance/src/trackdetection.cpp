@@ -16,6 +16,7 @@
 #define STITCH_DISTANCE_DELTA_Y 60
 #define TRACK_SPACE_MIN 100
 #define TRACK_SPACE_MAX 175
+#define VALIDITY_TRACK_DELTA 30
 
 
 //
@@ -138,8 +139,10 @@ void TrackDetection::find_features(FrameFeatures& iFrameFeatures) throw(FeatureE
                    cv::Scalar(0, 255, 255),
                    2);
 
-        iFrameFeatures.track_left = tTramTrack.first;
-        iFrameFeatures.track_right = tTramTrack.second;
+        if (is_valid(iFrameFeatures.tracks, tTramTrack))
+        {
+            iFrameFeatures.tracks = tTramTrack;
+        }
     }
 }
 
@@ -400,6 +403,41 @@ bool TrackDetection::find_trackstart(const QList<Track >& iStitches, int iScanli
         return true;
     }
     return false;
+}
+
+bool TrackDetection::is_valid(const QPair<Track, Track>& iOldTracks, QPair<Track, Track> iNewTracks)
+{
+    // Check if we uberhaupt have points
+    if (iNewTracks.first.size() == 0 || iNewTracks.second.size() == 0)
+        return false;
+
+    // Check if first track is left and second one is right
+    int tX0 = iNewTracks.first.back().x;
+    int tX1 = iNewTracks.second.back().x;
+    if (tX0 > tX1)
+        return false;
+
+    // Check if new track starts at a sensible location
+    if (tX0 < 300 || tX1 > 700)
+        return false;
+
+    if (iOldTracks.first.size() != 0 && iOldTracks.second.size() != 0)
+    {
+        // Check if the new track doesn't too much away from the previous one
+        // (unless it moves towards the center of the screen, which quite likely
+        // means the previous track was wrong)
+        int tOldCenter = (iOldTracks.first.back().x + iOldTracks.first.back().x) / 2;
+        int tNewCenter = (iNewTracks.first.back().x + iNewTracks.first.back().x) / 2;
+        int tFrameCenter = mFrameDebug.size().width / 2;
+        if (abs(tFrameCenter - tNewCenter) > abs(tFrameCenter - tOldCenter))
+        {
+            // Track is moving away from the center, check if the delta isn't too high
+            if (abs(tOldCenter - tNewCenter) > VALIDITY_TRACK_DELTA)
+                return false;
+        }
+    }
+
+    return true;
 }
 
 
