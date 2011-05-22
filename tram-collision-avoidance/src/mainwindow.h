@@ -85,8 +85,9 @@ private:
     // Detection state
     bool mProcessing;
     FrameFeatures mFeatures;
-    unsigned int mFrames;
+    unsigned int mFrameCounter;
     unsigned long mTime, mTimePreprocess, mTimeTrack, mTimeTram, mTimeDraw;
+    unsigned int mAgeTrack, mAgeTram;
 };
 
 #endif // MAINWINDOW_H

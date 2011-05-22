@@ -15,6 +15,9 @@
 #include <omp.h>
 #endif
 
+// Definitions
+#define FEATURES_MAX_AGE 10
+
 
 //
 // Construction and destruction
@@ -64,7 +67,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), mUI(new Ui::MainW
 #else
     mUI->statusBar->showMessage("Application initialized (singelthreaded execution)");
 #endif
-    mFrames = 0; drawStats();
+    mFrameCounter = 0; drawStats();
     setTitle();
 }
 
@@ -150,7 +153,7 @@ bool MainWindow::openFile(QString iFilename)
 
         // Update the interface
         mUI->btnStart->setEnabled(false);
-        mFrames = 0; drawStats();
+        mFrameCounter = 0; drawStats();
         setTitle();
     }
 
@@ -180,11 +183,16 @@ bool MainWindow::openFile(QString iFilename)
                              true);
 #endif
 
-    mFrames = 0;
+    // Reset time counters
+    mFrameCounter = 0;
     mTimePreprocess = 0;
     mTimeTrack = 0;
     mTimeTram = 0;
     mTimeDraw = 0;
+
+    // Reset age trackers
+    mAgeTrack = 0;
+    mAgeTram = 0;
 
     statusBar()->showMessage("File opened and loaded");
     mUI->btnStart->setEnabled(true);
@@ -203,7 +211,7 @@ void MainWindow::process()
         if (tFrame.data)
         {
             processFrame(tFrame);
-            mFrames++;
+            mFrameCounter++;
             drawStats();
             QTimer::singleShot(25, this, SLOT(process()));
         }
@@ -236,6 +244,7 @@ void MainWindow::processFrame(cv::Mat &iFrame)
     try
     {
         tTrackDetection.find_features(mFeatures);
+        mAgeTrack = mFrameCounter;
     }
     catch (FeatureException e)
     {
@@ -245,6 +254,7 @@ void MainWindow::processFrame(cv::Mat &iFrame)
     try
     {
         tTramDetection.find_features(mFeatures);
+        mAgeTram = mFrameCounter;
     }
     catch (FeatureException e)
     {
@@ -280,17 +290,26 @@ void MainWindow::processFrame(cv::Mat &iFrame)
     }    
     mGLWidget->sendImage(&tVisualisation);
     mTimeDraw += timeDelta();
+
+    // Check for outdated features
+    if (mFrameCounter - mAgeTrack > FEATURES_MAX_AGE)
+    {
+        mFeatures.track_left.clear();
+        mFeatures.track_right.clear();
+    }
+    if (mFrameCounter - mAgeTram > FEATURES_MAX_AGE)
+        mFeatures.tram = cv::Rect();
 }
 
 void MainWindow::drawStats()
 {
     int mPreprocessDelta = 0, mTrackDelta = 0, mTramDelta = 0, mTimeDelta = 0;
-    if (mFrames > 0)
+    if (mFrameCounter > 0)
     {
-        mPreprocessDelta = mTimePreprocess / mFrames;
-        mTrackDelta = mTimeTrack / mFrames;
-        mTramDelta = mTimeTram / mFrames;
-        mTimeDelta = mTimeDraw / mFrames;
+        mPreprocessDelta = mTimePreprocess / mFrameCounter;
+        mTrackDelta = mTimeTrack / mFrameCounter;
+        mTramDelta = mTimeTram / mFrameCounter;
+        mTimeDelta = mTimeDraw / mFrameCounter;
     }
     mUI->lblPreprocess->setText("Preprocess: " + QString::number(mPreprocessDelta) + " ms");
     mUI->lblTrack->setText("Track: " + QString::number(mTrackDelta) + " ms");
