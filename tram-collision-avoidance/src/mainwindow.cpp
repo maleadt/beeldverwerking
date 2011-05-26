@@ -15,6 +15,9 @@
 #include <omp.h>
 #endif
 
+// Definitions
+#define FEATURES_MAX_AGE 10
+
 
 //
 // Construction and destruction
@@ -64,7 +67,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), mUI(new Ui::MainW
 #else
     mUI->statusBar->showMessage("Application initialized (singelthreaded execution)");
 #endif
-    mFrames = 0; drawStats();
+    mFrameCounter = 0; drawStats();
     setTitle();
 }
 
@@ -102,6 +105,7 @@ void MainWindow::on_btnStart_clicked()
 
     // Schedule processing
     mUI->btnStop->setEnabled(true);
+    mUI->btnStop->setFocus();
     mProcessing = true;
     process();
 }
@@ -112,6 +116,7 @@ void MainWindow::on_btnStop_clicked()
     mUI->statusBar->showMessage("Stopped processing");
     mProcessing = false;
     mUI->btnStart->setEnabled(true);
+    mUI->btnStart->setFocus();
     mUI->btnStop->setEnabled(false);
 }
 
@@ -119,6 +124,7 @@ void MainWindow::on_actOpen_triggered()
 {
     QString tFilename = QFileDialog::getOpenFileName(this, tr("Open Video"), "", tr("Video Files (*.avi *.mp4)"));
     openFile(tFilename);
+    mUI->btnStart->setEnabled(true);
 }
 
 void MainWindow::on_actRecentFile_triggered()
@@ -147,7 +153,7 @@ bool MainWindow::openFile(QString iFilename)
 
         // Update the interface
         mUI->btnStart->setEnabled(false);
-        mFrames = 0; drawStats();
+        mFrameCounter = 0; drawStats();
         setTitle();
     }
 
@@ -165,6 +171,7 @@ bool MainWindow::openFile(QString iFilename)
         statusBar()->showMessage("Error: could not open file");
         return false;
     }
+    //mGLWidget->setMinimumSize(mVideoCapture->get(CV_CAP_PROP_FRAME_WIDTH), mVideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT));
 
     // Open output video
 #if WRITE_VIDEO
@@ -172,15 +179,20 @@ bool MainWindow::openFile(QString iFilename)
     mVideoWriter = new cv::VideoWriter(oVideoFile,
                              CV_FOURCC('M', 'J', 'P', 'G'),
                              mVideoCapture->get(CV_CAP_PROP_FPS),
-                             cv::Size(mVideoCapture->get(CV_CAP_PROP_FRAME_WIDTH),mVideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT)),
+                             cv::Size(mVideoCapture->get(CV_CAP_PROP_FRAME_WIDTH), mVideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT)),
                              true);
 #endif
 
-    mFrames = 0;
+    // Reset time counters
+    mFrameCounter = 0;
     mTimePreprocess = 0;
     mTimeTrack = 0;
     mTimeTram = 0;
     mTimeDraw = 0;
+
+    // Reset age trackers
+    mAgeTrack = 0;
+    mAgeTram = 0;
 
     statusBar()->showMessage("File opened and loaded");
     mUI->btnStart->setEnabled(true);
@@ -199,7 +211,7 @@ void MainWindow::process()
         if (tFrame.data)
         {
             processFrame(tFrame);
-            mFrames++;
+            mFrameCounter++;
             drawStats();
             QTimer::singleShot(25, this, SLOT(process()));
         }
@@ -232,6 +244,7 @@ void MainWindow::processFrame(cv::Mat &iFrame)
     try
     {
         tTrackDetection.find_features(mFeatures);
+        mAgeTrack = mFrameCounter;
     }
     catch (FeatureException e)
     {
@@ -241,6 +254,7 @@ void MainWindow::processFrame(cv::Mat &iFrame)
     try
     {
         tTramDetection.find_features(mFeatures);
+        mAgeTram = mFrameCounter;
     }
     catch (FeatureException e)
     {
@@ -260,15 +274,15 @@ void MainWindow::processFrame(cv::Mat &iFrame)
     if (mUI->chkFeatures->isChecked())
     {
         // Draw tracks
-        if (mFeatures.track_left.size())
+        if (mFeatures.tracks.first.size())
         {
-            for (size_t i = 0; i < mFeatures.track_left.size()-1; i++)
-                cv::line(tVisualisation, mFeatures.track_left[i], mFeatures.track_left[i+1], cv::Scalar(0, 255, 0), 3);
+            for (int i = 0; i < mFeatures.tracks.first.size()-1; i++)
+                cv::line(tVisualisation, mFeatures.tracks.first[i], mFeatures.tracks.first[i+1], cv::Scalar(0, 255, 0), 3);
         }
-        if (mFeatures.track_right.size())
+        if (mFeatures.tracks.second.size())
         {
-            for (size_t i = 0; i < mFeatures.track_right.size()-1; i++)
-                cv::line(tVisualisation, mFeatures.track_right[i], mFeatures.track_right[i+1], cv::Scalar(0, 255, 0), 3);
+            for (int i = 0; i < mFeatures.tracks.second.size()-1; i++)
+                cv::line(tVisualisation, mFeatures.tracks.second[i], mFeatures.tracks.second[i+1], cv::Scalar(0, 255, 0), 3);
         }
 
         // Draw tram
@@ -276,17 +290,26 @@ void MainWindow::processFrame(cv::Mat &iFrame)
     }    
     mGLWidget->sendImage(&tVisualisation);
     mTimeDraw += timeDelta();
+
+    // Check for outdated features
+    if (mFrameCounter - mAgeTrack > FEATURES_MAX_AGE)
+    {
+        mFeatures.tracks.first.clear();
+        mFeatures.tracks.second.clear();
+    }
+    if (mFrameCounter - mAgeTram > FEATURES_MAX_AGE)
+        mFeatures.tram = cv::Rect();
 }
 
 void MainWindow::drawStats()
 {
     int mPreprocessDelta = 0, mTrackDelta = 0, mTramDelta = 0, mTimeDelta = 0;
-    if (mFrames > 0)
+    if (mFrameCounter > 0)
     {
-        mPreprocessDelta = mTimePreprocess / mFrames;
-        mTrackDelta = mTimeTrack / mFrames;
-        mTramDelta = mTimeTram / mFrames;
-        mTimeDelta = mTimeDraw / mFrames;
+        mPreprocessDelta = mTimePreprocess / mFrameCounter;
+        mTrackDelta = mTimeTrack / mFrameCounter;
+        mTramDelta = mTimeTram / mFrameCounter;
+        mTimeDelta = mTimeDraw / mFrameCounter;
     }
     mUI->lblPreprocess->setText("Preprocess: " + QString::number(mPreprocessDelta) + " ms");
     mUI->lblTrack->setText("Track: " + QString::number(mTrackDelta) + " ms");

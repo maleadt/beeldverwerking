@@ -9,10 +9,15 @@
 // Includes
 #include "opencv/cv.h"
 #include <vector>
+#include <QList>
+#include <QPair>
+
+// Type definitions
+typedef QList<cv::Point> Track;
 
 struct FrameFeatures
 {
-    std::vector<cv::Point> track_left, track_right;
+    QPair<Track, Track> tracks;
     std::vector<cv::Rect> pedestrians;
     std::vector<cv::Rect> vehicles;
 
