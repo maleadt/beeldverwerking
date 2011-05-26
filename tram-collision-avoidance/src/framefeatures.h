@@ -20,6 +20,7 @@ struct FrameFeatures
     cv::Rect tram;
     cv::Point location;
     double minValue, maxValue;
+    //cv::Point leftUpperLeft, leftLowerRight, rightUpperRight, rightLowerLeft;
 };
 
 #endif // FRAMEFEATURES_H

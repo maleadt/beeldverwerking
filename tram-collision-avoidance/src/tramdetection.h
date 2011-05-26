@@ -19,6 +19,7 @@ public:
     // Component interface
     void preprocess();
     void find_features(FrameFeatures& iFrameFeatures) throw(FeatureException);
+    void calculate_croparea(FrameFeatures &iFrameFeatures);
     cv::Mat frameDebug() const;
 
 private:
