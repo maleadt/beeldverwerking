@@ -81,9 +81,9 @@ To create and test the cascade of boosted classifiers based on haar-like feature
 Before we can start creating samples we need positive images, these are images which contain pedestrians without much variations in the illumination, if there are too many variations the resulting detector will not work well.
 Besides the positive images we also need negative images and testing images. The testing images are images in combination with the location of the pedestrians. We used the CBCL PEDESTRIAN DATABASE \#1 from MIT which contains 924 images.
 From one image we can create several samples by using distortion, we can use the createsamples program delivered by OpenCV for this. For example 
-\\\\
+
 createsamples -img image.png -num 10 -bg negatives.dat -vec samples.vec -w 64 -h 128
-\\\\
+
 will generate 10 samples out of one image.
 The file 'negatives.dat' is a file containing a list of the negative images used.
 
