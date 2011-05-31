@@ -16,8 +16,8 @@
 %
 % Single address.
 % ---------------
-\name{Tim Besard, Ruben Schollaert, Dimitri Roose, Sebastiaan Labijn
-\thanks{Thanks to University College Ghent for funding.}}
+\name{Tim Besard, Ruben Schollaert, Dimitri Roose, Sebastiaan Labijn}
+%\thanks{Thanks to University College Ghent for funding.}
 \address{University College Ghent\\Applied Engineering\\Campus Schoonmeersen, Valentin Vaerwyckweg 1, 9000 Gent}
 
 
@@ -27,13 +27,15 @@
 \maketitle
 %
 \begin{abstract}
-The abstract should appear at the top of the left-hand column of text, about
-0.5 inch (12 mm) below the title area and no more than 3.125 inches (80 mm) in
-length.  Leave a 0.5 inch (12 mm) space between the end of the abstract and the
-beginning of the main text.  The abstract should contain about 100 to 150
-words, and should be identical to the abstract text submitted electronically
-along with the paper cover sheet.  All manuscripts must be in English, printed
-in black ink.
+%The abstract should appear at the top of the left-hand column of text, about
+%0.5 inch (12 mm) below the title area and no more than 3.125 inches (80 mm) in
+%length.  Leave a 0.5 inch (12 mm) space between the end of the abstract and the
+%beginning of the main text.  The abstract should contain about 100 to 150
+%words, and should be identical to the abstract text submitted electronically
+%along with the paper cover sheet.  All manuscripts must be in English, printed
+%in black ink.
+% Begin abstract
+In this paper a solution for pedestrian detection is described using Haar-like features. It is being developed to be used in a tram collision advoidance project. 
 \end{abstract}
 %
 \begin{keywords}
@@ -42,9 +44,9 @@ Pedestrian Detection, Haar-like Features, AdaBoost Classification
 %
 \section{Introduction}
 \label{sec:intro}
-In this paper a solution for pedestrian detection is described using Haar-like features. It is being developed to be used in a tram collision advoidance project. 
-\\
-The major problems lie in~\cite{monteiro2006vision}:
+Object detection is a very important element in computer vision areas. The goal is to find a predefined object in a set of images or video frames. This task can be fulfilled using template matching techniques extracting certain image features such as edges, color regions, textures and contours.
+\par
+Alas for complex objects such as pedestrians these features are hard to find due the great variety of instances of these pedestrians. The major problems causing this huge variety lie in~\cite{monteiro2006vision}:
 \begin{itemize}
 \item The size, color and style of pedestrian clothing are very diverse.
 \item Pedestrians are nong-rigid bodies. Their shape and size differ greatly and therefore they are more complex that rigid objects.
@@ -52,22 +54,90 @@ The major problems lie in~\cite{monteiro2006vision}:
 \item Illumination and weather conditions can lower the distinction between background and pedestrian.
 \item Also the lack in motion due the slow speed of pedestrians hardens the possibility for them to be detected.
 \end{itemize}
+Instead of using the template matching approach, another possible encounter has been stated by Viola and Jones~\cite{viola2001rapid}.
 \section{How it works}
+This approach uses statistical models, so called classifiers. These are created by extensive training using a pool of test images. These pools consists of "positive" and "negative" samples, respectively images that contain pedestrians and images that don't. From these sample images features are extracted and the features which classify the pedestrians are selected. These are the so called Haar-like features. The general flow of this process is shown in Figure~\ref{fig:flowchart}.
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.5]{HaarTrainingFlowChart.png}
+\caption{Flowchart for detecting pedestrians.}
+\label{fig:flowchart}
+\end{figure}
+
+%The Haar-like features (so called because they are computed
+%similarly to the coefficients of Haar wavelet trans-
+%forms) and a large set of very simple “weak”
+%classifiers, that use a single feature to classify
+%the image as pedestrian or non-pedestrian, were
+%used to extract the features characteristics of the
+%pedestrians.
+%
+%and extended by Lienhart et al. [1,2]. In one image
+%sub-window, the total number of Haar-like fea-
+%tures is very large, far larger than the number of
+%pixels. In order to ensure a fast classification, the
+%learning process must exclude a large majority of
+%the available features, and focus on a small set of
+%critical features. A variant of AdaBoost [4] is used
+%for making those features selection (see Figure 1).
+%Training Set
+%Normalization
+%A similar methodology combining Haar-like fea-
+%tures and the AdaBoost algorithm, proposed by
+%Viola et. al. to detect faces, is proposed here to
+%detect pedestrians on the road.
+
+% TODO Per sectie beetje uitleg geven.
+\section{Haar-like features}
+A feature is represented by a shape composed of two or three black and white rectangles joined together. These rectangles can be turned horizontal, vertical or diagonal.
+%Each feature is represented by a template (shape
+%of the feature), its coordinate relative to the search
+%window origin and the size of the feature (its
+%scale). A subset of the features prototypes used
+%is shown in Figure 2.
+%Each feature is composed of two or three “black”
+%and “white” rectangles joined together - these
+%rectangles can be up-right or rotated by 45 de-
+%grees. The Haar-like features value is calculated
+%as a weighted sum of two components: the pixel
+%gray level values sum over the black rectangle and
+%the sum over the whole feature area (all black and
+%white areas). The weights of these two compo-
+%nents are of opposite signs and for normalization
+%purpose, their absolute values are inversely pro-
+%portional to the areas.
+%Fig. 2. Subset of the Haar-like features prototypes
+%used in the pedestrian detection.
+%2.1 Integral Image
+%Hundreds of features are used in a real and ro-
+%bust classifier. Therefore,the direct computation
+%of pixel sums over multiple rectangles would make
+%the detection task very slow and not suitable
+%for real-time applications. Viola et al. [3] intro-
+%duced an efficient method for computing the sums
+%quickly. The integral image, Summed Area Table
+%(SAT ), is computed over the whole image I, and
+%the SAT is defined by the Equation 1.
+%h
+%1
+%SAT (x, y) =
+%I(i, j)
+%(1)
+%i<x,j<y
+%The pixel sum over a generic rectangle
+%r = {(x, y) , x0 ≤ x < x0 + w, y0 ≤ y < y0 + h}
+%can then be computed using the SAT. The sum is
+%done by using the rectangle corners coordinates,
+%as described in the Equation 2.
+%S(r) = SAT (x0 + w, y0 + h) − SAT (x0 + w, y0 )
+%− SAT (x0 , y0 + h) + SAT (x0 , y0 ) (2)
+%For rotated features/rectangles, a separate “ro-
+%tated” integral image must be computed, as Lien-
+%hart et al. [2] describes.
 \label{sec:format}
 
-The system we are using has two different different processes. One process will be done before any detection starts. The other process will be done in realtime. These two processes are shown in Figure \ref{fig:Schema}.
-
-TODO: Schema met hier van de flow:\\
-aanmaken:\\
-training -> haar features -> adaboost -> boosted classifiers
-detecteren:\\
-frame -> detectie -> resultaat\\
-
-Building the boosted classifiers takes the most time because it requires a lot of training data and iterations in the AdaBoost algorithm. Once these classifiers are built, the detection is capable of processing images
-extremely rapidly and achieving high detection rates (\cite{viola2001rapid}).
-
-\section{HAAR like features}
-
+%TODO: Schema met hier van de flow:\\
+Building the boosted classifiers takes the most time because it requires a lot of training data and iterations in the AdaBoost algorithm. Once these classifiers are built, the detection is capable of processing images extremely rapidly and achieving high detection rates~\cite{viola2001rapid}.
 
 \section{Training a cascade of classifiers}
 
@@ -187,30 +257,6 @@ published in the proceedings.  The copyright form is available as a Word file,
 a PDF file, and an HTML file. You can also use the form sent with your author
 kit.
 
-\section{REFERENCES}
-\label{sec:ref}
-
-List and number all bibliographical references at the end of the paper.  The references can be numbered in alphabetic order or in order of appearance in the document.  When referring to them in the text, type the corresponding reference number in square brackets as shown at the end of this sentence \cite{C2}.
-This is another reference \cite{GW}. More info concerning the use of BibTeX on wikipedia \cite{wiki}.
-
-% Gebruik van bibliografie�n en BibTeX:
-% Bibliografische verwijzingen voeg je toe in het bestand 'bibliografie.bib'. 
-% In dat bestand vind je voorbeelden hoe je die moet toevoegen. 
-% De meest 'cleane' manier is uiteraard een teksteditor gebruiken, 
-% hoewel er ook programma's zijn die je een grafische interface geven om eenvoudig entry's toe te voegen. 
-% Op OSX raad ik BibDesk aan.
-
-% Hoe compileren met BibTeX?
-% 1. Onderaan het document voeg je de bibliotheek met entry's toe (zie hieronder)
-% 2. Compileer je LaTeX file (dit file dus) met LaTeX.
-% 3. Indien dat geen errors van LaTeX oplevert, compileer je dat LaTeX file (dit file dus) met BibTeX.
-% 4. Indien dat geen errors van BibTeX oplevert, compileer je twee (2) maal met LaTeX.
-% 5. Done!
-
-% References should be produced using the bibtex program from suitable
-% BiBTeX files (here: bibliografie). The IEEEbib.bst bibliography
-% style file from IEEE produces unsorted bibliography list.
-% -------------------------------------------------------------------------
 \bibliographystyle{IEEEbib}
 \bibliography{bibliografie}
 
