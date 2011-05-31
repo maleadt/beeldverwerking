@@ -56,7 +56,7 @@ Alas for complex objects such as pedestrians these features are hard to find due
 \end{itemize}
 Instead of using the template matching approach, another possible encounter has been stated by Viola and Jones~\cite{viola2001rapid}.
 \section{How it works}
-This approach uses statistical models, so called classifiers. These are created by extensive training using a pool of test images. These pools consists of "positive" and "negative" samples, respectively images that contain pedestrians and images that don't. From these sample images features are extracted and the features which classify the pedestrians are selected. These are the so called Haar-like features. The general flow of this process is shown in Figure~\ref{fig:flowchart}.
+This approach uses statistical models, so called classifiers. These are created by extensive training using a pool of test images. These pools consists of positive and negative samples, respectively images that contain pedestrians and images that don't. From these sample images features are extracted and the features which classify the pedestrians are selected. These are the so called Haar-like features. The general flow of this process is shown in Figure~\ref{fig:flowchart}.
 \begin{figure}[h!]
 \centering
 \includegraphics[scale=0.5]{HaarTrainingFlowChart.png}
@@ -89,59 +89,25 @@ This approach uses statistical models, so called classifiers. These are created 
 
 % TODO Per sectie beetje uitleg geven.
 \section{Haar-like features}
-A feature is represented by a shape composed of two or three black and white rectangles joined together. These rectangles can be turned horizontal, vertical or diagonal.
-%Each feature is represented by a template (shape
-%of the feature), its coordinate relative to the search
-%window origin and the size of the feature (its
-%scale). A subset of the features prototypes used
-%is shown in Figure 2.
-%Each feature is composed of two or three “black”
-%and “white” rectangles joined together - these
-%rectangles can be up-right or rotated by 45 de-
-%grees. The Haar-like features value is calculated
-%as a weighted sum of two components: the pixel
-%gray level values sum over the black rectangle and
-%the sum over the whole feature area (all black and
-%white areas). The weights of these two compo-
-%nents are of opposite signs and for normalization
-%purpose, their absolute values are inversely pro-
-%portional to the areas.
-%Fig. 2. Subset of the Haar-like features prototypes
-%used in the pedestrian detection.
-%2.1 Integral Image
-%Hundreds of features are used in a real and ro-
-%bust classifier. Therefore,the direct computation
-%of pixel sums over multiple rectangles would make
-%the detection task very slow and not suitable
-%for real-time applications. Viola et al. [3] intro-
-%duced an efficient method for computing the sums
-%quickly. The integral image, Summed Area Table
-%(SAT ), is computed over the whole image I, and
-%the SAT is defined by the Equation 1.
-%h
-%1
-%SAT (x, y) =
-%I(i, j)
-%(1)
-%i<x,j<y
-%The pixel sum over a generic rectangle
-%r = {(x, y) , x0 ≤ x < x0 + w, y0 ≤ y < y0 + h}
-%can then be computed using the SAT. The sum is
-%done by using the rectangle corners coordinates,
-%as described in the Equation 2.
-%S(r) = SAT (x0 + w, y0 + h) − SAT (x0 + w, y0 )
-%− SAT (x0 , y0 + h) + SAT (x0 , y0 ) (2)
-%For rotated features/rectangles, a separate “ro-
-%tated” integral image must be computed, as Lien-
-%hart et al. [2] describes.
-\label{sec:format}
-
-%TODO: Schema met hier van de flow:\\
+A Haar-like feature is represented by a template, its coordinate relative to the sub window and his size.
+The template, a shape, is composed of two or three rectangles joined together. Each of these rectangles is colored black or white. Three of these Haar-like features are displayed in Figure~\ref{fig:features}. These rectangles can be turned horizontal, vertical or even  diagonal, an extension proposed in~\cite{lienhart2002extended}.
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.6]{Features.png}
+\caption{Prototypes of Haar-like features.}
+\label{fig:features}
+\end{figure}
+\par
+Foreach feature a value is calculated for each position in the search sub window. These values sum up the pixel intensities in these regions and calculates the difference between them. This difference is then used to chech wether the feature resembles with this position on the sub window.
+\par
+A subwindow of an image contains a far larger amount of features than pixels. Therefore a mechanism is needed to select the most valuable of these.
+\section{AdaBoost}
+In possesion of a training set of positive and negative samples and a feature set a machine learning system can be invoked to fulfill the training of the classifier. Viola and Jones~\cite{viola2001rapid} used a variant of AdaBoost to both select a small set of features and to train the classifier. In its original form, the AdaBoost learning algorithm is used to boost the classification performance of a simple  learning algorithm.
+\par
+Although each feature can be computed very efficiently, the computation of the complete feature set is unfeasible.
+\par
 Building the boosted classifiers takes the most time because it requires a lot of training data and iterations in the AdaBoost algorithm. Once these classifiers are built, the detection is capable of processing images extremely rapidly and achieving high detection rates~\cite{viola2001rapid}.
-
 \section{Training a cascade of classifiers}
-
-\section{Adaboost Algorithm}
 
 
 \section{OpenCV Haartraining}
