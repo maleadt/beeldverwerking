@@ -10,7 +10,8 @@ SOURCES += \
     mainwindow.cpp \
     tramdetection.cpp \
     pedestriandetection.cpp \
-    vehicledetection.cpp
+    vehicledetection.cpp \
+    auxiliary.cpp
 
 HEADERS += \
     trackdetection.h \
@@ -31,3 +32,7 @@ profile {
 
 FORMS += \
     mainwindow.ui
+
+# OpenMP
+QMAKE_CXXFLAGS += -fopenmp
+QMAKE_LFLAGS += -fopenmp

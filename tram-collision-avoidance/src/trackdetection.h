@@ -9,15 +9,20 @@
 // Includes
 #include "opencv/cv.h"
 #include <cmath>
-#include <vector>
+#include <QVector>
+#include <QPair>
 #include "component.h"
 #include "framefeatures.h"
+#include "auxiliary.h"
+
+// Type definitions
+typedef QPair<cv::Point, cv::Point> TrackStart;
 
 class TrackDetection : public Component
 {
 public:
     // Construction and destruction
-    TrackDetection(const cv::Mat& iFrame);
+    TrackDetection(cv::Mat const* iFrame);
 
     // Component interface
     void preprocess();
@@ -26,13 +31,23 @@ public:
 
 private:
     // Feature detection
-    std::vector<cv::Vec4i> find_lines();
-    std::vector<cv::Point> find_track_start(const std::vector<cv::Vec4i>& iLines, unsigned int iScanline);
-    std::vector<cv::Point> find_track(const cv::Point& iStart, const std::vector<cv::Vec4i>& iLines);
+    QList<Line > find_lines();
+    QList<QList<Line> > find_groups(const QList<Line>& iLines);
+    QList<Line> find_representatives(const QList<QList<Line> >& iGroups);
+    QList<Track > find_stitches(const QList<Line>& iRepresentatives);
+    bool find_trackstart(const QList<Track>& iStitches, int iScanlineOffset, TrackStart& oTrackStart, QPair<Track, Track>& oTracks);
+    void check_validity(const QPair<Track, Track>& iOldTracks, QPair<Track, Track> iNewTracks) throw(FeatureException);
+
+    // Auxiliary methods
+    bool groups_match(const QList<Line>& iGroupA, const QList<Line>& iGroupB);
+    bool stitches_match(const Track& iStitchA, const Track& iStitchB, cv::Point& oIntersection);
 
     // Frames
     cv::Mat mFramePreprocessed;
     cv::Mat mFrameDebug;
+
+    // Member data
+    cv::RNG mRng;
 };
 
 #endif // TRACKDETECTION_H

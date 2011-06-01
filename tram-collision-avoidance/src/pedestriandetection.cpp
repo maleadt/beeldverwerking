@@ -9,7 +9,7 @@
 // Construction and destruction
 //
 
-PedestrianDetection::PedestrianDetection(const cv::Mat& iFrame) : Component(iFrame)
+PedestrianDetection::PedestrianDetection(cv::Mat const* iFrame) : Component(iFrame)
 {
     std::string cascade_file("/home/ruben/haarcascade_fullbody.xml");
     cascade.load(cascade_file);
@@ -49,11 +49,11 @@ void PedestrianDetection::cropFrame() {
     //VideoCapture cap("/media/windows/Beeldverwerking/tramdetectie.avi"); railsStartCol = 380; railsEndCol = 560;
 
     railsStartCol = 0;
-    railsEndCol = frame().cols;
+    railsEndCol = frame()->cols;
 
-    cv::Range rowRange(0, frame().rows);
+    cv::Range rowRange(0, frame()->rows);
     cv::Range colRange(railsStartCol, railsEndCol);
-    cv::Mat blockFromFrame(frame(), rowRange, colRange);
+    cv::Mat blockFromFrame(*frame(), rowRange, colRange);
 
     //int scale = 3.5;
     scale = blockFromFrame.rows / 190;

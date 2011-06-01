@@ -16,7 +16,7 @@
 // Construction and destruction
 //
 
-VehicleDetection::VehicleDetection(const cv::Mat& iFrame) : Component(iFrame)
+VehicleDetection::VehicleDetection(cv::Mat const* iFrame) : Component(iFrame)
 {
 
 }
@@ -95,7 +95,7 @@ private:
 void VehicleDetection::detectWheels() {
 
     cv::Mat img;
-    cv::cvtColor(frame(), img, CV_RGB2GRAY);
+    cv::cvtColor(*frame(), img, CV_RGB2GRAY);
 
     std::list<Rectangle*> lst;
     lst.resize(50, 0);

@@ -19,7 +19,7 @@ class PedestrianDetection : public Component
 {
 public:
     // Construction and destruction
-    PedestrianDetection(const cv::Mat& iFrame);
+    PedestrianDetection(cv::Mat const* iFrame);
 
     // Component interface
     void preprocess();

@@ -14,17 +14,21 @@ class TramDetection : public Component
 public:
     TramDetection();
     // Construction and destruction
-    TramDetection(const cv::Mat& iFrame);
+    TramDetection(cv::Mat const* iFrame);
 
     // Component interface
     void preprocess();
     void find_features(FrameFeatures& iFrameFeatures) throw(FeatureException);
+    void calculate_croparea(FrameFeatures &iFrameFeatures);
     cv::Mat frameDebug() const;
 
 private:
     // Frames
     cv::Mat mFramePreprocessed;
     cv::Mat mFrameDebug;
+
+    cv::Point mROIPoint;
+    cv::Size mROISize;
 };
 
 #endif // TRAMDETECTION_H
