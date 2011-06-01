@@ -1,0 +1,61 @@
+                    % alle rijen overlopen
+                    for j = 1:9,
+                        if ~matrixOk,
+                            break;
+                        end
+                        % een controle rij om te zien of de rij mogelijk is
+                        mogelijk = zeros(1, 9);
+                        for k = 0:8,
+                            if k == 0,
+                                disp(father(j+k*9));
+                            end    
+                            if ~matrixOk,
+                                break;
+                            end
+                            % staat een 0 dus mogelijk
+                            if father(j+k*9) == 0,
+                                
+                            else
+                                % getal nog niet voorgekomen op rij, dus ok
+                                if mogelijk(father(j+k*9)) == 0,
+                                    mogelijk(father(j+k*9)) = 1;
+                                else
+                                    % 2 zelfde getallen op rij, dus geen
+                                    % geldige matrix
+                                    matrixOk = 0;
+                                end
+                            end
+                        end    
+                    end
+                    
+                    % alle kolommen overlopen
+                    for j = 1:9,
+                        if ~matrixOk,
+                            break;
+                        end
+                        % een controle rij om te zien of de rij mogelijk is
+                        mogelijk = zeros(1, 9);
+                        for k = 0:8,
+                            if k == 0,
+                                disp(father(j+k*9));
+                            end    
+                            if ~matrixOk,
+                                break;
+                            end
+                            % staat een 0 dus mogelijk
+                            if father(j+k*9) == 0,
+                                
+                            else
+                                % getal nog niet voorgekomen op rij, dus ok
+                                if mogelijk(father(j+k*9)) == 0,
+                                    mogelijk(father(j+k*9)) = 1;
+                                else
+                                    % 2 zelfde getallen op rij, dus geen
+                                    % geldige matrix
+                                    matrixOk = 0;
+                                end
+                            end
+                        end    
+                    end
+                    disp(father);
+                    disp(matrixOk);
