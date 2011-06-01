@@ -126,13 +126,15 @@ Building the boosted classifiers takes the most time because it requires a lot o
 
 A cascade of classifiers consists of multiple weaker classifiers. The simpler classifiers go first, they will then reject the majority of the negative matches. When a window passes these simpler classifiers, more complex ones are used. This causes a lower false positive rate.
 
-Each round of this cascade was trained using AdaBoost. Adaboost is an algorithm for constructing a strong classifier as a linear combination of simple weak classifiers.
+A cascade of classifiers is a degenerated decision tree where at each stage a classifier is trained to detect almost all objects of interest (pedestrians in our example) while rejecting a certain fraction of the non-object patterns~\cite{viola2001rapid}.
 
-To have a highly efficient outcome a goal is set at the beginning, this goal contains the number of false positives and the detection rate. After this goal is set new rounds with new weak classifiers are added to the cascade. After every round the new cascade of classifiers is tested on a validation set. If the goal is not yet reached, new rounds are added over and over again.
+Each stage of this cascade was trained using AdaBoost. Adaboost is an algorithm for constructing a strong classifier as a linear combination of simple weak classifiers.
+
+To have a highly efficient outcome a goal is set at the beginning, this goal contains the number of false positives and the detection rate. After this goal is set, a new stage with new weak classifiers is added to the cascade. After every stage the new cascade of classifiers is tested on a validation set. If the goal is not yet reached, new stages are added over and over again.
 
 To create a successful cascade of classifiers a lot of samples are required. These samples contain images from pedestrians in all possible poses, sizes and with different clothing. A large number of samples (1000+) are required for a good detection rate.  Besides these positive pedestrian images we also require negative samples. The negative samples can just be the positive images backgrounds.
 
-A pedestrian detection cascade file, as delivered with OpenCV, contains 30 rounds. Each round contains 40 features. 
+A pedestrian detection cascade file, as delivered with OpenCV, contains 30 stages. Each stage contains 40 features. 
 
 
 
