@@ -147,17 +147,17 @@ To create and test the cascade of boosted classifiers based on Haar-like feature
 \subsection{Create samples}
 Before we can start creating samples we need positive images, these are images which contain pedestrians without much variations in the illumination, if there are too many variations the resulting detector will not work well.
 Besides the positive images we also need negative images and testing images. The testing images are images combined with the location of the pedestrians. We used the CBCL PEDESTRIAN DATABASE \#1 from MIT which contains 924 images.
-From one image we can create several samples by using distortion, we can use the createsamples program delivered by OpenCV for this. For example 
+From one image we can create several samples by using distortion, we can use the createsamples program delivered by OpenCV for this. For example:
 
-createsamples -img image.png -num 10 -bg negatives.dat -vec samples.vec -w 64 -h 128
+\texttt{createsamples -img image.png -num 10 -bg negatives.dat -vec samples.vec -w 64 -h 128}
 
-will generate 10 samples out of one image.
-The file 'negatives.dat' is a file containing a list of the negative images used.
+This will generate 10 samples out of one image.
+The file \texttt{negatives.dat} is a file containing a list of the negative images used.
 
 For the test images we need to create a file which includes the location of the pedestrian in each image. This file will just hold the x and y coordinates in combination with the height and width of the pedestrian.
 After these steps we can start creating the testing samples, these are created as follows:
 
-createsamples -img image.png -num 10 -bg negatives.dat -info test.dat -maxxangle 0.6 -maxyangle 0 -maxzangle 0.3 -maxidev 100 -bgcolor 0 -bgthresh 0
+\texttt{createsamples -img image.png -num 10 -bg negatives.dat -info test.dat -maxxangle 0.6 -maxyangle 0 -maxzangle 0.3 -maxidev 100 -bgcolor 0 -bgthresh 0}
 
 This wil generate cropped pedestrians placed on top of negative samples as output. A description file with the coordinates of the cropped pedestrian in the new image will also be available.
 
@@ -166,18 +166,18 @@ This wil generate cropped pedestrians placed on top of negative samples as outpu
 
 \subsection{Train}
 
-To train our classifier we can use the haartraining utility. The following training takes about four days.
+To train our classifier we can use the haartraining utility. The following training takes about four days:
 
-haartraining -data haarcascade -vec samples.vec -bg negatives.dat -nstages 20 -nsplits 2 -npos 5000 -nneg 2500 -w 20 -h 80 -nonsym -mem 512 -mode ALL
+\texttt{haartraining -data haarcascade -vec samples.vec -bg negatives.dat -nstages 20 -nsplits 2 -npos 5000 -nneg 2500 -w 20 -h 80 -nonsym -mem 512 -mode ALL}
 
-We use the '-nonsym' parameter because people don't have a symmetric body structure in all poses. If we would be making classifiers for a symmetric object we would use the default, so only half of the image will be processed  thus speeding up the training. We also specified the '-mode ALL', this means the haartraining will look for all Haar-like features, default will only look for upright features.
+We use the \texttt{-nonsym} parameter because people don't have a symmetric body structure in all poses. If we would be making classifiers for a symmetric object we would use the default, so only half of the image will be processed  thus speeding up the training. We also specified the \texttt{-mode ALL}, this means the haartraining will look for all Haar-like features, default will only look for upright features.
 Increasing the number of stages (-nstages 20) will not necessarily produce a better result. If the default threshold of minimum 99.5\% hitrate or the maximum false alarm of 50\% is reached, the training will stop.
 When the training is finished, OpenCV will generate an XML outputfile.
 
 \subsection{Test}
-OpenCV also has a program to test the performance of the generated classifiers. This program is called 'performance'. Testing the XML can be done like this:
+OpenCV also has a program to test the performance of the generated classifiers. This program is called \texttt{performance}. Testing the XML can be done like this:
 performance -data haarcascade.xml -info tests.dat -ni
-The tests.dat file contains a list of testing images and the 'ni' parameter is used so the performance-utility will not output any detection images.
+The tests.dat file contains a list of testing images and the \texttt{ni} parameter is used so the performance-utility will not output any detection images.
 The performance-utility will then output the number of correct detections, the number of missed or false negatives and the number of false positives.
 
 \section{Experimental results}
