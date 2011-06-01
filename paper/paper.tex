@@ -124,6 +124,20 @@ Building the boosted classifiers takes the most time because it requires a lot o
 
 \section{Training a cascade of classifiers}
 
+A cascade of classifiers consists of multiple weaker classifiers. The simpler classifiers go first, they will then reject the majority of the negative matches. When a window passes these simpler classifiers, more complex ones are used. This causes a lower false positive rate.
+
+Each round of this cascade was trained using AdaBoost. Adaboost is an algorithm for constructing a strong classifier as a linear combination of simple weak classifiers.
+
+To have a highly efficient outcome a goal is set at the beginning, this goal contains the number of false positives and the detection rate. After this goal is set new rounds with new weak classifiers are added to the cascade. After every round the new cascade of classifiers is tested on a validation set. If the goal is not yet reached, new rounds are added over and over again.
+
+To create a successful cascade of classifiers a lot of samples are required. These samples contain images from pedestrians in all possible poses, sizes and with different clothing. A large number of samples (1000+) are required for a good detection rate.  Besides these positive pedestrian images we also require negative samples. The negative samples can just be the positive images backgrounds.
+
+A pedestrian detection cascade file, as delivered with OpenCV, contains 30 rounds. Each round contains 40 features. 
+
+
+
+
+
 \section{OpenCV Haartraining}
 To create and test the cascade of boosted classifiers based on Haar-like features we are using OpenCV \cite{opencv_library}. OpenCV provides us programs that we can use to create our own classifiers.
 
