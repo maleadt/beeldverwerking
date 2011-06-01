@@ -35,7 +35,7 @@
 %along with the paper cover sheet.  All manuscripts must be in English, printed
 %in black ink.
 % Begin abstract
-In this paper a solution for pedestrian detection is described using Haar-like features. It is being developed to be used in a tram collision advoidance project. 
+In this paper a solution for pedestrian detection is described using Haar-like features. It is being developed to be used in a tram collision avoidance project. 
 \end{abstract}
 %
 \begin{keywords}
@@ -63,7 +63,7 @@ Instead of using the template matching approach, another possible method has bee
 This approach uses statistical models, so called classifiers. These are created by extensive training using a pool of test images. These pools consists of positive and negative samples, respectively images that contain pedestrians and images that don't. 
 From these sample images features will be extracted and the features which classify that pedestrians are selected. These are the so called Haar-like features. The general flow of this process is shown in Figure~\ref{fig:flowchart}.
 
-\begin{figure}[H]
+\begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.5]{HaarTrainingFlowChart.png}
 	\caption{Flowchart for detecting pedestrians.}
@@ -99,7 +99,7 @@ From these sample images features will be extracted and the features which class
 A Haar-like feature is represented by a template, its coordinate relative to the sub window and his size.
 The template, a shape, is composed of two or three rectangles joined together. Each of these rectangles is colored black or white. Three of these Haar-like features are displayed in Figure~\ref{fig:features}. These rectangles can be turned horizontal, vertical or even  diagonal, an extension proposed in~\cite{lienhart2002extended}.
 
-\begin{figure}[H]
+\begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.6]{Features.png}
 	\caption{Prototypes of Haar-like features.}
@@ -178,10 +178,10 @@ The tests.dat file contains a list of testing images and the 'ni' parameter is u
 The performance-utility will then output the number of correct detections, the number of missed or false negatives and the number of false positives.
 
 \section{Experimental results}
+To test detector created by OpenCV we used a set of 40 positive images and 60 negative images. A ROC curve showing the performance of our detector on this test set is shown in Figure [NOG TOE TE VOEGEN]. We also tested the speed and number of positive and negative detections when reducing the size of the images to 80\%, 60\% and 40\%. The results of this test can be found in Table [NOG TOE TE VOEGEN]. Figure [NOG TOE TE VOEGEN] shows the output of our detector on some of the test images.
 
 \section{Conclusion}
-
-
+In this paper we discussed a method for pedestrian detection to be used in a tram collision avoidance project. By using a boosted cascade of Haar-like features this is made possible. After preprocessing the cascade of classifiers the detection is able to be used in real time.
 
 \bibliographystyle{IEEEbib}
 \bibliography{bibliografie}
