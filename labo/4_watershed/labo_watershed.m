@@ -1,0 +1,47 @@
+% Labo 5: Watershed
+function labo_watershed( )
+
+% Opdracht 1: Watershed op basis van de afstandstransformatie
+I = imread('images/eurocoins.jpg');
+figure, imshow(I)
+I = rgb2gray(I);
+figure, imhist(I)
+bw = im2bw(255-I,50/255);
+figure, imshow(bw)
+D = bwdist(~bw);
+figure, imshow(D,[]), title('Distance transformatie van bw')
+D = -D;
+D(~bw) = -Inf;
+L = watershed(D);
+rgb = label2rgb(L,'jet',[.5 .5 .5]);
+figure, imshow(rgb), title('Watershed transformatie van D')
+
+% Opdracht 2: Watershed op basis van de gradiënt-magnitude
+I = imread('images/cameraman.jpg');
+f = [-1 -2 -1;0 0 0; 1 2 1];
+imv1 = filter2(f, I);
+imh1 = filter2(f',I);
+gradmagn = sqrt(imv1.^2+imh1.^2);
+figure, imshow(gradmagn,[]);
+[X,Y] = meshgrid(1:size(I,1),1:size(I,2));
+figure, surf(X,Y,gradmagn), colormap hsv, colorbar
+W = watershed(gradmagn);
+figure, imshow(W)
+
+% Opdracht 3: Flooding
+
+flooding('images/satim.jpg');
+
+% Vraag: Wat zijn de voor- en nadelen van deze methode?
+% Antwoord: De voordelen zijn dat het altijd gesloten contouren vind en
+% bovendien vereist het minder rekenwerk als andere segmentatie methoden.
+% Een nadeel van watershed is dat het kan leiden tot oversegmentatie.
+
+% Opdracht 4: Rainfalling
+
+% Vraag: Wat is het voordeel van deze methode ten opzicht van de
+% floodingmethode?
+% Antwoord: Het voorkomt oversegmentatie omwille van het volgen van de 
+% dalende gradienten.
+
+end
