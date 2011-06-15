@@ -144,7 +144,19 @@ performance \= -data haar-cascade.xml \\
 \end{tabbing}}
 The \texttt{tests.dat} file contains a list of testing images and the \texttt{ni} parameter is used so the performance-utility will not output any detection images. The performance-utility will then output the number of correct detections, the number of missed or false negatives and the number of false positives.
 \section{Experimental results}
-To test the detector created by OpenCV we used a set of 40 positive images and 60 negative images. A ROC curve showing the performance of our detector on this test set is shown in Figure [NOG TOE TE VOEGEN]. We also tested the speed and number of positive and negative detections when reducing the size of the images to 80\%, 60\% and 40\%. The results of this test can be found in Table [NOG TOE TE VOEGEN]. Figure \ref{fig:pdetection1} and \ref{fig:pdetection2} show the output of our detector on some of the test images.
+To test the detector created by OpenCV we used a set of 40 positive images and 60 negative images. A ROC curve showing the performance of our detector on this test set is shown in Figure [NOG TOE TE VOEGEN]. We also tested the speed and number of positive and negative detections when reducing the size of the images to 80\%, 60\% and 40\%. The results of this test can be found in Table \ref{table:test}. Figure \ref{fig:pdetection1} and \ref{fig:pdetection2} show the output of our detector on some of the test images.
+\begin{table}
+    \begin{tabular}{ | c | c | c | c |}
+    \hline
+    Image size & Detection time & People detected & False detections \\ \hline
+    100\%  & 900ms & 85\% & 10\% \\  \hline
+    80\%   & 600ms & 85\% & 5\% \\  \hline
+    60\%   & 280ms & 80\% & 3\% \\  \hline
+    40\%   & 100ms & 60\% & 2\% \\ \hline
+    \end{tabular}
+    \caption{Test results when resizing the image}
+    \label{table:test}
+\end{table}
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.6]{peopledetection1.png}
