@@ -75,7 +75,7 @@ For each feature a value is calculated for each position in the search sub windo
 \par
 A sub window of an image contains a far larger amount of features than pixels. Therefore a mechanism is needed to select the most valuable ones.
 \section{AdaBoost}
-Once a machine learning system has a training set of positive and negative samples and a feature set it can be invoked to fulfill the training of the classifier. Viola and Jones~\cite{viola2001rapid} used a variant of AdaBoost to both select a small set of features and to train the classifier. In its original form, the AdaBoost learning algorithm is used to boost the classification performance of a simple  learning algorithm.
+Once a machine learning system has a training set of positive and negative samples and a feature set, it can be invoked to fulfill the training of the classifier. Viola and Jones~\cite{viola2001rapid} used a variant of AdaBoost to both select a small set of features and to train the classifier. In its original form, the AdaBoost learning algorithm is used to boost the classification performance of a simple learning algorithm. AdaBoost is an algorithm which constructs a strong classifier as a combination of weak classifiers.
 \par
 Although each feature can be computed very efficiently, the computation of the complete feature set is unfeasible.
 \par
@@ -144,7 +144,19 @@ performance \= -data haar-cascade.xml \\
 \end{tabbing}}
 The \texttt{tests.dat} file contains a list of testing images and the \texttt{ni} parameter is used so the performance-utility will not output any detection images. The performance-utility will then output the number of correct detections, the number of missed or false negatives and the number of false positives.
 \section{Experimental results}
-To test detector created by OpenCV we used a set of 40 positive images and 60 negative images. A ROC curve showing the performance of our detector on this test set is shown in Figure [NOG TOE TE VOEGEN]. We also tested the speed and number of positive and negative detections when reducing the size of the images to 80\%, 60\% and 40\%. The results of this test can be found in Table [NOG TOE TE VOEGEN]. Figure [NOG TOE TE VOEGEN] shows the output of our detector on some of the test images.
+To test the detector created by OpenCV we used a set of 40 positive images and 60 negative images. A ROC curve showing the performance of our detector on this test set is shown in Figure [NOG TOE TE VOEGEN]. We also tested the speed and number of positive and negative detections when reducing the size of the images to 80\%, 60\% and 40\%. The results of this test can be found in Table [NOG TOE TE VOEGEN]. Figure \ref{fig:pdetection1} and \ref{fig:pdetection2} show the output of our detector on some of the test images.
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.6]{peopledetection1.png}
+	\caption{People detection: two people as a group}
+	\label{fig:pdetection1}
+\end{figure}
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.4]{peopledetection2.png}
+	\caption{People detection: two seperate}
+	\label{fig:pdetection2}
+\end{figure}
 \section{Conclusion}
 In this paper we discussed a method for pedestrian detection to be used in a tram collision avoidance project. By using a boosted cascade of Haar-like features this is made possible. After preprocessing the cascade of classifiers the detection is able to be used in real time.
 \bibliographystyle{IEEEbib}
