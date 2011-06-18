@@ -269,7 +269,7 @@ void MainWindow::processFrame(cv::Mat &iFrame)
     mTimeTrack += timeDelta();
     try
     {
-        //tTramDetection.find_features(mFeatures);
+        tTramDetection.find_features(mFeatures);
         mAgeTram = mFrameCounter;
     }
     catch (FeatureException e)

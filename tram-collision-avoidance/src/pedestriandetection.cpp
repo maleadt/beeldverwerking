@@ -12,12 +12,6 @@
 
 PedestrianDetection::PedestrianDetection(cv::Mat const* iFrame) : Component(iFrame)
 {
-    std::string cascade_file("./res/haarcascade_fullbody.xml");
-    if (cascade.load(cascade_file)) {
-        std::cout<<"LOADED OK"<<std::endl;
-    } else {
-        std::cout<<"LOADED NOK"<<std::endl;
-    }
     adjustedX = 0;
     tracksWidth = -1;
 }
