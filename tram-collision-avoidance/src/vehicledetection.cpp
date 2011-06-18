@@ -18,7 +18,7 @@
 
 VehicleDetection::VehicleDetection(cv::Mat const* iFrame) : Component(iFrame)
 {
-
+    tracksWidth = -1;
 }
 
 
@@ -28,11 +28,23 @@ VehicleDetection::VehicleDetection(cv::Mat const* iFrame) : Component(iFrame)
 
 void VehicleDetection::preprocess()
 {
-    detectWheels();
+    mFrameDebug = (*frame()).clone();
 }
 
 void VehicleDetection::find_features(FrameFeatures& iFrameFeatures) throw(FeatureException)
 {
+    if (iFrameFeatures.tracks.first.length() > 1 && iFrameFeatures.tracks.second.length() > 1) {
+        int x1 = iFrameFeatures.tracks.first[0].x;
+        int y1 = iFrameFeatures.tracks.first[0].y;
+        int x2 = iFrameFeatures.tracks.second[0].x;
+        int y2 = iFrameFeatures.tracks.second[0].y;
+
+        tracksWidth = sqrt(pow(x2-x1, 2) + pow(y2-y1, 2));
+        tracksStartCol = x1;
+        tracksEndCol = x2;
+    }
+    cropFrame();
+    detectWheels();
     for (size_t i = 0; i < vehicles.size(); i++) {
         iFrameFeatures.vehicles.push_back(vehicles[i]);
     }
@@ -54,7 +66,6 @@ public:
         this->center = _box.center;
         this->tl = _box.boundingRect().tl();
         this->br = _box.boundingRect().br();
-        //this->box = _box;
     }
     void draw(cv::Mat &img) {
         line(img, this->tl, cv::Point2f(this->br.x, this->tl.y), cv::Scalar(0,255,0), 1, CV_AA);
@@ -88,14 +99,28 @@ private:
     cv::Point2f center;
     cv::Point2f tl;
     cv::Point2f br;
-    //RotatedRect box;
 };
 
+void VehicleDetection::cropFrame() {
+    if (tracksWidth > -1) {
+        adjustedX = tracksStartCol - 1.5*tracksWidth;
+        if (adjustedX < 0) {
+            adjustedX = 0;
+        }
+        cv::Range rowRange(0, frame()->rows);
+        cv::Range colRange(adjustedX, (tracksEndCol + 2*tracksWidth > frame()->cols?frame()->cols:tracksEndCol + 1.5*tracksWidth));
+        mFrameCropped = cv::Mat(*frame(), rowRange, colRange);
+    } else {
+        mFrameCropped = mFrameDebug.clone();
+    }
+}
 
 void VehicleDetection::detectWheels() {
 
+
+
     cv::Mat img;
-    cv::cvtColor(*frame(), img, CV_RGB2GRAY);
+    cv::cvtColor(mFrameCropped, img, CV_RGB2GRAY);
 
     std::list<Rectangle*> lst;
     lst.resize(50, 0);
@@ -105,9 +130,7 @@ void VehicleDetection::detectWheels() {
         std::vector<std::vector<cv::Point> > contours;
         cv::Mat bimage = img >= i;
 
-        findContours(bimage, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE ); //CV_RETR_LIST
-
-        cv::Mat cimage = cv::Mat::zeros(bimage.size(), CV_8UC3);
+        findContours(bimage, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_TC89_L1 );
 
         for(size_t i = 0; i < contours.size(); i++)
         {
@@ -119,24 +142,32 @@ void VehicleDetection::detectWheels() {
             cv::Mat(contours[i]).convertTo(pointsf, CV_32F);
             cv::RotatedRect box = cv::fitEllipse(pointsf);
 
+
             cv::Point2f vtx[4];
             box.points(vtx);
-            //std::cout<<box.boundingRect().tl()<<std::endl;
 
-            if( MAX(box.size.width, box.size.height) > MIN(box.size.width, box.size.height)*2 )
+            int height = box.boundingRect().br().y - box.boundingRect().tl().y;
+            int width = box.boundingRect().br().x - box.boundingRect().tl().x;
+
+            if (height < width*.92)
+                continue;
+
+            if( box.size.height < box.size.width)
                 continue;
 
             if (MIN(box.size.width, box.size.height) < VEHICLE_LOW_BOUND || MAX(box.size.width, box.size.height) > VEHICLE_HIGH_BOUND)
                 continue;
 
-            //ellipse(frame, box.center, box.size*0.5f, box.angle, 0, 360, Scalar(0,255,255), 1, CV_AA);
+            if (tracksWidth > -1) {
+                if (width < tracksWidth / 3 || width > tracksWidth/3*2) {
+                    continue;
+                }
+                if (height < tracksWidth / 3 || height > tracksWidth/3*2) {
+                    continue;
+                }
+            }
 
-
-            //std::cout << std::endl;
-            /*for( int j = 0; j < 4; j++ ) {
-                line(frame, vtx[j], vtx[(j+1)%4], Scalar(0,255,0), 1, CV_AA);
-                //std::cout<<vtx[j]<<" ";
-            }*/
+            cv::ellipse(mFrameDebug, box.center, box.size*0.5f, box.angle, 0, 360, cv::Scalar(0,255,255), 1, CV_AA);
 
             Rectangle * r = new Rectangle(box);
 
@@ -164,8 +195,9 @@ void VehicleDetection::detectWheels() {
     std::list<Rectangle*>::iterator it;
     for ( it=lst.begin() ; it != lst.end(); it++ ) {
         if ((*it) != 0) {
-            vehicles.push_back((*(*it)).getRect());
-            //(*(*it)).draw(frame);
+            cv::Rect * r = &(*(*it)).getRect();
+            r->x += adjustedX;
+            vehicles.push_back(*r);
         }
     }
 }

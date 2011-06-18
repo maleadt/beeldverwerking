@@ -51,6 +51,16 @@
               <string>Tram detection debugging</string>
              </property>
             </item>
+            <item>
+             <property name="text">
+              <string>Pedestrian detection debugging</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Vehicle detection debugging</string>
+             </property>
+            </item>
            </widget>
           </item>
          </layout>
@@ -120,6 +130,20 @@
          </widget>
         </item>
         <item>
+         <widget class="QLabel" name="lblPedestrian">
+          <property name="text">
+           <string>Pedestrian</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="lblVehicle">
+          <property name="text">
+           <string>Vehicle</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QLabel" name="lblDraw">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -144,7 +168,7 @@
      <x>0</x>
      <y>0</y>
      <width>746</width>
-     <height>27</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
