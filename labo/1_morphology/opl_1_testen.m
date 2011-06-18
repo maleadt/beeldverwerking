@@ -14,7 +14,7 @@ img_adjusted = imdilate(not(img), se);
 
 %Pixels verwijderen aan de rand van de objecten, het object gaat naar de vorm
 %van het structural element (se)
-%img_adjusted = imerode(not(img), se);
+img_adjusted_erode = imerode(not(img), se);
 
 %dit is erode met erna dilate (met 2x hetzelfde structural element)
 %dit is bv handig om kleine objecten van de image te verwijderen maar
@@ -22,10 +22,10 @@ img_adjusted = imdilate(not(img), se);
 %hiervoor gebruik je dan een structural element die groot genoeg is om de
 %kleine te verwijderen elementen te omvatten, maar toch nog klein genoeg is
 %om de grote niet te wijzigen
-%img_adjusted = imopen(not(img), se);
+img_adjusted_open = imopen(not(img), se);
 
 %dit is dilate met erna erode (met 2x hetzelfde structural element)
-%img_adjusted = imclose(not(img), se);
+img_adjusted_close = imclose(not(img), se);
 
 imshow(img), title('origineel')
 figure, imshow(not(img_adjusted)), title('aangepast')

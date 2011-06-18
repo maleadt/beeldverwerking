@@ -13,7 +13,8 @@ binary=im2bw(verschil-cte,0);
 % Waarom resulteert deze aanpassing in een verbetering van het resultaat?
 %   im2bw gaat alle pixels in de input die groter zijn dan 0 vervangen door 1
 %   zo krijgen we dus meer ingekleurd zonder het verschil met die constante
-%   door dit verschil wel in rekening te brengen, worden uitschieters dus vermeden
+%   door dit verschil wel in rekening te brengen, worden uitschieters 
+%   (lichte intensiteiten) dus vermeden
 
 figure,imshow(not(binary));
 end
