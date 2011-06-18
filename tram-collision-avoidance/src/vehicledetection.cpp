@@ -192,9 +192,9 @@ void VehicleDetection::detectWheels() {
     std::list<Rectangle*>::iterator it;
     for ( it=lst.begin() ; it != lst.end(); it++ ) {
         if ((*it) != 0) {
-            cv::Rect * r = &(*(*it)).getRect();
-            r->x += adjustedX;
-            vehicles.push_back(*r);
+            cv::Rect r = (*it)->getRect();
+            r.x += adjustedX;
+            vehicles.push_back(r);
         }
     }
 }
