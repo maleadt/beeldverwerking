@@ -12,8 +12,6 @@
 
 PedestrianDetection::PedestrianDetection(cv::Mat const* iFrame) : Component(iFrame)
 {
-    std::string cascade_file("/home/ruben/haarcascade_fullbody.xml");
-    cascade.load(cascade_file);
 }
 
 
@@ -25,7 +23,6 @@ void PedestrianDetection::preprocess()
 {
     mFrameDebug = (*frame()).clone();
 
-    cropFrame();
     enhanceFrame();
 }
 
@@ -43,6 +40,7 @@ void PedestrianDetection::find_features(FrameFeatures& iFrameFeatures) throw(Fea
         tracksEndCol = x2;
     }
 
+    cropFrame();
     detectPedestrians(iFrameFeatures);
 }
 
@@ -95,13 +93,11 @@ void PedestrianDetection::enhanceFrame()
 
 void PedestrianDetection::detectPedestrians(FrameFeatures& iFrameFeatures)
 {
-
     std::vector<cv::Rect> found_filtered;
     std::vector<cv::Rect> found;
 
-
-    found_filtered.clear();
-
+    if (!cascade.load("./res/haarcascade_fullbody.xml"))
+        throw FeatureException("Could not load cascade definition file");
     cascade.detectMultiScale(mFrameCropped, found);
 
     size_t j;
