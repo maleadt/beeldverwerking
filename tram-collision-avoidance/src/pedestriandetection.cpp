@@ -5,6 +5,7 @@
 // Includes
 #include "pedestriandetection.h"
 
+
 //
 // Construction and destruction
 //
@@ -23,11 +24,15 @@ PedestrianDetection::PedestrianDetection(cv::Mat const* iFrame) : Component(iFra
 void PedestrianDetection::preprocess()
 {
     mFrameDebug = (*frame()).clone();
+
+    cropFrame();
+    enhanceFrame();
 }
 
 void PedestrianDetection::find_features(FrameFeatures& iFrameFeatures) throw(FeatureException)
 {
-    if (iFrameFeatures.tracks.first.length() > 1 && iFrameFeatures.tracks.second.length() > 1) {
+    if (iFrameFeatures.tracks.first.length() > 1 && iFrameFeatures.tracks.second.length() > 1)
+    {
         int x1 = iFrameFeatures.tracks.first[0].x;
         int y1 = iFrameFeatures.tracks.first[0].y;
         int x2 = iFrameFeatures.tracks.second[0].x;
@@ -38,8 +43,6 @@ void PedestrianDetection::find_features(FrameFeatures& iFrameFeatures) throw(Fea
         tracksEndCol = x2;
     }
 
-    cropFrame();
-    enhanceFrame();
     detectPedestrians(iFrameFeatures);
 }
 
@@ -53,7 +56,8 @@ cv::Mat PedestrianDetection::frameDebug() const
 // Feature detection
 //
 
-void PedestrianDetection::cropFrame() {
+void PedestrianDetection::cropFrame()
+{
     cv::Range rowRange(0, frame()->rows);
     adjustedX = tracksStartCol - 2*tracksWidth;
     if (adjustedX < 0) {
@@ -66,7 +70,9 @@ void PedestrianDetection::cropFrame() {
     mFrameCropped = cv::Mat(blockFromFrame.rows / scale, blockFromFrame.cols / scale, CV_8UC3);
     cv::resize(blockFromFrame, mFrameCropped, mFrameCropped.size(), 0, 0, cv::INTER_LINEAR);
 }
-void PedestrianDetection::enhanceFrame() {
+
+void PedestrianDetection::enhanceFrame()
+{
     //    int brightness = 0;
     //        int contrast = 0;
     //        double a, b;
@@ -86,7 +92,9 @@ void PedestrianDetection::enhanceFrame() {
     //        frame.convertTo(dst, CV_8U, a, b);
     //        GaussianBlur(dst, dst, Size(5, 5), 1.2, 1.2);
 }
-void PedestrianDetection::detectPedestrians(FrameFeatures& iFrameFeatures) {
+
+void PedestrianDetection::detectPedestrians(FrameFeatures& iFrameFeatures)
+{
 
     std::vector<cv::Rect> found_filtered;
     std::vector<cv::Rect> found;
