@@ -63,7 +63,7 @@ Instead of using the template matching approach, another possible method has bee
 This approach uses statistical models, so called classifiers. These are created by extensive training using a pool of test images. These pools consists of positive and negative samples, respectively images that contain pedestrians and images that don't. 
 From these sample images features will be extracted and the features which classify that pedestrians are selected. These are the so called Haar-like features. The general flow of this process is shown in Figure~\ref{fig:flowchart}.
 
-\begin{figure}[H]
+\begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.5]{HaarTrainingFlowChart.png}
 	\caption{Flowchart for detecting pedestrians.}
@@ -98,13 +98,13 @@ From these sample images features will be extracted and the features which class
 
 A Haar-like feature is represented by a template, its coordinate relative to the sub window and his size.
 The template, a shape, is composed of two or three rectangles joined together. Each of these rectangles is colored black or white. Three of these Haar-like features are displayed in Figure~\ref{fig:features}. These rectangles can be turned horizontal, vertical or even  diagonal, an extension proposed in~\cite{lienhart2002extended}.
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[scale=0.6]{Features.png}
-	\caption{Prototypes of Haar-like features.}
-	\label{fig:features}
-\end{figure}
+%
+%\begin{figure}[H]
+%	\centering
+%	\includegraphics[scale=0.6]{Features.png}
+%	\caption{Prototypes of Haar-like features.}
+%	\label{fig:features}
+%\end{figure}
 
 \par
 Foreach feature a value is calculated for each position in the search sub window. These values sum up the pixel intensities in these regions and calculates the difference between them. This difference is then used to check wether the feature resembles with this position on the sub window.
