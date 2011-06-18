@@ -30,8 +30,13 @@ public:
 
 private:
     // Feature detection
+    void cropFrame();
     void detectWheels();
     std::vector<cv::Rect> vehicles;
+    int tracksWidth, tracksStartCol, tracksEndCol;
+    int adjustedX;
+
+    cv::Mat mFrameCropped;
 
     // Frames
     cv::Mat mFramePreprocessed;
