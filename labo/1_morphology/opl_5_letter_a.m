@@ -22,6 +22,8 @@ template = im_bw_inverted(topleft(2):downright(2), topleft(1):downright(1));
 figure, imshow(bwhitmiss(uint8(im_bw_inverted),uint8(template)));
 
 
-%normxcorr2 ??? --> ZIE TEMPLATE MATCHING
+C = normxcorr2(template, im_bw_inverted);
+C1 = C>0.8;
+figure, imshow(C1), title('adhv normxcorr2');
 end
 
