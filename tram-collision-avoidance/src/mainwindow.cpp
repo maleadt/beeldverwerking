@@ -353,9 +353,10 @@ void MainWindow::processFrame(cv::Mat &iFrame)
     }
     if (mFrameCounter - mAgeTram > FEATURES_MAX_AGE)
         mFeatures.tram = cv::Rect();
-
-    mFeatures.pedestrians.clear();
-    mFeatures.vehicles.clear();
+    if (mFrameCounter - mAgePedestrian > FEATURES_MAX_AGE)
+        mFeatures.pedestrians.clear();
+    if (mFrameCounter - mAgeVehicle > FEATURES_MAX_AGE)
+        mFeatures.vehicles.clear();
 }
 
 void MainWindow::drawStats()
