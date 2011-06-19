@@ -24,6 +24,7 @@ struct FrameFeatures
     // TramDetection
     cv::Rect tram;
     cv::Point location;
+    cv::Point tramHalfX, trackHalfX;
     double minValue, maxValue;
     //cv::Point leftUpperLeft, leftLowerRight, rightUpperRight, rightLowerLeft;
 };

@@ -11,7 +11,8 @@ SOURCES += \
     tramdetection.cpp \
     pedestriandetection.cpp \
     vehicledetection.cpp \
-    auxiliary.cpp
+    auxiliary.cpp \
+    tramdistance.cpp
 
 HEADERS += \
     trackdetection.h \
@@ -23,7 +24,8 @@ HEADERS += \
     mainwindow.h \
     tramdetection.h \
     pedestriandetection.h \
-    vehicledetection.h
+    vehicledetection.h \
+    tramdistance.h
 
 profile {
     QMAKE_CXXFLAGS_DEBUG += -pg

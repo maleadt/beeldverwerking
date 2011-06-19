@@ -30,7 +30,8 @@ private:
     // Feature detection
     cv::CascadeClassifier cascade;
     int scale;
-    int railsStartCol, railsEndCol;
+    int tracksWidth, tracksStartCol, tracksEndCol;
+    int adjustedX;
 
     void cropFrame();
     void enhanceFrame();

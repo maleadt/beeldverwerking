@@ -8,7 +8,6 @@ function [ output ] = globalthresholding_1( image )
     %    T = 116
     %    T = 155
     % Dit zijn de grootste verschil in bulten
-
     T0 = 0.000000001;
     
     %drempelwaarde automatisch via iteratief clusteringalgoritme:

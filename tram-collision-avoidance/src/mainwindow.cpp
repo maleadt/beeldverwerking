@@ -9,6 +9,9 @@
 #include <iostream>
 #include "trackdetection.h"
 #include "tramdetection.h"
+#include "tramdistance.h"
+#include "pedestriandetection.h"
+#include "vehicledetection.h"
 #include <QFileDialog>
 #include <QDebug>
 #ifdef _OPENMP
@@ -177,10 +180,10 @@ bool MainWindow::openFile(QString iFilename)
 #if WRITE_VIDEO
     std::string oVideoFile = argv[2];
     mVideoWriter = new cv::VideoWriter(oVideoFile,
-                             CV_FOURCC('M', 'J', 'P', 'G'),
-                             mVideoCapture->get(CV_CAP_PROP_FPS),
-                             cv::Size(mVideoCapture->get(CV_CAP_PROP_FRAME_WIDTH), mVideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT)),
-                             true);
+                                       CV_FOURCC('M', 'J', 'P', 'G'),
+                                       mVideoCapture->get(CV_CAP_PROP_FPS),
+                                       cv::Size(mVideoCapture->get(CV_CAP_PROP_FRAME_WIDTH), mVideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT)),
+                                       true);
 #endif
 
     // Reset time counters
@@ -188,11 +191,16 @@ bool MainWindow::openFile(QString iFilename)
     mTimePreprocess = 0;
     mTimeTrack = 0;
     mTimeTram = 0;
+    mTimeDistance = 0;
+    mTimePedestrians = 0;
+    mTimeVehicle = 0;
     mTimeDraw = 0;
 
     // Reset age trackers
     mAgeTrack = 0;
     mAgeTram = 0;
+    mAgePedestrian = 0;
+    mAgeVehicle = 0;
 
     statusBar()->showMessage("File opened and loaded");
     mUI->btnStart->setEnabled(true);
@@ -223,18 +231,29 @@ void MainWindow::processFrame(cv::Mat &iFrame)
     // Load objects
     TrackDetection tTrackDetection(&iFrame);
     TramDetection tTramDetection(&iFrame);
+    TramDistance tTramDistance(&iFrame);
+    PedestrianDetection tPedestrianDetection(&iFrame);
+    VehicleDetection tVehicleDetection(&iFrame);
 
     // Preprocess
     timeStart();
-    #pragma omp parallel sections
+#pragma omp parallel sections
     {
-        #pragma omp section
+#pragma omp section
         {
             tTrackDetection.preprocess();
         }
-        #pragma omp section
+#pragma omp section
         {
             tTramDetection.preprocess();
+        }
+#pragma omp section
+        {
+            tPedestrianDetection.preprocess();
+        }
+#pragma omp section
+        {
+            tVehicleDetection.preprocess();
         }
     }
     mTimePreprocess += timeDelta();
@@ -261,6 +280,38 @@ void MainWindow::processFrame(cv::Mat &iFrame)
         std::cout << "  Error finding tram: " << e.what() << std::endl;
     }
     mTimeTram += timeDelta();
+   try
+    {
+        tTramDistance.find_features(mFeatures);
+        mAgeTram = mFrameCounter;
+    }
+    catch (FeatureException e)
+    {
+        std::cout << "  Error finding distance: " << e.what() << std::endl;
+    }
+    mTimeDistance += timeDelta();
+
+    try
+    {
+        //tPedestrianDetection.find_features(mFeatures);
+        mAgePedestrian = mFrameCounter;
+    }
+    catch (FeatureException e)
+    {
+        std::cout << "  Error finding pedestrians: " << e.what() << std::endl;
+    }
+    mTimePedestrians += timeDelta();
+
+    try
+    {
+        //tVehicleDetection.find_features(mFeatures);
+        mAgeVehicle = mFrameCounter;
+    }
+    catch (FeatureException e)
+    {
+        std::cout << "  Error finding vehicles: " << e.what() << std::endl;
+    }
+    mTimeVehicle += timeDelta();
 
     // Draw image
     timeStart();
@@ -271,6 +322,11 @@ void MainWindow::processFrame(cv::Mat &iFrame)
         tVisualisation = tTrackDetection.frameDebug();
     else if (mUI->slcType->currentIndex() == 2)
         tVisualisation = tTramDetection.frameDebug();
+    else if (mUI->slcType->currentIndex() == 3)
+        tVisualisation = tPedestrianDetection.frameDebug();
+    else if (mUI->slcType->currentIndex() == 4)
+        tVisualisation = tVehicleDetection.frameDebug();
+
     if (mUI->chkFeatures->isChecked())
     {
         // Draw tracks
@@ -287,6 +343,23 @@ void MainWindow::processFrame(cv::Mat &iFrame)
 
         // Draw tram
         cv::rectangle(tVisualisation, mFeatures.tram, cv::Scalar(0, 255, 0), 1);
+
+        // Draw line between middle of the tram and middle of the track
+/*        std::cout << "From: " << mFeatures.trackHalfX.x << "," << mFeatures.trackHalfX.y  << std::endl;
+        std::cout << "To: " << mFeatures.tramHalfX.x << "," << mFeatures.tramHalfX.y << std::endl;
+        cv::line(tVisualisation, mFeatures.trackHalfX, mFeatures.tramHalfX, cv::Scalar(0, 255, 0), 3);
+*/
+        //Draw pedestrians
+        for (int i = 0; i < mFeatures.pedestrians.size(); i++) {
+            cv::Rect r = mFeatures.pedestrians[i];
+            cv::rectangle(tVisualisation, r.tl(), r.br(), cv::Scalar(0,0,255), 2);
+        }
+
+        //Draw vehicles
+        for (int i = 0; i < mFeatures.vehicles.size(); i++) {
+            cv::Rect r = mFeatures.vehicles[i];
+            cv::rectangle(tVisualisation, r.tl(), r.br(), cv::Scalar(255,0,0), 1);
+        }
     }    
     mGLWidget->sendImage(&tVisualisation);
     mTimeDraw += timeDelta();
@@ -299,21 +372,28 @@ void MainWindow::processFrame(cv::Mat &iFrame)
     }
     if (mFrameCounter - mAgeTram > FEATURES_MAX_AGE)
         mFeatures.tram = cv::Rect();
+
+    mFeatures.pedestrians.clear();
+    mFeatures.vehicles.clear();
 }
 
 void MainWindow::drawStats()
 {
-    int mPreprocessDelta = 0, mTrackDelta = 0, mTramDelta = 0, mTimeDelta = 0;
+    int mPreprocessDelta = 0, mTrackDelta = 0, mTramDelta = 0, mPedestriansDelta = 0, mVehicleDelta = 0, mTimeDelta = 0;
     if (mFrameCounter > 0)
     {
         mPreprocessDelta = mTimePreprocess / mFrameCounter;
         mTrackDelta = mTimeTrack / mFrameCounter;
         mTramDelta = mTimeTram / mFrameCounter;
+        mPedestriansDelta = mTimePedestrians / mFrameCounter;
+        mVehicleDelta = mTimeVehicle / mFrameCounter;
         mTimeDelta = mTimeDraw / mFrameCounter;
     }
     mUI->lblPreprocess->setText("Preprocess: " + QString::number(mPreprocessDelta) + " ms");
     mUI->lblTrack->setText("Track: " + QString::number(mTrackDelta) + " ms");
     mUI->lblTram->setText("Tram: " + QString::number(mTramDelta) + " ms");
+    mUI->lblPedestrian->setText("Pedestrian: " + QString::number(mPedestriansDelta) + " ms");
+    mUI->lblVehicle->setText("Vehicle: " + QString::number(mVehicleDelta) + " ms");
     mUI->lblDraw->setText("Draw: " + QString::number(mTimeDelta) + " ms");
 }
 
@@ -367,7 +447,7 @@ void MainWindow::setTitle(QString iFilename)
         setWindowTitle(tr("Tram Collision Detection"));
     else
         setWindowTitle(tr("%1 - %2").arg(strippedName(iFilename))
-                                    .arg("Tram Collision Detection"));
+                       .arg("Tram Collision Detection"));
 
 }
 

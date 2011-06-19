@@ -106,7 +106,7 @@ void TrackDetection::find_features(FrameFeatures& iFrameFeatures) throw(FeatureE
              );
     }
 
-    // Stitch representative lines
+    // Stitch representatdan zoive lines
     QList<Track > tStitches = find_stitches(tRepresentatives);
     foreach (const Track& tStitch, tStitches)
     {
@@ -127,7 +127,7 @@ void TrackDetection::find_features(FrameFeatures& iFrameFeatures) throw(FeatureE
     }
 
     // Find valid tracks
-    for (int tScanheight = TRACK_START_LOWER; tScanheight < TRACK_START_UPPER; tScanheight += TRACK_START_DELTA)
+    for (int tScanheight = TRACK_START_LOWER; tScanheight < TRACK_START_UPPER ; tScanheight += TRACK_START_DELTA)
     {
         TrackStart tTrackStart;
         QPair<Track, Track> tTramTrack;

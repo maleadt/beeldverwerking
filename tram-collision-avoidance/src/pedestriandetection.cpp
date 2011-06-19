@@ -5,14 +5,13 @@
 // Includes
 #include "pedestriandetection.h"
 
+
 //
 // Construction and destruction
 //
 
 PedestrianDetection::PedestrianDetection(cv::Mat const* iFrame) : Component(iFrame)
 {
-    std::string cascade_file("/home/ruben/haarcascade_fullbody.xml");
-    cascade.load(cascade_file);
 }
 
 
@@ -22,13 +21,26 @@ PedestrianDetection::PedestrianDetection(cv::Mat const* iFrame) : Component(iFra
 
 void PedestrianDetection::preprocess()
 {
+    mFrameDebug = (*frame()).clone();
 
+    enhanceFrame();
 }
 
 void PedestrianDetection::find_features(FrameFeatures& iFrameFeatures) throw(FeatureException)
 {
+    if (iFrameFeatures.tracks.first.length() > 1 && iFrameFeatures.tracks.second.length() > 1)
+    {
+        int x1 = iFrameFeatures.tracks.first[0].x;
+        int y1 = iFrameFeatures.tracks.first[0].y;
+        int x2 = iFrameFeatures.tracks.second[0].x;
+        int y2 = iFrameFeatures.tracks.second[0].y;
+
+        tracksWidth = sqrt(pow(x2-x1, 2) + pow(y2-y1, 2));
+        tracksStartCol = x1;
+        tracksEndCol = x2;
+    }
+
     cropFrame();
-    enhanceFrame();
     detectPedestrians(iFrameFeatures);
 }
 
@@ -42,25 +54,23 @@ cv::Mat PedestrianDetection::frameDebug() const
 // Feature detection
 //
 
-void PedestrianDetection::cropFrame() {
-    //VideoCapture cap("/media/windows/Beeldverwerking/HD/terug.MP4"); railsStartCol = 500; railsEndCol = 900;
-    //VideoCapture cap("/media/windows/Beeldverwerking/HD/heen.MP4"); railsStartCol = 500; railsEndCol = 900;
-    //VideoCapture cap("/media/windows/Beeldverwerking/obstakeldetectie.avi"); railsStartCol = 420; railsEndCol = 600;
-    //VideoCapture cap("/media/windows/Beeldverwerking/tramdetectie.avi"); railsStartCol = 380; railsEndCol = 560;
-
-    railsStartCol = 0;
-    railsEndCol = frame()->cols;
-
+void PedestrianDetection::cropFrame()
+{
     cv::Range rowRange(0, frame()->rows);
-    cv::Range colRange(railsStartCol, railsEndCol);
+    adjustedX = tracksStartCol - 2*tracksWidth;
+    if (adjustedX < 0) {
+        adjustedX = 0;
+    }
+    cv::Range colRange(adjustedX, (tracksEndCol + 2*tracksWidth > frame()->cols?frame()->cols:tracksEndCol + 2*tracksWidth));
     cv::Mat blockFromFrame(*frame(), rowRange, colRange);
 
-    //int scale = 3.5;
     scale = blockFromFrame.rows / 190;
     mFrameCropped = cv::Mat(blockFromFrame.rows / scale, blockFromFrame.cols / scale, CV_8UC3);
     cv::resize(blockFromFrame, mFrameCropped, mFrameCropped.size(), 0, 0, cv::INTER_LINEAR);
 }
-void PedestrianDetection::enhanceFrame() {
+
+void PedestrianDetection::enhanceFrame()
+{
     //    int brightness = 0;
     //        int contrast = 0;
     //        double a, b;
@@ -79,26 +89,16 @@ void PedestrianDetection::enhanceFrame() {
     //        Mat dst;
     //        frame.convertTo(dst, CV_8U, a, b);
     //        GaussianBlur(dst, dst, Size(5, 5), 1.2, 1.2);
-
-    //        imshow("image", dst);
-    //        waitKey(0);
-    //        imshow("image", frame);
-    //        waitKey(0);
-    //        return 0;
 }
-void PedestrianDetection::detectPedestrians(FrameFeatures& iFrameFeatures) {
 
+void PedestrianDetection::detectPedestrians(FrameFeatures& iFrameFeatures)
+{
     std::vector<cv::Rect> found_filtered;
     std::vector<cv::Rect> found;
 
-
-    found_filtered.clear();
-    //double t = (double)getTickCount();
-
+    if (!cascade.load("./res/haarcascade_fullbody.xml"))
+        throw FeatureException("Could not load cascade definition file");
     cascade.detectMultiScale(mFrameCropped, found);
-
-    //t = (double)getTickCount() - t;
-    //printf("tdetection time = %gms\n", t*1000./cv::getTickFrequency());
 
     size_t j;
     for(size_t i = 0; i < found.size(); i++ )
@@ -115,20 +115,13 @@ void PedestrianDetection::detectPedestrians(FrameFeatures& iFrameFeatures) {
     {
         cv::Rect r = found_filtered[i];
         r.x *= scale;
-        r.x += railsStartCol;
+        r.x += adjustedX;
         r.y *= scale;
         r.width *= scale;
         r.height *= scale;
 
         iFrameFeatures.pedestrians.push_back(r);
 
-        //rectangle(frame, r.tl(), r.br(), cv::Scalar(0,0,255), 3);
+        cv::rectangle(mFrameDebug, r.tl(), r.br(), cv::Scalar(0,0,255), 2);
     }
-
-    //    Rect r;
-    //    r.x = railsStartCol;
-    //    r.width = railsEndCol - railsStartCol;
-    //    r.y = 0;
-    //    r.height = frame.rows;
-    //    rectangle(frame, r.tl(), r.br(), cv::Scalar(0,255,0), 2);
 }
