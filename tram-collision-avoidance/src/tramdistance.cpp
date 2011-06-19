@@ -8,7 +8,7 @@
 
 //Feature properties
 #define TRACK_WIDTH 0.70  // the distance in meters betweens the tracks
-#define DISTANCE_DEPTH 125 // distance shown in depth off screen in meters
+#define DISTANCE_DEPTH 200 // distance shown in depth off screen in meters
 #define TRAM_WIDTH 2.5    // widths in meter of a tram
 
 //
@@ -55,10 +55,10 @@ void TramDistance::find_features(FrameFeatures& iFrameFeatures) throw(FeatureExc
         tramHalfX.x = iFrameFeatures.tram.x + iFrameFeatures.tram.width/2;
         iFrameFeatures.tramHalfX = tramHalfX;
 
-
+        double ratio = 1.0 *(frameHeight - tramHalfX.y) / frameHeight;
         //calculate the depth distance
         double yDistance;
-        yDistance = (frameHeight - iFrameFeatures.tram.y) * DISTANCE_DEPTH / frameHeight;
+        yDistance = ratio * ratio * ratio * DISTANCE_DEPTH;
 
         // calculate the total width is shown at that current line
         double widthDistance;
@@ -72,6 +72,7 @@ void TramDistance::find_features(FrameFeatures& iFrameFeatures) throw(FeatureExc
 
         iFrameFeatures.tramDistance = sqrt(totalDistance);
     }
+    // no tram found
     else{
         iFrameFeatures.tramHalfX = trackHalfX;
         iFrameFeatures.tramDistance = 0;
