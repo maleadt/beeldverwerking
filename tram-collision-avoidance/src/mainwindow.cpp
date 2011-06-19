@@ -9,6 +9,7 @@
 #include <iostream>
 #include "trackdetection.h"
 #include "tramdetection.h"
+#include "tramdistance.h"
 #include "pedestriandetection.h"
 #include "vehicledetection.h"
 #include <QFileDialog>
@@ -190,6 +191,7 @@ bool MainWindow::openFile(QString iFilename)
     mTimePreprocess = 0;
     mTimeTrack = 0;
     mTimeTram = 0;
+    mTimeDistance = 0;
     mTimePedestrians = 0;
     mTimeVehicle = 0;
     mTimeDraw = 0;
@@ -229,6 +231,7 @@ void MainWindow::processFrame(cv::Mat &iFrame)
     // Load objects
     TrackDetection tTrackDetection(&iFrame);
     TramDetection tTramDetection(&iFrame);
+    TramDistance tTramDistance(&iFrame);
     PedestrianDetection tPedestrianDetection(&iFrame);
     VehicleDetection tVehicleDetection(&iFrame);
 
@@ -277,9 +280,20 @@ void MainWindow::processFrame(cv::Mat &iFrame)
         std::cout << "  Error finding tram: " << e.what() << std::endl;
     }
     mTimeTram += timeDelta();
+   try
+    {
+        tTramDistance.find_features(mFeatures);
+        mAgeTram = mFrameCounter;
+    }
+    catch (FeatureException e)
+    {
+        std::cout << "  Error finding distance: " << e.what() << std::endl;
+    }
+    mTimeDistance += timeDelta();
+
     try
     {
-        tPedestrianDetection.find_features(mFeatures);
+        //tPedestrianDetection.find_features(mFeatures);
         mAgePedestrian = mFrameCounter;
     }
     catch (FeatureException e)
@@ -290,7 +304,7 @@ void MainWindow::processFrame(cv::Mat &iFrame)
 
     try
     {
-        tVehicleDetection.find_features(mFeatures);
+        //tVehicleDetection.find_features(mFeatures);
         mAgeVehicle = mFrameCounter;
     }
     catch (FeatureException e)
@@ -330,6 +344,11 @@ void MainWindow::processFrame(cv::Mat &iFrame)
         // Draw tram
         cv::rectangle(tVisualisation, mFeatures.tram, cv::Scalar(0, 255, 0), 1);
 
+        // Draw line between middle of the tram and middle of the track
+/*        std::cout << "From: " << mFeatures.trackHalfX.x << "," << mFeatures.trackHalfX.y  << std::endl;
+        std::cout << "To: " << mFeatures.tramHalfX.x << "," << mFeatures.tramHalfX.y << std::endl;
+        cv::line(tVisualisation, mFeatures.trackHalfX, mFeatures.tramHalfX, cv::Scalar(0, 255, 0), 3);
+*/
         //Draw pedestrians
         for (size_t i = 0; i < mFeatures.pedestrians.size(); i++) {
             cv::Rect r = mFeatures.pedestrians[i];

@@ -86,7 +86,7 @@ private:
     bool mProcessing;
     FrameFeatures mFeatures;
     unsigned int mFrameCounter;
-    unsigned long mTime, mTimePreprocess, mTimeTrack, mTimeTram, mTimePedestrians, mTimeVehicle, mTimeDraw;
+    unsigned long mTime, mTimePreprocess, mTimeTrack, mTimeTram, mTimeDistance, mTimePedestrians, mTimeVehicle, mTimeDraw;
     unsigned int mAgeTrack, mAgeTram, mAgePedestrian, mAgeVehicle;
 };
 
