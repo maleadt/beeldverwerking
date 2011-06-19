@@ -12,6 +12,8 @@
 
 PedestrianDetection::PedestrianDetection(cv::Mat const* iFrame) : Component(iFrame)
 {
+    adjustedX = 0;
+    tracksWidth = -1;
 }
 
 
@@ -28,8 +30,8 @@ void PedestrianDetection::preprocess()
 
 void PedestrianDetection::find_features(FrameFeatures& iFrameFeatures) throw(FeatureException)
 {
-    if (iFrameFeatures.tracks.first.length() > 1 && iFrameFeatures.tracks.second.length() > 1)
-    {
+    //Detecting current tracks width
+    if (iFrameFeatures.tracks.first.size() > 1 && iFrameFeatures.tracks.second.size() > 1) {
         int x1 = iFrameFeatures.tracks.first[0].x;
         int y1 = iFrameFeatures.tracks.first[0].y;
         int x2 = iFrameFeatures.tracks.second[0].x;
@@ -39,8 +41,9 @@ void PedestrianDetection::find_features(FrameFeatures& iFrameFeatures) throw(Fea
         tracksStartCol = x1;
         tracksEndCol = x2;
     }
-
+    //Crop the frame = faster detection
     cropFrame();
+    //Detect pedestrians
     detectPedestrians(iFrameFeatures);
 }
 
@@ -56,14 +59,21 @@ cv::Mat PedestrianDetection::frameDebug() const
 
 void PedestrianDetection::cropFrame()
 {
+    //Only interested in the area next to the tracks
     cv::Range rowRange(0, frame()->rows);
-    adjustedX = tracksStartCol - 2*tracksWidth;
-    if (adjustedX < 0) {
-        adjustedX = 0;
+    cv::Range colRange;
+    if (tracksWidth > -1) {
+        adjustedX = tracksStartCol - 2*tracksWidth;
+        if (adjustedX < 0) {
+            adjustedX = 0;
+        }
+        colRange = cv::Range(adjustedX, (tracksEndCol + 2*tracksWidth > frame()->cols?frame()->cols:tracksEndCol + 2*tracksWidth));
+    } else {
+        colRange = cv::Range(0, frame()->cols);
     }
-    cv::Range colRange(adjustedX, (tracksEndCol + 2*tracksWidth > frame()->cols?frame()->cols:tracksEndCol + 2*tracksWidth));
     cv::Mat blockFromFrame(*frame(), rowRange, colRange);
 
+    //Scaling it down to 190x[x]
     scale = blockFromFrame.rows / 190;
     mFrameCropped = cv::Mat(blockFromFrame.rows / scale, blockFromFrame.cols / scale, CV_8UC3);
     cv::resize(blockFromFrame, mFrameCropped, mFrameCropped.size(), 0, 0, cv::INTER_LINEAR);
@@ -93,14 +103,16 @@ void PedestrianDetection::enhanceFrame()
 
 void PedestrianDetection::detectPedestrians(FrameFeatures& iFrameFeatures)
 {
+    bool added = false;
     std::vector<cv::Rect> found_filtered;
     std::vector<cv::Rect> found;
-
+    //Loading cascade xml
     if (!cascade.load("./res/haarcascade_fullbody.xml"))
         throw FeatureException("Could not load cascade definition file");
     cascade.detectMultiScale(mFrameCropped, found);
 
     size_t j;
+    //Find the rect's found for the people
     for(size_t i = 0; i < found.size(); i++ )
     {
         cv::Rect r = found[i];
@@ -110,7 +122,7 @@ void PedestrianDetection::detectPedestrians(FrameFeatures& iFrameFeatures)
         if( j == found.size() )
             found_filtered.push_back(r);
     }
-
+    //Add them to the found features
     for(size_t i = 0; i < found_filtered.size(); i++ )
     {
         cv::Rect r = found_filtered[i];
@@ -120,8 +132,18 @@ void PedestrianDetection::detectPedestrians(FrameFeatures& iFrameFeatures)
         r.width *= scale;
         r.height *= scale;
 
+        if (!added) {
+            iFrameFeatures.pedestrians.clear();
+        }
+
         iFrameFeatures.pedestrians.push_back(r);
 
+        added = true;
+
         cv::rectangle(mFrameDebug, r.tl(), r.br(), cv::Scalar(0,0,255), 2);
+    }
+    //If no features are found: exception
+    if (!added) {
+        throw FeatureException("no pedestrians found");
     }
 }

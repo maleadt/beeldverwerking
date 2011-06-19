@@ -350,13 +350,13 @@ void MainWindow::processFrame(cv::Mat &iFrame)
         cv::line(tVisualisation, mFeatures.trackHalfX, mFeatures.tramHalfX, cv::Scalar(0, 255, 0), 3);
 */
         //Draw pedestrians
-        for (int i = 0; i < mFeatures.pedestrians.size(); i++) {
+        for (size_t i = 0; i < mFeatures.pedestrians.size(); i++) {
             cv::Rect r = mFeatures.pedestrians[i];
             cv::rectangle(tVisualisation, r.tl(), r.br(), cv::Scalar(0,0,255), 2);
         }
 
         //Draw vehicles
-        for (int i = 0; i < mFeatures.vehicles.size(); i++) {
+        for (size_t i = 0; i < mFeatures.vehicles.size(); i++) {
             cv::Rect r = mFeatures.vehicles[i];
             cv::rectangle(tVisualisation, r.tl(), r.br(), cv::Scalar(255,0,0), 1);
         }
@@ -372,9 +372,10 @@ void MainWindow::processFrame(cv::Mat &iFrame)
     }
     if (mFrameCounter - mAgeTram > FEATURES_MAX_AGE)
         mFeatures.tram = cv::Rect();
-
-    mFeatures.pedestrians.clear();
-    mFeatures.vehicles.clear();
+    if (mFrameCounter - mAgePedestrian > FEATURES_MAX_AGE)
+        mFeatures.pedestrians.clear();
+    if (mFrameCounter - mAgeVehicle > FEATURES_MAX_AGE)
+        mFeatures.vehicles.clear();
 }
 
 void MainWindow::drawStats()
