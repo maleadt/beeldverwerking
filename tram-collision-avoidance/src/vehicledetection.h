@@ -32,6 +32,7 @@ private:
     // Feature detection
     void cropFrame();
     void detectWheels();
+    void detectVehiclesFromWheels(FrameFeatures& iFrameFeatures);
     std::vector<cv::Rect> vehicles;
     int tracksWidth, tracksStartCol, tracksEndCol;
     int adjustedX;
