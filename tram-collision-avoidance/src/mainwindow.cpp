@@ -299,7 +299,7 @@ void MainWindow::processFrame(cv::Mat &iFrame)
 
     try
     {
-        //tPedestrianDetection.find_features(mFeatures);
+        tPedestrianDetection.find_features(mFeatures);
         mAgePedestrian = mFrameCounter;
     }
     catch (FeatureException e)
@@ -310,7 +310,7 @@ void MainWindow::processFrame(cv::Mat &iFrame)
 
     try
     {
-        //tVehicleDetection.find_features(mFeatures);
+        tVehicleDetection.find_features(mFeatures);
         mAgeVehicle = mFrameCounter;
     }
     catch (FeatureException e)
