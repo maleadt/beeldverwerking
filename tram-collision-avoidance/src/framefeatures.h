@@ -25,7 +25,7 @@ struct FrameFeatures
     cv::Rect tram;
     cv::Point location;
     cv::Point tramHalfX, trackHalfX;
-    double minValue, maxValue;
+    double minValue, maxValue, tramDistance;
     //cv::Point leftUpperLeft, leftLowerRight, rightUpperRight, rightLowerLeft;
 };
 

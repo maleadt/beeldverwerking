@@ -7,6 +7,8 @@
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QVBoxLayout>
 #include <iostream>
+#include <sstream>
+#include <string>
 #include "trackdetection.h"
 #include "tramdetection.h"
 #include "tramdistance.h"
@@ -249,6 +251,10 @@ void MainWindow::processFrame(cv::Mat &iFrame)
         }
 #pragma omp section
         {
+            tTramDistance.preprocess();
+        }
+#pragma omp section
+        {
             tPedestrianDetection.preprocess();
         }
 #pragma omp section
@@ -323,8 +329,10 @@ void MainWindow::processFrame(cv::Mat &iFrame)
     else if (mUI->slcType->currentIndex() == 2)
         tVisualisation = tTramDetection.frameDebug();
     else if (mUI->slcType->currentIndex() == 3)
-        tVisualisation = tPedestrianDetection.frameDebug();
+        tVisualisation = tTramDistance.frameDebug();
     else if (mUI->slcType->currentIndex() == 4)
+        tVisualisation = tPedestrianDetection.frameDebug();
+    else if (mUI->slcType->currentIndex() == 5)
         tVisualisation = tVehicleDetection.frameDebug();
 
     if (mUI->chkFeatures->isChecked())
@@ -345,10 +353,17 @@ void MainWindow::processFrame(cv::Mat &iFrame)
         cv::rectangle(tVisualisation, mFeatures.tram, cv::Scalar(0, 255, 0), 1);
 
         // Draw line between middle of the tram and middle of the track
-/*        std::cout << "From: " << mFeatures.trackHalfX.x << "," << mFeatures.trackHalfX.y  << std::endl;
-        std::cout << "To: " << mFeatures.tramHalfX.x << "," << mFeatures.tramHalfX.y << std::endl;
-        cv::line(tVisualisation, mFeatures.trackHalfX, mFeatures.tramHalfX, cv::Scalar(0, 255, 0), 3);
-*/
+        cv::line(tVisualisation, mFeatures.trackHalfX, mFeatures.tramHalfX, cv::Scalar(255, 0, 0), 2);
+
+        cv::Point textStart;
+        textStart.y = (mFeatures.trackHalfX.y + mFeatures.tramHalfX.y)/2;
+        textStart.x = (mFeatures.trackHalfX.x + mFeatures.tramHalfX.x)/2 + 5;
+
+        std::ostringstream o;
+        if (!(o << mFeatures.tramDistance))
+          throw FeatureException("Can not convert distance to string");
+        cv::putText(tVisualisation, o.str()+" m", textStart, cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar(255,0,0));
+
         //Draw pedestrians
         for (size_t i = 0; i < mFeatures.pedestrians.size(); i++) {
             cv::Rect r = mFeatures.pedestrians[i];

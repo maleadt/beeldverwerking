@@ -53,6 +53,11 @@
             </item>
             <item>
              <property name="text">
+              <string>Tram distance debugging</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
               <string>Pedestrian detection debugging</string>
              </property>
             </item>
@@ -168,7 +173,7 @@
      <x>0</x>
      <y>0</y>
      <width>746</width>
-     <height>25</height>
+     <height>29</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
