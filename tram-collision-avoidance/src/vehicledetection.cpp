@@ -34,6 +34,7 @@ void VehicleDetection::preprocess()
 
 void VehicleDetection::find_features(FrameFeatures& iFrameFeatures) throw(FeatureException)
 {
+    //Detecting current tracks width
     if (iFrameFeatures.tracks.first.length() > 1 && iFrameFeatures.tracks.second.length() > 1) {
         int x1 = iFrameFeatures.tracks.first[0].x;
         int y1 = iFrameFeatures.tracks.first[0].y;
@@ -44,8 +45,11 @@ void VehicleDetection::find_features(FrameFeatures& iFrameFeatures) throw(Featur
         tracksStartCol = x1;
         tracksEndCol = x2;
     }
+    //Crop the frame = faster detection
     cropFrame();
+    //Detect wheels (ellipse)
     detectWheels();
+    //Detect cars from wheels
     detectVehiclesFromWheels(iFrameFeatures);
 }
 
@@ -59,6 +63,7 @@ cv::Mat VehicleDetection::frameDebug() const
 //
 // Feature detection
 //
+//Used so we don't have overlapping rects
 class Rectangle {
 public:
     Rectangle(cv::RotatedRect _box) {
@@ -101,6 +106,7 @@ private:
 };
 
 void VehicleDetection::cropFrame() {
+    //Only interested in the area next to the tracks
     if (tracksWidth > -1) {
         adjustedX = tracksStartCol - 1.2*tracksWidth;
         if (adjustedX < 0) {
@@ -122,7 +128,8 @@ void VehicleDetection::detectWheels() {
     lst.resize(50, 0);
 
     int start = 5; int end = 100;
-    for (int i = start; i < end; i += 15) { //i += 5
+    for (int i = start; i < end; i += 15) {
+        //Find all contours
         std::vector<std::vector<cv::Point> > contours;
         cv::Mat bimage = img >= i;
 
@@ -130,6 +137,7 @@ void VehicleDetection::detectWheels() {
 
         for(size_t i = 0; i < contours.size(); i++)
         {
+            //Check if the ellipse found is valid (not too big/small etc)
             size_t count = contours[i].size();
             if( count < 6 )
                 continue;
@@ -164,8 +172,10 @@ void VehicleDetection::detectWheels() {
             }
             cv::Point p = box.center;
             p.x += adjustedX;
+            //Draw ellipse on debug
             cv::ellipse(mFrameDebug, p, box.size*0.5f, box.angle, 0, 360, cv::Scalar(0,255,255), 1, CV_AA);
 
+            //Check if it does not overlap any existing wheel (that's not possible!)
             Rectangle * r = new Rectangle(box);
 
             std::list<Rectangle*>::iterator it;
@@ -189,6 +199,7 @@ void VehicleDetection::detectWheels() {
             }
         }
     }
+    //Save the found wheels
     std::list<Rectangle*>::iterator it;
     for ( it=lst.begin() ; it != lst.end(); it++ ) {
         if ((*it) != 0) {
@@ -210,8 +221,8 @@ void VehicleDetection::detectVehiclesFromWheels(FrameFeatures& iFrameFeatures) {
     if (tracksWidth > -1) { //Only detect vehicles if we have a reference from the tracks!
         maxCar = tracksWidth * 3;
 
-        for (int i = 0; i < vehicles.size(); i++) {
-            for (int j = 0; j < vehicles.size(); j++) {
+        for (size_t i = 0; i < vehicles.size(); i++) {
+            for (size_t j = 0; j < vehicles.size(); j++) {
                 if (i != j) {
 
                     //Distance between i & j:
@@ -239,7 +250,7 @@ void VehicleDetection::detectVehiclesFromWheels(FrameFeatures& iFrameFeatures) {
         }
 
         //Create cars!
-        for (int i = 0; i < connected.size(); i++) {
+        for (size_t i = 0; i < connected.size(); i++) {
             if (connected[i] > -1) {
                 int x1 = vehicles[i].x;
                 int y1 = vehicles[i].y;
@@ -271,9 +282,9 @@ void VehicleDetection::detectVehiclesFromWheels(FrameFeatures& iFrameFeatures) {
             }
         }
     }
-
+    //If no features are found: exception
     if (!added) {
-         throw FeatureException("no vehicles found");
+        throw FeatureException("no vehicles found");
     }
 }
 
