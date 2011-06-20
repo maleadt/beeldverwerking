@@ -27,7 +27,7 @@
 \maketitle
 %
 \begin{abstract}
-In this paper a solution for pedestrian detection is described using Haar-like features. It is being developed to be used in a tram collision avoidance project. OpenCV~\cite{opencv} is used as implementation framework. In this paper a short introduction is given about Haar-like features and experimental results are obtained using the OpenCV implementation.
+In this paper a solution for pedestrian detection is described using a boosted cascade of simple Haar-like features. It is being developed to be used in a tram collision avoidance project. OpenCV~\cite{opencv} is used as implementation framework. In this paper a short introduction is given about Haar-like features and experimental results are obtained using the OpenCV implementation.
 \end{abstract}
 %
 \begin{keywords}
@@ -56,6 +56,8 @@ The method of Viola and Jones uses three different algorithms:
 \item Classifiercascade: Building a cascade reduces the amount of backgroundnoise drasticly. The cascade represents a decisiontree that either rejects a subwindow or lets it go deeper in the tree.
 \end{itemize}
 The Lienhart and Maydt method extended this by using the original Haar-like features but rotated over 45 degrees.
+
+We propose this method because it uses real features from pedestrians extracted from training data, it's a similar method that was proposed by Viola and Jones~\cite{viola2001rapid} and has been proven to work in real time.
 \section{How it works}
 This approach uses statistical models, so called classifiers. These are created by extensive training using a pool of test images. These pools consists of positive and negative samples, respectively images that contain pedestrians and images that don't. 
 From these sample images features will be extracted and the features which classify that pedestrians are selected. These are the so called Haar-like features. The general flow of this process is shown in Figure~\ref{fig:flowchart}.
@@ -156,7 +158,7 @@ The \texttt{tests.dat} file contains a list of testing images and the \texttt{ni
 \section{Experimental results}
 The OpenCV implementation is tested using a pool of samples. This pool consists of fourty positive and sixty negative samples. Each of the positive samples may contain one or more people and these people can walk widely apart or be packed together. Some results are shown in Figures~\ref{fig:pdetection1} and~\ref{fig:pdetection2}.
 \par
-In Figure~\ref{fig:roc} an ROC curve is showing the performance outcome of the OpenCV pedestrian detection using Haar-like features is shown. The ROC represents the fraction of true positives out of the positives versus the fraction of false positives out of the negatives.
+In Figure~\ref{fig:roc} an ROC curve is showing the performance outcome of the OpenCV pedestrian detection using Haar-like features. The ROC represents the fraction of true positives out of the positives versus the fraction of false positives out of the negatives.
 \par
 As seen initially a small increase in false positive detection rate will result in a high increase in the number of true positives found. At approximatly the 10\,\% mark the high increase in true positives is slowed down drastically. Each further increase in false positive detection increases the true positives only sublineair instead of a exponentially before. This behavior is as expected.
 \begin{figure}[h!]
@@ -168,9 +170,9 @@ As seen initially a small increase in false positive detection rate will result 
 \par
 To further optimize the results gained using the OpenCV implementation another test is performed. Again the comparison is made between the number of positive and negative detections. This time an alteration is made to the image size. The image sizes are each time reduced with 20\,\% given new image sizes as shown in Table~\ref{table:test}. The image's original size is 1280\,px by 720\,px.
 \par
-A noticable fact is that resizing the image might improve the performance of the pedestrian detection greatly. The detection time reduces exponentially as the image size gets smaller. The more the image is rescaled to a smaller format the lower the detection rate gets for both true and false positives.
+A noticeable fact is that resizing the image might improve the performance of the pedestrian detection greatly. The detection time reduces exponentially as the image size gets smaller. The more the image is rescaled to a smaller format the lower the detection rate gets for both true and false positives.
 \par
-If speed is of great importance the image can be sized down to approximately 40\,\% and still have a detection rate of 60\,\%. Is the detection rate of greater importance the image can be sized down with 20\,\%. This gives the same detection rate for true positives and even lowers the false positive detection rate. Moreover the duration of the detection is reduced by about 30\,\%.
+If speed is of great importance the image can be sized down to approximately 40\,\% and still have a detection rate of 60\,\%. If the detection rate is of greater importance the image can be sized down with 20\,\%. This gives the same detection rate for true positives and even lowers the false positive detection rate. Moreover the duration of the detection is reduced by about 30\,\%.
 \begin{table}
 \centering
 \scalebox{0.9}{
@@ -198,7 +200,7 @@ If speed is of great importance the image can be sized down to approximately 40\
 	\label{fig:pdetection2}
 \end{figure}
 \section{Conclusion}
-In this paper we discussed a method for pedestrian detection to be used in a tram collision avoidance project. By using a boosted cascade of Haar-like features this is made possible. After preprocessing the cascade of classifiers the detection is able to be used in real time.
+In this paper we discussed a method for pedestrian detection to be used in a tram collision avoidance project. By using a boosted cascade of Haar-like features this is made possible. After preprocessing the cascade of classifiers the detection is able to be used in real time. It was also shown that decreasing the size of big images will decrease the detection time exponentially.
 \bibliographystyle{IEEEbib}
 \bibliography{bibliografie}
 \end{document}

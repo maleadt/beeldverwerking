@@ -4,7 +4,7 @@
 \usepackage[dutch]{babel}
 \usepackage{a4}
 \begin{document}
-\subsubsection*{"Rapid object detection using a boosted cascade of simple features" - P. Viola and M. Jones}
+\subsubsection*{"Rapid object detection using a boosted cascade of simple features$"$ - P. Viola and M. Jones}
 In deze paper wordt een nieuwe manier beschreven om objecten zeer snel en accuraat (hoge detectie kans) te detecteren, naar het einde toe wordt een gezichts-detector uitgewerkt.
 \par
 Hiervoor gebruikt het algoritme een nieuwe soort voorstelling van afbeeldingen: "Integral Image", hierdoor kunnen features zeer snel berekend worden. Deze representatie wordt simpelweg berekend door de som te nemen van de pixels boven en links van de x,y locaties, dit gaat dus enorm snel.
@@ -14,7 +14,7 @@ Het tweede deel van deze nieuwe manier om objecten te detecteren is het leer alg
 Het laatste deel is het opbouwen van een cascade van classifier, waardoor achtergrond ruis zeer snel zal verworpen worden. Door deze cascade wordt er veel meer gedetecteerd en wordt de berekeningstijd enorm verlaagd. Hiervoor worden kleinere en dus ook meer efficientere classifiers opgebouwd die veel negatieve sub-windows verwerpen. De cascade stelt een soort beslissingsboom voor die een subwindow al dan niet verwerpt of verder in de boom laat afdalen.
 \par
 Het resultaat is in staat real time gezichten te detecteren aan 15 fps (700 MHz Intel Pentium III).
-\subsubsection*{"An extended set of haar-like features for rapid object detection" - R. Lienhart and J. Maydt}
+\subsubsection*{"An extended set of haar-like features for rapid object detection$"$ - R. Lienhart and J. Maydt}
 In deze paper wordt een manier beschreven om objecten te detecteren die verder bouwt op de bevindingen uit "Rapid object detection using a boosted cascade of simple features" door P. Viola and M. Jones. Bovenop de features uit de vorige paper wordt er ook gebruik gemaakt van de oorspronkelijke haar-like features maar dan geroteerd over 45graden.
 \par
 Features worden berekend aan de hand van de som van de pixels binnen de rechthoek. Rechtstaande rechthoeken kunnen berekend worden door 1 maal door alle pixels van de afbeelding te gaan. De geroteerde features worden berekend door twee maal doorheen alle pixels te gaan, eenmaal van links naar rechts en boven naar onder, en dan van rechts naar links en onder naar boven.
@@ -22,8 +22,10 @@ Features worden berekend aan de hand van de som van de pixels binnen de rechthoe
 Daarbij wordt het elke stage classifier van het AdaBoost algoritme ook nog eens geoptimaliseerd door geleidelijk aan een paar parameters aan te passen tot de uitkomst, een aangegeven hit rate, ideaal is.
 \par
 Met deze extended (geroteerde) haar-like feature set is het gemiddelde false alarm ongeveer met 10\% gedaald. Het gebruik van deze features en de daling van 10\% heeft geen invloed op de computationele complexiteit. Door bovenop deze extended feature set ook nog eens de post-optimalisatie te gebruiken werden de false alarms nog eens verminderd met 12.5\% terwijl opnieuw de computationele complexiteit ongeveer gelijk bleef.
-\subsubsection*{"Vision-based pedestrian detection using haar-like features" - G. Monteiro, P. Peixoto, and U. Nunes}
-
+\subsubsection*{"Vision-based pedestrian detection using haar-like features$"$ - G. Monteiro, P. Peixoto, and U. Nunes}
+In deze paper wordt een manier beschreven om voetgangers te detecteren aan de hand van Haar-like features, deze detectie is een module in een groter systeem gebruikt om botsingen te voorkomen bij traag bewegende voertuigen. De bevindingen in deze paper bouwen verder op bevindingen van Viola and Jones.
+Na het opbouwen van de cascade van classifiers worden voetgangers gedetecteerd door een window over een frame te schuiven en dit window telkens te herschalen. In dit window wordt nagegaan of dit al dan niet een voetganger bevat.
+Het systeem is getest op 1032 afbeeldingen en kan voetgangers detecteren aan 17 frames per seconde met afbeeldingen van 213px op 160px. Ondanks de intensieve training met vele datasets worden er nog redelijk wat false positives gevonden, om deze foute detecties te verminderen kan gebruik gemaakt worden van een laserscanner. Deze laserscanner geeft een correctere ROI aan die dan gescanned wordt met de Haar-like features, waardoor er 39\% minder foute detecties plaatsvinden.
 \end{document}
 
 

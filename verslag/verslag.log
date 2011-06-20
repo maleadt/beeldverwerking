@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (MiKTeX 2.8) (preloaded format=pdflatex 2011.5.25)  20 JUN 2011 19:27
+This is pdfTeX, Version 3.1415926-1.40.10 (MiKTeX 2.8) (preloaded format=pdflatex 2011.5.25)  20 JUN 2011 22:13
 entering extended mode
 **verslag.tex
 (F:\School\Master\Beeldverwerking\beeldverwerking\verslag\verslag.tex
@@ -94,25 +94,29 @@ LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 6.
 LaTeX Font Info:    ... okay on input line 6.
 LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 6.
 LaTeX Font Info:    ... okay on input line 6.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 7.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 7.
  [1
 
 {C:/Documents and Settings/Ruben/Local Settings/Application Data/MiKTeX/2.8/pdf
-tex/config/pdftex.map}]
+tex/config/pdftex.map}] [2]
 (F:\School\Master\Beeldverwerking\beeldverwerking\verslag\verslag.aux) ) 
 Here is how much of TeX's memory you used:
- 902 strings out of 495289
- 11543 string characters out of 3180555
- 66243 words of memory out of 3000000
- 4148 multiletter control sequences out of 15000+200000
+ 905 strings out of 495289
+ 11584 string characters out of 3180555
+ 68243 words of memory out of 3000000
+ 4151 multiletter control sequences out of 15000+200000
  3948 words of font info for 15 fonts, out of 3000000 for 9000
  14 hyphenation exceptions out of 8191
- 25i,4n,24p,471b,109s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 25i,4n,24p,492b,111s stack positions out of 5000i,500n,10000p,200000b,50000s
 <C:/Pro
 gram Files/MiKTeX 2.8/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Program Fil
 es/MiKTeX 2.8/fonts/type1/public/amsfonts/cm/cmr10.pfb>
-Output written on verslag.pdf (1 page, 40495 bytes).
+Output written on verslag.pdf (2 pages, 42842 bytes).
 PDF statistics:
- 14 PDF objects out of 1000 (max. 8388607)
+ 17 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
