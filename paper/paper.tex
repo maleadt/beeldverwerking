@@ -46,6 +46,16 @@ Alas for complex objects such as pedestrians these features are hard to find due
 \item Also the lack in motion due the slow speed of pedestrians hardens the possibility for them to be detected.
 \end{itemize}
 Instead of using the template matching approach, another possible method has been described by Viola and Jones~\cite{viola2001rapid} and extended by Lienhart and Maydt~\cite{lienhart2002extended}.
+
+The method of Viola and Jones uses three different algorithms:
+\begin{itemize}
+\item Integral Image: This algorithm enhances the representation of images thereby allowing features to be processed realy quick. The representation is calculated by taking the sum of the pixels above and to the left of the x, y locations.
+\item AdoBoost: This is a trainingalgorithm used to train classifiers to select a small amount of critical features out of a bigger set thus creating very efficient classifiers.
+\item Classifiercascade: Building a cascade reduces the amount of backgroundnoise drasticly. The cascade represents a decisiontree that either rejects a subwindow or lets it go deeper in the tree.
+\end{itemize}
+
+The Lienhart and Maydt method extended this by using the original Haar-like features but rotated vor 45 degrees.
+
 \section{How it works}
 This approach uses statistical models, so called classifiers. These are created by extensive training using a pool of test images. These pools consists of positive and negative samples, respectively images that contain pedestrians and images that don't. 
 From these sample images features will be extracted and the features which classify that pedestrians are selected. These are the so called Haar-like features. The general flow of this process is shown in Figure~\ref{fig:flowchart}.
@@ -148,6 +158,8 @@ performance \= -data haar-cascade.xml \\
 The \texttt{tests.dat} file contains a list of testing images and the \texttt{ni} parameter is used so the performance-utility will not output any detection images. The performance-utility will then output the number of correct detections, the number of missed or false negatives and the number of false positives.
 \section{Experimental results}
 
+To test the detector created by OpenCV we used a set of 40 positive images and 60 negative images. A Receiver Operating Characteristic curve showing the performance of our detector on this test set is shown in Figure \ref{fig:roc}. We can hereby conclude that a small increase in false positives detected will result in a very steep increase in number of true positives found at start. But any increase past the 20\% false postives mark will result in a smaller amount of increased true positive cases then the number of extra false positives.
+
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.68]{roc.png}
@@ -155,9 +167,7 @@ The \texttt{tests.dat} file contains a list of testing images and the \texttt{ni
 	\label{fig:roc}
 \end{figure}
 
-To test the detector created by OpenCV we used a set of 40 positive images and 60 negative images. A Receiver Operating Characteristic curve showing the performance of our detector on this test set is shown in Figure \ref{fig:roc}. We can hereby conclude that a small increase in false positives detected will result in a very steep increase in number of true positives found at start. But any increase past the 20\% false postives mark will result in a smaller amount of increased true positive cases then the number of extra false positives.
-
-We also tested the speed and number of positive and negative detections when reducing the orignal size (1280x720px) of the images to 80\%, 60\% and 40\%. The results of this test can be found in Table \ref{table:test}. As you can see from these results the bigger the size of the image is the more people are detected but also the detection time increases. Going from 40\% to 100\% image size gives us a gain of 25\% more people detected. The detection time is multiplied by 800\% from 100ms to 900ms when increasing the quality of the picture. The number of false detections is multiplied by 5 for that matter.
+We also tested the speed and number of positive and negative detections when reducing the orignal size (1280x720px) of the images to 80\%, 60\% and 40\%. The results of this test can be found in Table \ref{table:test}. As you can see from these results the bigger the size of the image is the more people are detected but also the detection time increases. Going from 40\% to 100\% image size gives us a gain of 25\% more people detected. It does increase multiply the detection time by 800\% from 100ms to 900ms. The number of false detections is multiplied by 5 for that matter.
 
 \begin{table}[h!]
 \centering
