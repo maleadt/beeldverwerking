@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (MiKTeX 2.8) (preloaded format=pdflatex 2011.5.25)  19 JUN 2011 21:24
+This is pdfTeX, Version 3.1415926-1.40.10 (MiKTeX 2.8) (preloaded format=pdflatex 2011.5.25)  20 JUN 2011 19:27
 entering extended mode
 **verslag.tex
 (F:\School\Master\Beeldverwerking\beeldverwerking\verslag\verslag.tex
@@ -81,7 +81,7 @@ Package babel Info: Making " an active character on input line 132.
 s\a4.sty"
 Package: a4 2004/04/15 v1.2g A4 based page layout
 )
-No file verslag.aux.
+(F:\School\Master\Beeldverwerking\beeldverwerking\verslag\verslag.aux)
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 6.
 LaTeX Font Info:    ... okay on input line 6.
 LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 6.
@@ -94,38 +94,25 @@ LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 6.
 LaTeX Font Info:    ... okay on input line 6.
 LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 6.
 LaTeX Font Info:    ... okay on input line 6.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <12> on input line 7.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 7.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 7.
-
-Overfull \hbox (12.86938pt too wide) in paragraph at lines 19--19
-[]\OT1/cmr/bx/n/12 "An ex-tended set of haar-like fea-tures for rapid ob-ject d
-etection$\OT1/cmr/m/n/12 "$
- []
-
-[1
+ [1
 
 {C:/Documents and Settings/Ruben/Local Settings/Application Data/MiKTeX/2.8/pdf
 tex/config/pdftex.map}]
 (F:\School\Master\Beeldverwerking\beeldverwerking\verslag\verslag.aux) ) 
 Here is how much of TeX's memory you used:
- 921 strings out of 495289
- 11628 string characters out of 3180555
+ 902 strings out of 495289
+ 11543 string characters out of 3180555
  66243 words of memory out of 3000000
- 4161 multiletter control sequences out of 15000+200000
- 6683 words of font info for 24 fonts, out of 3000000 for 9000
+ 4148 multiletter control sequences out of 15000+200000
+ 3948 words of font info for 15 fonts, out of 3000000 for 9000
  14 hyphenation exceptions out of 8191
- 25i,4n,24p,471b,111s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 25i,4n,24p,471b,109s stack positions out of 5000i,500n,10000p,200000b,50000s
 <C:/Pro
-gram Files/MiKTeX 2.8/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Program Fil
-es/MiKTeX 2.8/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Program Files/MiKTeX
- 2.8/fonts/type1/public/amsfonts/cm/cmr12.pfb>
-Output written on verslag.pdf (1 page, 46188 bytes).
+gram Files/MiKTeX 2.8/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Program Fil
+es/MiKTeX 2.8/fonts/type1/public/amsfonts/cm/cmr10.pfb>
+Output written on verslag.pdf (1 page, 40495 bytes).
 PDF statistics:
- 18 PDF objects out of 1000 (max. 8388607)
+ 14 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
