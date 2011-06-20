@@ -5,6 +5,7 @@
 \documentclass{article}
 \usepackage{spconf,amsmath,epsfig}
 \usepackage[english]{babel}
+\usepackage{array}
 
 % Example definitions.
 % --------------------
@@ -26,7 +27,7 @@
 \maketitle
 %
 \begin{abstract}
-In this paper a solution for pedestrian detection is described using Haar-like features. It is being developed to be used in a tram collision avoidance project. 
+In this paper a solution for pedestrian detection is described using Haar-like features. It is being developed to be used in a tram collision avoidance project. OpenCV~\cite{opencv} is used as implementation framework. In this paper a short introduction is given about Haar-like features and experimental results are obtained using the OpenCV implementation.
 \end{abstract}
 %
 \begin{keywords}
@@ -35,31 +36,29 @@ Pedestrian Detection, Haar-like Features, AdaBoost Classification
 %
 \section{Introduction}
 \label{sec:intro}
-Object detection is a very important element in computer vision areas. The goal is to find a predefined object in a set of images or video frames. This task can be fulfilled using template matching techniques extracting certain image features such as edges, color regions, textures and contours.
+Object detection is a very important element in computer vision areas. The goal is to find a predefined object in a set of images or video frames. This task can be fulfilled using template matching techniques extracting certain image features such as edges, color regions, textures and contours. Therefore template matching approaches aren't sufficient.
 \par
-Alas for complex objects such as pedestrians these features are hard to find due the great variety of instances of these pedestrians. This huge variety is caused by the following major problems~\cite{monteiro2006vision}:
-\begin{itemize}
-\item The size, color and style of pedestrian clothing are very diverse. Examples are shown in Figure~\ref{fig:people}.
-\item Pedestrians are non-rigid bodies. Their shape and size differ greatly and therefore they are more complex then rigid objects.
-\item Not only the pedestrians are part of the problem, but the background too. It can cause cluttering or can be mistaken for pedestrians due to its composition.
-\item Illumination and weather conditions can lower the distinction between background and pedestrian.
-\item Also the lack in motion due the slow speed of pedestrians hardens the possibility for them to be detected.
-\end{itemize}
+%\par
+%Alas for complex objects such as pedestrians these features are hard to find due the great variety of instances of these pedestrians. This huge variety is caused by the following major problems~\cite{monteiro2006vision}:
+%\begin{itemize}
+%\item The size, color and style of pedestrian clothing are very diverse. Examples are shown in Figure~\ref{fig:people}.
+%\item Pedestrians are non-rigid bodies. Their shape and size differ greatly and therefore they are more complex then rigid objects.
+%\item Not only the pedestrians are part of the problem, but the background too. It can cause cluttering or can be mistaken for pedestrians due to its composition.
+%\item Illumination and weather conditions can lower the distinction between background and pedestrian.
+%\item Also the lack in motion due the slow speed of pedestrians hardens the possibility for them to be detected.
+%\end{itemize}
 Instead of using the template matching approach, another possible method has been described by Viola and Jones~\cite{viola2001rapid} and extended by Lienhart and Maydt~\cite{lienhart2002extended}.
-
+\par
 The method of Viola and Jones uses three different algorithms:
 \begin{itemize}
 \item Integral Image: This algorithm enhances the representation of images thereby allowing features to be processed realy quick. The representation is calculated by taking the sum of the pixels above and to the left of the x, y locations.
-\item AdoBoost: This is a trainingalgorithm used to train classifiers to select a small amount of critical features out of a bigger set thus creating very efficient classifiers.
+\item AdaBoost: This is a trainingalgorithm used to train classifiers to select a small amount of critical features out of a bigger set thus creating very efficient classifiers.
 \item Classifiercascade: Building a cascade reduces the amount of backgroundnoise drasticly. The cascade represents a decisiontree that either rejects a subwindow or lets it go deeper in the tree.
 \end{itemize}
-
-The Lienhart and Maydt method extended this by using the original Haar-like features but rotated vor 45 degrees.
-
+The Lienhart and Maydt method extended this by using the original Haar-like features but rotated over 45 degrees.
 \section{How it works}
 This approach uses statistical models, so called classifiers. These are created by extensive training using a pool of test images. These pools consists of positive and negative samples, respectively images that contain pedestrians and images that don't. 
 From these sample images features will be extracted and the features which classify that pedestrians are selected. These are the so called Haar-like features. The general flow of this process is shown in Figure~\ref{fig:flowchart}.
-
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.5]{HaarTrainingFlowChart.png}
@@ -75,14 +74,12 @@ From these sample images features will be extracted and the features which class
 \section{Haar-like features}
 A Haar-like feature is represented by a template, its coordinate relative to the sub window and his size.
 The template, a shape, is composed of two or three rectangles joined together. Each of these rectangles is colored black or white. Three of these Haar-like features are displayed in Figure~\ref{fig:features}. These rectangles can be turned horizontal, vertical or even  diagonal, an extension proposed in~\cite{lienhart2002extended}.
-
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.6]{Features.png}
 	\caption{Prototypes of Haar-like features.}
 	\label{fig:features}
 \end{figure}
-
 \par
 For each feature a value is calculated for each position in the search sub window. These values sum up the pixel intensities in these regions and calculates the difference between them. This difference is then used to check whether the feature resembles with this position on the sub window.
 \par
@@ -157,44 +154,47 @@ performance \= -data haar-cascade.xml \\
 \end{tabbing}}
 The \texttt{tests.dat} file contains a list of testing images and the \texttt{ni} parameter is used so the performance-utility will not output any detection images. The performance-utility will then output the number of correct detections, the number of missed or false negatives and the number of false positives.
 \section{Experimental results}
-
-To test the detector created by OpenCV we used a set of 40 positive images and 60 negative images. A Receiver Operating Characteristic curve showing the performance of our detector on this test set is shown in Figure \ref{fig:roc}. We can hereby conclude that a small increase in false positives detected will result in a very steep increase in number of true positives found at start. But any increase past the 20\% false postives mark will result in a smaller amount of increased true positive cases then the number of extra false positives.
-
+The OpenCV implementation is tested using a pool of samples. This pool consists of fourty positive and sixty negative samples. Each of the positive samples may contain one or more people and these people can walk widely apart or be packed together. Some results are shown in Figures~\ref{fig:pdetection1} and~\ref{fig:pdetection2}.
+\par
+In Figure~\ref{fig:roc} an ROC curve is showing the performance outcome of the OpenCV pedestrian detection using Haar-like features is shown. The ROC represents the fraction of true positives out of the positives versus the fraction of false positives out of the negatives.
+\par
+As seen initially a small increase in false positive detection rate will result in a high increase in the number of true positives found. At approximatly the 10\,\% mark the high increase in true positives is slowed down drastically. Each further increase in false positive detection increases the true positives only sublineair instead of a exponentially before. This behavior is as expected.
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.68]{roc.png}
 	\caption{ROC of the test results}
 	\label{fig:roc}
 \end{figure}
-
-We also tested the speed and number of positive and negative detections when reducing the orignal size (1280x720px) of the images to 80\%, 60\% and 40\%. The results of this test can be found in Table \ref{table:test}. As you can see from these results the bigger the size of the image is the more people are detected but also the detection time increases. Going from 40\% to 100\% image size gives us a gain of 25\% more people detected. It does increase multiply the detection time by 800\% from 100ms to 900ms. The number of false detections is multiplied by 5 for that matter.
-
-\begin{table}[h!]
+\par
+To further optimize the results gained using the OpenCV implementation another test is performed. Again the comparison is made between the number of positive and negative detections. This time an alteration is made to the image size. The image sizes are each time reduced with 20\,\% given new image sizes as shown in Table~\ref{table:test}. The image's original size is 1280\,px by 720\,px.
+\par
+A noticable fact is that resizing the image might improve the performance of the pedestrian detection greatly. The detection time reduces exponentially as the image size gets smaller. The more the image is rescaled to a smaller format the lower the detection rate gets for both true and false positives.
+\par
+If speed is of great importance the image can be sized down to approximately 40\,\% and still have a detection rate of 60\,\%. Is the detection rate of greater importance the image can be sized down with 20\,\%. This gives the same detection rate for true positives and even lowers the false positive detection rate. Moreover the duration of the detection is reduced by about 30\,\%.
+\begin{table}
 \centering
-\scalebox{0.9}{%
-    \begin{tabular}{ | c | c | c | c |}
+\scalebox{0.9}{
+    \begin{tabular}{ | m{2cm} | m{2cm}  | m{2cm} | m{2cm}  |}
     \hline
-    Image size & Detection time & People detected & False detections \\ \hline
-    100\%  & 900ms & 85\% & 10\% \\  \hline
-    80\%   & 600ms & 85\% & 5\% \\  \hline
-    60\%   & 280ms & 80\% & 3\% \\  \hline
-    40\%   & 100ms & 60\% & 2\% \\ \hline
+    \textbf{Image size} & \textbf{Detection time} & \textbf{True positive detection rate} & \textbf{False positive detection rate} \\ \hline
+    100\,\%  & 900\,ms & 85\,\% & 10\,\% \\  \hline
+    80\,\%   & 600\,ms & 85\,\% & 5\,\% \\  \hline
+    60\,\%   & 280\,ms & 80\,\% & 3\,\% \\  \hline
+    40\,\%   & 100\,ms & 60\,\% & 2\,\% \\ \hline
     \end{tabular}}
 \caption{Test results when resizing the image}
 \label{table:test}
 \end{table}
-
-Figure \ref{fig:pdetection1} and \ref{fig:pdetection2} show the output of our detector on some of the test images.
 \begin{figure}[h!]
 	\centering
-	\includegraphics[scale=0.60]{peopledetection1.png}
-	\caption{People detection: two people as a group}
+	\includegraphics[scale=0.75]{peopledetection1.png}
+	\caption{Detection of a pair of people}
 	\label{fig:pdetection1}
 \end{figure}
 \begin{figure}[h!]
 	\centering
-	\includegraphics[scale=0.4]{peopledetection2.png}
-	\caption{People detection: two seperate}
+	\includegraphics[scale=0.5]{peopledetection2.png}
+	\caption{Detection of two seperate people}
 	\label{fig:pdetection2}
 \end{figure}
 \section{Conclusion}
