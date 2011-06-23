@@ -2,3 +2,6 @@
 *.qm
 *-build-*
 *~
+*.aux
+*.log
+*.synctex.gz
