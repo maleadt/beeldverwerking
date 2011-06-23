@@ -34,7 +34,27 @@
     <body>
         <div class="presentation">
             <div id="presentation-counter">Loading...</div>
-
+            <!--
+                Auxiliary styles
+            -->
+            
+            <!-- Nice style to include photos and pictures -->
+            <style> 
+              #photo {
+                margin: 0 auto;
+                display: block;
+                border: 3px solid #ccc;
+              }
+              figure {
+                display: block;
+                text-align: center;
+              }
+              figcaption {
+                display: block;
+              }
+            </style>
+            
+            
             <!--
                 Introduction
             -->
@@ -114,16 +134,47 @@
                 <div class="slide transitionSlide" id="wp1-title">
                     <section class="middle">
                         <h2>Track detection</h2>
-                        <p>Een subtitel</p>
+                        <p>Low-contrast edge detection</p>
                     </section>
                 </div>
 
-                <div class="slide" id="wp1-content-slide">
-                    <header>Huidige situatie</header>
+                <!-- Similar projects -->
+                
+                <div class="slide" id="wp1-similar-slide">
+                    <header>Similar projects</header>
                     <section>
-                        <p>
-                            Blabla.
-                        </p>
+                    <h2>Road lane detection</h2>
+                        <div>
+                            <figure> 
+                              <img id="photo" src="res/road lane.jpg" /> 
+                              <figcaption>Sample picture of a road lane.</figcaption> 
+                            <figure>
+                        </div>
+                        
+                        <ul class="bullets">
+                            <li><strong>High-contrast image</strong>: easy edge detection</li>
+                            <li><strong>Clear lane markers</strong>: feature detection</li>
+                        </ul>
+                    </section>
+                </div>
+                
+                <!-- Issues with track detection -->
+                
+                <div class="slide" id="wp1-issues-slide">
+                    <header>Similar projects</header>
+                    <section>
+                    <h2>Issues with track detection</h2>
+                        <div>
+                            <figure> 
+                              <img id="photo" src="res/track issues.png" /> 
+                              <figcaption>Sample picture of a typical tramway track.</figcaption> 
+                            <figure>
+                        </div>
+                        
+                        <ul class="bullets">
+                            <li><strong>Low-contrast image</strong>: edge detection has low S/N</li>
+                            <li><strong>No clear indicators</strong>: difficult feature extraction</li>
+                        </ul>
                     </section>
                 </div>
 
