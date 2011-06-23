@@ -165,7 +165,7 @@
                 <div class="slide transitionSlide" id="wp1-title">
                     <section class="middle">
                         <h2>Track detection</h2>
-                        <p>Low-contrast edge detection</p>
+                        <p>Robust edge detection</p>
                     </section>
                 </div>
 
@@ -405,7 +405,7 @@
                     <section>
                         <p>
                             <ul class="bullets">
-                                <li><strong>Speed</strong>: <em>fast</em>, about ~10 ms (100 FPS) for 720p images</li>
+                                <li><strong>Speed</strong>: <em>fast</em>, ~10 ms (100 FPS) for 720p images</li>
                                 <li><strong>Quality</strong>: quite good, but not ultimately reliable</li>
                                 <li><strong>Problems</strong>: extremely low contrast, curved tracks</li>
                             </ul>
@@ -493,16 +493,35 @@
                 <div class="slide transitionSlide" id="application-title">
                     <section class="middle">
                         <h2>Final application</h2>
-                        <p>How we encapsulated the different components in a functional entity.</p>
+                        <p>Performance and intuitiveness</p>
                     </section>
                 </div>
 
-                <div class="slide" id="application-content-slide">
-                    <header>Content slides</header>
+                <div class="slide" id="application-features-slide">
+                    <header>Features</header>
                     <section>
                         <p>
-                            Blabla.
+                            <ul class="bullets">
+                                <li><strong>Qt-based UI</strong>: user-friendly and native interface</li>
+                                <li><strong>OpenGL</strong>: improved drawing performance</li>
+                                <li><strong>OpenMP</strong>: independant parts of the components are executed in parallel</li>
+                                <li><strong>Feature cache</strong>: if one component fails, others continue to work with previous data (until it expires)</li>
+                            </ul>
                         </p>
+                    </section>
+                </div>
+
+                <div class="slide" id="application-screenshot-slide">
+                    <header>Screenshot</header>
+                    <section>                        
+                        <div>
+                            <figure> 
+                                <img id="photo" src="res/application.png" /> 
+                                <figcaption>
+                                    The application in action.
+                                </figcaption> 
+                            <figure>
+                        </div>
                     </section>
                 </div>
 
