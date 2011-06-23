@@ -89,7 +89,7 @@ body {
 }
 
 .slide p, .slide textarea {
-  font-size: 20px;
+  font-size: 30px;
 }
 
 .slide .counter {
@@ -151,7 +151,7 @@ body {
 .slide.transitionSlide h2 {
   font-size: 40px;
   margin: 0;
-  line-height: 10px;
+  line-height: 25px;
 }
 .slide.transitionSlide p {
   margin: 0;
@@ -313,7 +313,7 @@ h1 {
 h2 {
   font-family: Arial;
   color: black;
-  font-size: 20px;
+  font-size: 32px;
   padding: 0;
   margin: 15px 0 5px 0;
 }
@@ -368,7 +368,7 @@ pre button {
 }
 
 .bullets {
-  font-size: 40px;
+  font-size: 30px;
 }
 
 section.left {
