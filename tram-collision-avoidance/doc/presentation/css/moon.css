@@ -98,7 +98,7 @@ body {
   left: 20px;
   bottom: 20px;
   display: block;
-  font-size: 12px;
+  font-size: 20px;
   width: 100%;
 }
 
@@ -112,34 +112,6 @@ body {
   bottom: 0;
   right: 45px;
   opacity: 0.25;
-}
-
-.offline-storage .counter:after {
-  background-image: url(http://www.html5rocks.com/static/images/identity/classes_32/HTML5_Offline_Storage_32.png);
-}
-
-.realtime-communication .counter:after {
-  background-image: url(http://www.html5rocks.com/static/images/identity/classes_32/HTML5_Connectivity_32.png);
-}
-
-.performance .counter:after {
-  background-image: url(http://www.html5rocks.com/static/images/identity/classes_32/HTML5_Performance_32.png);
-}
-
-.semantics .counter:after {
-  background-image: url(http://www.html5rocks.com/static/images/identity/classes_32/HTML5_Semantics_32.png);
-}
-
-.multimedia .counter:after {
-  background: url(http://www.html5rocks.com/static/images/identity/classes_32/HTML5_MultiMedia_32.png);
-}
-
-.effects .counter:after {
-  background: url(http://www.html5rocks.com/static/images/identity/classes_32/HTML5_3D_Effects_32.png);
-}
-
-.styling .counter:after {
-  background: url(http://www.html5rocks.com/static/images/identity/classes_32/HTML5_Styling_32.png);
 }
 
 .slide.title > .counter,
@@ -333,7 +305,7 @@ section, footer {
 }
 
 footer {
-  font-size: 12px;
+  font-size: 20px;
   margin: 20px 0 0 30px;
 }
 
