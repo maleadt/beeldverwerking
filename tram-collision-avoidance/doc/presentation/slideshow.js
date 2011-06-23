@@ -301,7 +301,7 @@
 		doc.addEventListener('touchend',
 		function(e) { _t.handleTouchEnd(e); }, false);
 		window.addEventListener('popstate',
-		function(e) { if (e.state) { _t.go(e.state); } }, false);
+		function(e) { if (e.state) { _t.go(e.state, true); } }, false);
 		query('#left-init-key').addEventListener('click',
 		function() { _t.next(); }, false);
 		this._update();
@@ -320,14 +320,29 @@
 			});
 			return slideCount + 1;
 		},
-		_update: function(dontPush) {
+		_update: function(targetId, dontPush) {
 			// in order to delay the time where the counter shows the slide number we check if
 			// the slides are already loaded (so we show the loading... instead)
 			// the technique to test visibility is taken from here
 			// http://stackoverflow.com/questions/704758/how-to-check-if-an-element-is-really-visible-with-javascript
+            var currentIndex = this._getCurrentIndex();
+
+            if (targetId) {
+                var savedIndex = currentIndex;
+                this.current = targetId;
+                currentIndex = this._getCurrentIndex();
+                if (Math.abs(savedIndex - currentIndex) > 1) {
+                    // if the current switch is not "prev" or "next", we need clear
+                    // the state setting near the original slide
+                    for (var x = savedIndex; x < savedIndex + 7; x++) {
+                        if (this._slides[x-4]) {
+                            this._slides[x-4].setState(0);
+                        }
+                    }
+                }
+            }
 			var docElem = document.documentElement;
 			var elem = document.elementFromPoint( docElem.clientWidth / 2, docElem.clientHeight / 2);
-			var currentIndex = this._getCurrentIndex();
 			if (elem && elem.className != 'presentation') {
 				this._presentationCounter.textContent = currentIndex;
 			}
@@ -338,9 +353,9 @@
 			} else {
 				window.location.hash = this.current;
 			}
-			for (var x = currentIndex-1; x < currentIndex + 7; x++) {
+			for (var x = currentIndex; x < currentIndex + 7; x++) {
 				if (this._slides[x-4]) {
-					this._slides[x-4].setState(Math.max(0, x-currentIndex));
+					this._slides[x-4].setState(x-currentIndex);
 				}
 			}
 		},
@@ -349,27 +364,20 @@
 		next: function() {
 			if (!this._slides[this._getCurrentIndex() - 1].buildNext()) {
 				var next = query('#' + this.current + ' + .slide');
-				this.current = (next) ? next.id : this.current;
-				this._update();
+                //this.current = (next) ? next.id : this.current;
+                this._update((next) ? next.id : this.current);
 			}
 		},
 		prev: function() {
 			var prev = query('.slide:nth-child(' + (this._getCurrentIndex() - 1) + ')');
-			this.current = (prev) ? prev.id : this.current;
-			this._update();
+            //this.current = (prev) ? prev.id : this.current;
+            this._update((prev) ? prev.id : this.current);
 		},
-		go: function(slideId) {
-			this.current = slideId;
-			this._update(true);
+        go: function(slideId, dontPush) {
+            //this.current = slideId;
+            this._update(slideId, dontPush);
 		},
 
-		_notesOn: false,
-		showNotes: function() {
-			var isOn = this._notesOn = !this._notesOn;
-			queryAll('.notes').forEach(function(el) {
-				el.style.display = (notesOn) ? 'block' : 'none';
-			});
-		},
 		switch3D: function() {
 			toggleClass(document.body, 'three-d');
 		},
@@ -386,7 +394,6 @@
 			sessionStorage['theme'] = linkEls[(sheetIndex + 1) % linkEls.length].href;
 		},
 		handleKeys: function(e) {
-
 			if (/^(input|textarea)$/i.test(e.target.nodeName) || e.target.isContentEditable) {
 				return;
 			}
@@ -397,8 +404,6 @@
 				case 39: // right arrow
 				case 32: // space
 					this.next(); break;
-				case 50: // 2
-					this.showNotes(); break;
 				case 51: // 3
 					this.switch3D(); break;
 				case 84: // T
@@ -428,10 +433,23 @@
 	});
 
 	// Initialize
+    var li_array = [];
+    var transitionSlides = queryAll('.transitionSlide').forEach(function(el) {
+        li_array.push( ['<li><a data-hash="', el.id, '">',
+        query('h2', el).textContent, '</a></li>'].join('')
+        );
+    });
+
+    query('#toc-list').innerHTML = li_array.join('');
+    
 	var slideshow = new SlideShow(queryAll('.slide'));
 
 	document.addEventListener('DOMContentLoaded', function() {
 		query('.slides').style.display = 'block';
 	}, false);
+	
+    queryAll('#toc-list li a').forEach(function(el) {
+        el.onclick = function() { slideshow.go(el.dataset['hash']); };
+    });
 
 })();
