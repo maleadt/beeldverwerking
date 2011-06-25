@@ -123,7 +123,6 @@ void VehicleDetection::cropFrame() {
 void VehicleDetection::detectWheels() {
     cv::Mat img;
     cv::cvtColor(mFrameCropped, img, CV_RGB2GRAY);
-
     std::list<Rectangle*> lst;
     lst.resize(50, 0);
 
@@ -132,7 +131,6 @@ void VehicleDetection::detectWheels() {
         //Find all contours
         std::vector<std::vector<cv::Point> > contours;
         cv::Mat bimage = img >= i;
-
         findContours(bimage, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_TC89_L1 );
 
         for(size_t i = 0; i < contours.size(); i++)
