@@ -640,6 +640,15 @@
                 <div class="slide" id="wp4-pedestrians-haar">
                     <header>Boosted cascade of Haar-like features</header>
                     <section>
+                    	<ul class="bullets">
+                    		<li>Samples are created<br />&nbsp;&nbsp;&nbsp;&nbsp;createsamples (OpenCV)</li>
+							<li>Feature selection by extensive training</li>
+							<li>AdaBoost to select a small set of features<br />&nbsp;&nbsp;&nbsp;&nbsp;haartraining (OpenCV)</li>
+							<li>Detection with sliding window</li>
+                    	</ul>
+                    	<figure>
+                    		<img src="res/od_cascade.png" />
+                    	</figure>
                     </section>
                 </div>
                 <div class="slide" id="wp4-pedestrians-results">
@@ -670,6 +679,7 @@
                     	<ul class="bullets">
                     	  <li>Template matching<br />&nbsp;&nbsp;&nbsp;&nbsp;too much vehicle types</li>
                     	  <li>Haar like features<br />&nbsp;&nbsp;&nbsp;&nbsp;no generic features for all types of vehicles</li>
+                    	  <li>Texture matching<br />&nbsp;&nbsp;&nbsp;&nbsp;low quality of images</li>
                     	  <li>Contours<br />&nbsp;&nbsp;&nbsp;&nbsp;too much vehicle types</li>
                     	  <li>Detecting wheels</li>
                     	</ul>
@@ -716,7 +726,7 @@
                         <p>
                             <ul class="bullets">
                                 <li><strong>Speed</strong>: <em>fast</em>, 10 ms for 720p images</li>
-                                <li><strong>Quality</strong>: poor,<br />&nbsp;&nbsp;&nbsp;no detection for vehicles with more then four wheels,<br />&nbsp;&nbsp;&nbsp;not all cars are detected due to poor quality in images,<br />&nbsp;&nbsp;&nbsp;nonexistant vehicles found due to noise in the picture</li>
+                                <li><strong>Quality</strong>: ok,<br />&nbsp;&nbsp;&nbsp;no detection for vehicles with more then four wheels,<br />&nbsp;&nbsp;&nbsp;not all cars are detected due to poor quality in images,<br />&nbsp;&nbsp;&nbsp;nonexistant vehicles found due to noise in the picture</li>
                             </ul>
                         </p>
                         <figure>
