@@ -476,19 +476,117 @@
                 <div class="slide transitionSlide" id="wp3-title">
                     <section class="middle">
                         <h2>Distance calculation</h2>
-                        <p>Subtitle</p>
+                        <p></p>
                     </section>
                 </div>
 
-                <div class="slide" id="wp3-content-slide">
-                    <header>Content slides</header>
+                <div class="slide" id="wp3-alternatives">
+                    <header>Alternatives</header>
                     <section>
+                        <h2>Builtin OpenCV methods</h2>
                         <p>
-                            Blabla.
+                            <ul class="bullets">
+                              <li>cv::findHomography</li>
+                              <li>cv::projectPoints</li>
+                              <li>cv::warpPerspective</li>
+                            </ul>
                         </p>
+                            <br />
+                            <br />
+                        
+                        <center>
+                        <p>
+                            Missing lots of camera information
+                            <br />
+                            <img alt="distance_x_middle" src="res/od_downarrow.png" />      
+                            <br />
+                                Mathematical Solution
+                        </p></center>
                     </section>
                 </div>
+                
+                <div class="slide" id="wp3-method">
+                    <header>Method</header>
+                    <section data-build>
+                        <p>
+                            Step 1: Distance X-axis
+                        </p>
+                        <div style="position: absolute; left:500px; top: 125px"><strong><img src="res/distance_x_end.png" /></strong></div>
+                        <p>
+                            Step 2: Distance Y-axis
+                        </p>
+                        <div style="position: absolute; left:500px; top: 125px"><strong><img src="res/distance_y_end.png" /></strong></div>
+                        <p>
+                            Step 3: Total Distance
+                        </p>
+                        <div style="position: absolute; left:500px; top: 125px"><strong><img src="res/distance_end.png" /></strong></div>
+                           
+                    </section>
+                </div>
+                                
+                <div class="slide" id="wp3-distance-x">
+                    <header>Distance X-axis</header>
+                    <section data-build>
+                        <ul class="bullets">
+                              <li>Detected positions</li>
+                        </ul>                        
+                        <div style="position: absolute; left:550px; top: 125px"><strong><img alt="distance_x_start" src="res/distance_x_start.png" /></strong></div>
+                        
+                        <ul class="bullets">
+                              <li>Determine the middles</li>
+                              <li>Calculate difference X</li>
+                        </ul>
+                        <div style="position: absolute; left:550px; top: 125px"><strong><img alt="distance_x_middle" src="res/distance_x_middle.png" /></strong></div>
 
+                        <ul class="bullets">
+                              <li>Convert pixel to real distance</li>
+                              <li>Distance X-axis</li>
+                        </ul>
+                        <div style="position: absolute; left:550px; top: 125px"><strong><img alt="distance_x_end" src="res/distance_x_end.png" /></strong></div>
+                    </section>
+                </div>
+                                                
+                <div class="slide" id="wp3-distance-y">
+                    <header>Distance Y-axis</header>
+                    <section data-build>
+                        <ul class="bullets">
+                              <li>Detected positions</li>
+                              <li>Calucate difference Y</li>
+                        </ul>   
+                        <div style="position: absolute; left:550px; top: 125px"><strong><img src="res/distance_x_end.png" /></strong></div>
+                                                
+                        <ul class="bullets">
+                              <li>Calculate ratio</li>
+                              <li>Calculate ratio^3</li>
+                              <li>Distance Y-axis</li>
+                        </ul>
+                        <div style="position: absolute; left:550px; top: 125px"><strong><img src="res/distance_y_end.png" /></strong></div>
+                    </section>
+                </div>
+                                     
+                <div class="slide" id="wp3-distance-total">
+                    <header>Total Distance</header>
+                    <section data-build>
+                        <figure style="position: absolute; left:0px; top: 180px">
+                          <img src="res/distance_example_far.png" />
+                          <figcaption>
+						    20 m
+                          </figcaption>
+                        </figure>
+                        <figure style="position: absolute; left:305px; top: 195px">
+                          <img src="res/distance_example_middle.png" />
+                          <figcaption>
+						    10 m
+                          </figcaption>
+                        </figure>
+                        <figure style="position: absolute; left:570px; top: 180px">
+                          <img src="res/distance_example_close.png" />
+                          <figcaption>
+						    5 m
+                          </figcaption>
+                        </figure>
+                    </section>
+                </div>
 
                 <!--
                     WP4 - Obstacle detection
@@ -682,22 +780,29 @@
                 <div class="slide transitionSlide" id="conclusion-title">
                     <section class="middle">
                         <h2>Conclusion</h2>
-                        <p>Subtitle</p>
                     </section>
                 </div>
 
                 <div class="slide" id="conclusion-slide">
-                    <header>Content slides</header>
+                    <header>Conclusion</header>
                     <section>
-                        <p>
-                            Blabla.
-                        </p>
+                            <ul class="bullets"  data-build>
+                                <li>Good results overal</li>
+                                <li>Bit slow <img src="res/conclusion_rightarrow.png" /> needs tweaking</li>
+                            </ul>
                     </section>
                 </div>
 
                 <div class="slide" id="end-title">
+                    <style>
+                        #end-title h1 {
+                            color: black;
+                            letter-spacing: -2px;
+                            font-size: 96px;
+                        }
+                    </style>
                     <section class="middle">
-                        <h2>Thanks for your attention</h2>
+                        <h1>Questions?</h1>
                     </section>
                 </div>
 

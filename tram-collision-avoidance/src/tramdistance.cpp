@@ -65,7 +65,7 @@ void TramDistance::find_features(FrameFeatures& iFrameFeatures) throw(FeatureExc
         widthDistance = frameWidth * TRAM_WIDTH / iFrameFeatures.tram.width;
 
         double xDistance;
-        xDistance = (frameWidth/2 - tramHalfX.x) * widthDistance / frameWidth ;
+        xDistance = (trackHalfX.x - tramHalfX.x) * widthDistance / frameWidth ;
 
         double totalDistance = yDistance * yDistance + xDistance * xDistance;
         std::cout << "totalDist: " << sqrt(totalDistance) << std::endl;
