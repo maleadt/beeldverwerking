@@ -455,19 +455,203 @@
                 <div class="slide transitionSlide" id="wp2-title">
                     <section class="middle">
                         <h2>Tram detection</h2>
-                        <p>Subtitle</p>
                     </section>
                 </div>
 
-                <div class="slide" id="wp2-content-slide">
-                    <header>Content slides</header>
+
+                <!-- Similar projects -->
+
+                <div class="slide" id="wp2-similar-slide">
+                    <header>Similar projects</header>
                     <section>
+                        <h2>Car detection</h2>
                         <p>
-                            Blabla.
+                            <ul class="bullets">
+                                <li><strong>Haar-training</strong></li>
+                            </ul>
+                        </p>
+
+                        <div>
+                            <figure>
+                                <img id="photo" src="res/car.jpg" />
+                                <figcaption>Sample picture of car detection.</figcaption>
+                            <figure>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Issues -->
+
+                <div class="slide" id="wp2-issues1-slide">
+                    <header>Issues</header>
+                    <section>
+			<h2>Is it or is it not a tram?</h2>
+                        <p>
+                            <ul class="bullets">
+                                <li>Cars</li>
+                                <li>Environment</li>
+                            </ul>
+                        </p>
+
+                        <div>
+                            <figure>
+                                <img id="photo" src="res/not_a_tram.png" />
+                                <figcaption>Not a tram!<br />
+                                </figcaption>
+                            <figure>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Solutions -->
+
+                <div class="slide" id="wp2-solutions1-slide">
+                    <header>Possible solutions</header>
+                    <section>
+			<h2>Haar-training</h2>
+                        <p>
+			    <strong>Necessities:</strong>
+                            <ul class="bullets">
+                                <li>Database of samples</li>
+                                <li>Intensive training for a classifier</li>
+                            </ul>
+                        </p>
+			<h2>Template matching</h2>
+                        <p>
+			    <strong>Necessities:</strong>
+                            <ul class="bullets">
+                                <li>Template</li>
+                            </ul>
                         </p>
                     </section>
                 </div>
 
+                <!-- Image preprocessing -->
+
+                <div class="slide" id="wp2-preprocess1-slide">
+                    <header>Image preprocessing</header>
+                    <section>
+			<h2>Static cropping</h2>
+                        <p>
+		            The position of the camera is constant. Cropping:
+			    <ul class="bullets">
+                                <li>Top border</li>
+                                <li>Right and left borders</li>
+                            </ul>
+                        </p>
+                        <div>
+                            <figure>
+                                <img id="photo" src="res/static_cropping.png" />
+                                <figcaption>
+                                    Result of the static cropping.
+                                </figcaption>
+                            <figure>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="slide" id="wp2-preprocess2-slide">
+                    <header>Image preprocessing</header>
+                    <section>
+			<h2>Dynamic cropping</h2>
+                        <p>
+		            Using the position of the tracks.
+                        </p>
+                        <div>
+                            <figure>
+                                <img id="photo" src="res/dynamic_cropping.png" />
+                                <figcaption>
+                                    Result of the dynamic cropping.
+                                </figcaption>
+                            <figure>
+                        </div>
+                    </section>
+                </div>
+
+		<!--- Solution -->
+
+                <div class="slide" id="wp2-solutions2-slide">
+                    <header>Template matching, our choice</header>
+                    <section>
+                        <p>
+			    <strong>Possible methods:</strong>
+                            <ul class="bullets">
+                                <li>Squared difference</li>
+                                <li>Cross correlation</li>
+				<li>Correlation coefficient</li>
+                            </ul>
+                        </p>
+                    </section>
+                </div>
+
+                <div class="slide" id="wp2-solutions3-slide">
+                    <header>Template matching, our choice</header>
+                    <section>
+                        <p>
+                        </p>
+                    </section>
+                    <figure>
+                        <img id="photo" src="res/cross_correlation.png" />
+                        <figcaption>
+                            Correlation coefficient template matching method.
+                        </figcaption>
+                    <figure>
+                </div>
+
+                <div class="slide" id="wp2-solutions4-slide">
+                    <header>Template matching, our choice</header>
+                    <section>
+			<h2>OpenCV</h2>
+                        <p>
+			    <strong>Implementation</strong>
+                            <ul class="bullets">
+                                <li>void matchTemplate(const Mat& image, const Mat& templ, Mat& result, int method)</li>
+                                <li>void minMaxLoc(const SparseMat& src, double* minVal, double* maxVal, int* minIdx=0, int* maxIdx=0)</li>
+                            </ul>
+                        </p>
+                    </section>
+                </div>
+
+                <div class="slide" id="wp2-solutions5-slide">
+                    <header>Template matching, problems</header>
+                    <section>
+			<h2>Problems</h2>
+                        <p>
+                            <ul class="bullets">
+                                <li>No tram?</li>
+                                <li>Time consuming, ~125 ms</li>
+				<li>Scaling</li>
+                            </ul>
+			</p>
+			<h2>Solutions</h2>
+                        <p>
+                            <ul class="bullets">
+                                <li>Threshold</li>
+                                <li>Scaling the images of the video to lower resolution</li>
+				<li>Dynamic template scaling</li>
+                            </ul>
+			</p>
+                    </section>
+                </div>
+
+		<!--- Results -->
+
+                <div class="slide" id="wp2-solutions6-slide">
+                    <header>Tram detection results</header>
+                    <section>
+                        <p>
+                            <ul class="bullets">
+                                <li><strong>Speed</strong>: <em>125</em> ms each frame</li>
+                                <li><strong>Quality</strong>: Okay, initial threshold sometimes to high</li>
+			</p>
+
+			<p>
+			<strong>Known issues</strong>
+			<br><br>
+			Scalability problem: good results vs duration
+			</p>
+                    </section>
+                </div>
 
                 <!--
                     WP3 - Distance calculation
@@ -476,19 +660,117 @@
                 <div class="slide transitionSlide" id="wp3-title">
                     <section class="middle">
                         <h2>Distance calculation</h2>
-                        <p>Subtitle</p>
+                        <p></p>
                     </section>
                 </div>
 
-                <div class="slide" id="wp3-content-slide">
-                    <header>Content slides</header>
+                <div class="slide" id="wp3-alternatives">
+                    <header>Alternatives</header>
                     <section>
+                        <h2>Builtin OpenCV methods</h2>
                         <p>
-                            Blabla.
+                            <ul class="bullets">
+                              <li>cv::findHomography</li>
+                              <li>cv::projectPoints</li>
+                              <li>cv::warpPerspective</li>
+                            </ul>
                         </p>
+                            <br />
+                            <br />
+
+                        <center>
+                        <p>
+                            Missing lots of camera information
+                            <br />
+                            <img alt="distance_x_middle" src="res/od_downarrow.png" />
+                            <br />
+                                Mathematical Solution
+                        </p></center>
                     </section>
                 </div>
 
+                <div class="slide" id="wp3-method">
+                    <header>Method</header>
+                    <section data-build>
+                        <p>
+                            Step 1: Distance X-axis
+                        </p>
+                        <div style="position: absolute; left:500px; top: 125px"><strong><img src="res/distance_x_end.png" /></strong></div>
+                        <p>
+                            Step 2: Distance Y-axis
+                        </p>
+                        <div style="position: absolute; left:500px; top: 125px"><strong><img src="res/distance_y_end.png" /></strong></div>
+                        <p>
+                            Step 3: Total Distance
+                        </p>
+                        <div style="position: absolute; left:500px; top: 125px"><strong><img src="res/distance_end.png" /></strong></div>
+
+                    </section>
+                </div>
+
+                <div class="slide" id="wp3-distance-x">
+                    <header>Distance X-axis</header>
+                    <section data-build>
+                        <ul class="bullets">
+                              <li>Detected positions</li>
+                        </ul>
+                        <div style="position: absolute; left:550px; top: 125px"><strong><img alt="distance_x_start" src="res/distance_x_start.png" /></strong></div>
+
+                        <ul class="bullets">
+                              <li>Determine the middles</li>
+                              <li>Calculate difference X</li>
+                        </ul>
+                        <div style="position: absolute; left:550px; top: 125px"><strong><img alt="distance_x_middle" src="res/distance_x_middle.png" /></strong></div>
+
+                        <ul class="bullets">
+                              <li>Convert pixel to real distance</li>
+                              <li>Distance X-axis</li>
+                        </ul>
+                        <div style="position: absolute; left:550px; top: 125px"><strong><img alt="distance_x_end" src="res/distance_x_end.png" /></strong></div>
+                    </section>
+                </div>
+
+                <div class="slide" id="wp3-distance-y">
+                    <header>Distance Y-axis</header>
+                    <section data-build>
+                        <ul class="bullets">
+                              <li>Detected positions</li>
+                              <li>Calucate difference Y</li>
+                        </ul>
+                        <div style="position: absolute; left:550px; top: 125px"><strong><img src="res/distance_x_end.png" /></strong></div>
+
+                        <ul class="bullets">
+                              <li>Calculate ratio</li>
+                              <li>Calculate ratio^3</li>
+                              <li>Distance Y-axis</li>
+                        </ul>
+                        <div style="position: absolute; left:550px; top: 125px"><strong><img src="res/distance_y_end.png" /></strong></div>
+                    </section>
+                </div>
+
+                <div class="slide" id="wp3-distance-total">
+                    <header>Total Distance</header>
+                    <section data-build>
+                        <figure style="position: absolute; left:0px; top: 180px">
+                          <img src="res/distance_example_far.png" />
+                          <figcaption>
+						    20 m
+                          </figcaption>
+                        </figure>
+                        <figure style="position: absolute; left:305px; top: 195px">
+                          <img src="res/distance_example_middle.png" />
+                          <figcaption>
+						    10 m
+                          </figcaption>
+                        </figure>
+                        <figure style="position: absolute; left:570px; top: 180px">
+                          <img src="res/distance_example_close.png" />
+                          <figcaption>
+						    5 m
+                          </figcaption>
+                        </figure>
+                    </section>
+                </div>
 
                 <!--
                     WP4 - Obstacle detection
@@ -542,6 +824,15 @@
                 <div class="slide" id="wp4-pedestrians-haar">
                     <header>Boosted cascade of Haar-like features</header>
                     <section>
+                    	<ul class="bullets">
+                    		<li>Samples are created<br />&nbsp;&nbsp;&nbsp;&nbsp;createsamples (OpenCV)</li>
+							<li>Feature selection by extensive training</li>
+							<li>AdaBoost to select a small set of features<br />&nbsp;&nbsp;&nbsp;&nbsp;haartraining (OpenCV)</li>
+							<li>Detection with sliding window</li>
+                    	</ul>
+                    	<figure>
+                    		<img src="res/od_cascade.png" />
+                    	</figure>
                     </section>
                 </div>
                 <div class="slide" id="wp4-pedestrians-results">
@@ -572,6 +863,7 @@
                     	<ul class="bullets">
                     	  <li>Template matching<br />&nbsp;&nbsp;&nbsp;&nbsp;too much vehicle types</li>
                     	  <li>Haar like features<br />&nbsp;&nbsp;&nbsp;&nbsp;no generic features for all types of vehicles</li>
+                    	  <li>Texture matching<br />&nbsp;&nbsp;&nbsp;&nbsp;low quality of images</li>
                     	  <li>Contours<br />&nbsp;&nbsp;&nbsp;&nbsp;too much vehicle types</li>
                     	  <li>Detecting wheels</li>
                     	</ul>
@@ -618,7 +910,7 @@
                         <p>
                             <ul class="bullets">
                                 <li><strong>Speed</strong>: <em>fast</em>, 10 ms for 720p images</li>
-                                <li><strong>Quality</strong>: poor,<br />&nbsp;&nbsp;&nbsp;no detection for vehicles with more then four wheels,<br />&nbsp;&nbsp;&nbsp;not all cars are detected due to poor quality in images,<br />&nbsp;&nbsp;&nbsp;nonexistant vehicles found due to noise in the picture</li>
+                                <li><strong>Quality</strong>: ok,<br />&nbsp;&nbsp;&nbsp;no detection for vehicles with more then four wheels,<br />&nbsp;&nbsp;&nbsp;not all cars are detected due to poor quality in images,<br />&nbsp;&nbsp;&nbsp;nonexistant vehicles found due to noise in the picture</li>
                             </ul>
                         </p>
                         <figure>
@@ -682,22 +974,41 @@
                 <div class="slide transitionSlide" id="conclusion-title">
                     <section class="middle">
                         <h2>Conclusion</h2>
-                        <p>Subtitle</p>
                     </section>
                 </div>
 
                 <div class="slide" id="conclusion-slide">
-                    <header>Content slides</header>
-                    <section>
-                        <p>
-                            Blabla.
-                        </p>
+                    <header>Conclusion</header>
+                    <section data-build>
+                            <p>
+                                4 Work packages:
+                                <ul class="bullets" data-build>
+                                    <li>Track Detection  <img src="res/green_tick.png" /></li>
+                                    <li>Tram Detection  <img src="res/green_tick.png" /></li>
+                                    <li>Distance Calculation  <img src="res/green_tick.png" /></li>
+                                    <li>Obstacle Detection  <img src="res/green_tick.png" /></li>
+                                </ul>
+                            </p>
+                            <p>
+                                Project Results:
+                                <ul class="bullets" data-build>
+                                    <li>Good detection overall</li>
+                                    <li>Bit slow <img src="res/conclusion_rightarrow.png" /> needs tweaking</li>
+                                </ul>
+                            </p>
                     </section>
                 </div>
 
                 <div class="slide" id="end-title">
+                    <style>
+                        #end-title h1 {
+                            color: black;
+                            letter-spacing: -2px;
+                            font-size: 96px;
+                        }
+                    </style>
                     <section class="middle">
-                        <h2>Thanks for your attention</h2>
+                        <div><img src="res/questions.png" /></div>
                     </section>
                 </div>
 
