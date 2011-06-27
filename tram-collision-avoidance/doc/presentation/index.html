@@ -526,35 +526,6 @@
                     </section>
                 </div>
 
-                <div class="slide" id="wp2-solutions2-slide">
-                    <header>Template matching, our choice</header>
-                    <section>
-                        <p>
-			    <strong>Possible methods:</strong>
-                            <ul class="bullets">
-                                <li>Squared difference</li>
-                                <li>Cross correlation</li>
-				<li><strong>Correlation coefficient</strong></li>
-                            </ul>
-			Select minimum or maximum gives best position.
-                        </p>
-                    </section>
-                </div>
-
-                <div class="slide" id="wp2-solutions3-slide">
-                    <header>Template matching, our choice</header>
-                    <section>
-                        <p>
-                        </p>
-                    </section>
-                    <figure>
-                        <img id="photo" src="res/cross_correlation.png" />
-                        <figcaption>
-                            Cross correlation template matching method.
-                        </figcaption>
-                    <figure>
-                </div>
-
                 <!-- Image preprocessing -->
 
                 <div class="slide" id="wp2-preprocess1-slide">
@@ -594,6 +565,91 @@
                                 </figcaption>
                             <figure>
                         </div>
+                    </section>
+                </div>
+
+		<!--- Solution -->
+
+                <div class="slide" id="wp2-solutions2-slide">
+                    <header>Template matching, our choice</header>
+                    <section>
+                        <p>
+			    <strong>Possible methods:</strong>
+                            <ul class="bullets">
+                                <li>Squared difference</li>
+                                <li>Cross correlation</li>
+				<li>Correlation coefficient</li>
+                            </ul>
+                        </p>
+                    </section>
+                </div>
+
+                <div class="slide" id="wp2-solutions3-slide">
+                    <header>Template matching, our choice</header>
+                    <section>
+                        <p>
+                        </p>
+                    </section>
+                    <figure>
+                        <img id="photo" src="res/cross_correlation.png" />
+                        <figcaption>
+                            Correlation coefficient template matching method.
+                        </figcaption>
+                    <figure>
+                </div>
+
+                <div class="slide" id="wp2-solutions4-slide">
+                    <header>Template matching, our choice</header>
+                    <section>
+			<h2>OpenCV</h2>
+                        <p>
+			    <strong>Implementation</strong>
+                            <ul class="bullets">
+                                <li>void matchTemplate(const Mat& image, const Mat& templ, Mat& result, int method)</li>
+                                <li>void minMaxLoc(const SparseMat& src, double* minVal, double* maxVal, int* minIdx=0, int* maxIdx=0)</li>
+                            </ul>
+                        </p>
+                    </section>
+                </div>
+
+                <div class="slide" id="wp2-solutions5-slide">
+                    <header>Template matching, problems</header>
+                    <section>
+			<h2>Problems</h2>
+                        <p>
+                            <ul class="bullets">
+                                <li>No tram?</li>
+                                <li>Time consuming, ~125 ms</li>
+				<li>Scaling</li>
+                            </ul>
+			</p>
+			<h2>Solutions</h2>
+                        <p>
+                            <ul class="bullets">
+                                <li>Threshold</li>
+                                <li>Scaling the images of the video to lower resolution</li>
+				<li>Dynamic template scaling</li>
+                            </ul>
+			</p>
+                    </section>
+                </div>
+
+		<!--- Results -->
+
+                <div class="slide" id="wp2-solutions6-slide">
+                    <header>Tram detection results</header>
+                    <section>
+                        <p>
+                            <ul class="bullets">
+                                <li><strong>Speed</strong>: <em>125</em> ms each frame</li>
+                                <li><strong>Quality</strong>: Okay, initial threshold sometimes to high</li>
+			</p>
+
+			<p>
+			<strong>Known issues</strong>
+			<br><br>
+			Scalability problem: good results vs duration
+			</p>
                     </section>
                 </div>
 
